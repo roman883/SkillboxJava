@@ -25,8 +25,7 @@ public class Main {
 
                 // Получаем все дерево файлов в формате Path
                 ArrayList<Path> sourceFilesList = createAllFilesList(sourceFilesAndFolderList);
-                System.out.println("Размер всех файлов в исходной папке: " + getSizeOfFolder(sourceFilesList)[0] +
-                        " " + getSizeOfFolder(sourceFilesList)[1]);
+                System.out.println("Размер всех файлов в исходной папке : " + getSizeOfFolder(getSizeOfAllFiles(sourcePath)));
 
                 ArrayList<Path> outputParentFolderList;
                 outputParentFolderList = createTargetStructure(sourceFilesList, sourcePath, outputPath);
@@ -61,26 +60,22 @@ public class Main {
         return result;
     }
 
-    private static String[] getSizeOfFolder(ArrayList<Path> allFilesList) throws IOException {
-        double allFilesSizeByte = 0;
-        for (Path i : allFilesList) {
-            allFilesSizeByte += Files.size(i);
-        }
+    private static Long getSizeOfAllFiles (Path path) throws IOException {
+        return Files.walk(path).map(Path::toFile).filter(i -> !i.isDirectory()).mapToLong(File::length).sum();
+    }
+
+    private static String getSizeOfFolder(Long allFilesSizeByte) {
         int[] sizeMultiplier = {1, 1024, 1024 * 1024, 1024 * 1024 * 1024};
         String[] sizeMultiplierText = {"B", "kB", "MB", "GB"};
-        String[] sizeOfFolder = {"", ""};
+        String sizeOfFolder = "";
         if (allFilesSizeByte >= 0 && allFilesSizeByte < sizeMultiplier[1]) {
-            sizeOfFolder[0] = String.valueOf(allFilesSizeByte);
-            sizeOfFolder[1] = sizeMultiplierText[0];
+            sizeOfFolder = allFilesSizeByte + " " + sizeMultiplierText[0];
         } else if (allFilesSizeByte >= sizeMultiplier[1] && allFilesSizeByte < sizeMultiplier[2]) {
-            sizeOfFolder[0] = String.format("%,.3f", (allFilesSizeByte / sizeMultiplier[1]));
-            sizeOfFolder[1] = sizeMultiplierText[1];
+            sizeOfFolder = String.format("%,.3f", ((double) allFilesSizeByte / sizeMultiplier[1])) + " " + sizeMultiplierText[1];
         } else if (allFilesSizeByte >= sizeMultiplier[2] && allFilesSizeByte < sizeMultiplier[3]) {
-            sizeOfFolder[0] = String.format("%,.3f", (allFilesSizeByte / sizeMultiplier[2]));
-            sizeOfFolder[1] = sizeMultiplierText[2];
+            sizeOfFolder = String.format("%,.3f", ((double) allFilesSizeByte / sizeMultiplier[2])) + " " + sizeMultiplierText[2];
         } else {
-            sizeOfFolder[0] = String.format("%,.3f", (allFilesSizeByte / sizeMultiplier[3]));
-            sizeOfFolder[1] = sizeMultiplierText[3];
+            sizeOfFolder = String.format("%,.3f", ((double) allFilesSizeByte / sizeMultiplier[3])) + " " + sizeMultiplierText[3];
         }
         return sizeOfFolder;
     }
