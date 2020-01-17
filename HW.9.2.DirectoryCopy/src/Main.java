@@ -61,7 +61,7 @@ public class Main {
     }
 
     private static Long getSizeOfAllFiles (Path path) throws IOException {
-        return Files.walk(path).map(Path::toFile).filter(i -> !i.isDirectory()).mapToLong(File::length).sum();
+            return Files.walk(path).map(Path::toFile).filter(i -> !i.isDirectory()).mapToLong(File::length).sum();
     }
 
     private static String getSizeOfFolder(Long allFilesSizeByte) {
