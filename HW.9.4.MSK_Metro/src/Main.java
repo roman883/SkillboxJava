@@ -20,7 +20,7 @@ public class Main {
         JsonFileReader.createStationIndex();
         StationIndex stationIndexRead = JsonFileReader.getStationIndex();
         System.out.println("====== Выводим результаты по станциям и линиям ======");
-        stationIndexRead.getAllStations().forEach(System.out::println);
-        stationIndexRead.getAllLines().keySet().forEach(i -> System.out.println(i + " " + stationIndexRead.getLine(i).toString()));
+        //stationIndexRead.getAllStations().forEach(System.out::println);
+        stationIndexRead.getAllLines().keySet().forEach(i -> System.out.println(i + " " + stationIndexRead.getLine(i).getName() + ", станций всего:  " + stationIndexRead.getLine(i).getStations().size()));
     }
 }
