@@ -20,12 +20,9 @@ public class Main {
         System.out.println("1");
         Course course = session.get(Course.class, 13);
         System.out.println("2");
-        CompositeId compositeId = new CompositeId(session.get(Student.class, 4), session.get(Course.class, 13));
-        System.out.println("3");
-        System.out.println(course.getName() + " ");
-        System.out.println("id " + compositeId.toString());
-        Subscription subscription = session.get(Subscription.class, compositeId);
-//        course.getSubscriptionList().forEach(i -> i.getSubscriptionDate().toString());
+
+        Subscription subscription = session.get(Subscription.class, new CompositeId(2, 11));
+        System.out.println(subscription.getSubscriptionDate().toString() + subscription.getSubscriptionId().toString());
 
         transaction.commit();
         sessionFactory.close();

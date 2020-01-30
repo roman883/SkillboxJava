@@ -5,47 +5,47 @@ import java.util.Objects;
 @Embeddable
 public class CompositeId implements Serializable {
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Student student;
+    @Column(name = "student_id")
+    private int studentId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Course course;
+    @Column(name = "course_id")
+    private int courseId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CompositeId that = (CompositeId) o;
-        return student.equals(that.student) &&
-                course.equals(that.course);
+        return courseId == that.courseId &&
+                studentId == that.courseId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(student, course);
+        return Objects.hash(studentId, courseId);
     }
 
     public CompositeId() {
     }
 
-    public CompositeId(Student student, Course course) {
-        this.student = student;
-        this.course = course;
+    public CompositeId(int studentId, int courseId) {
+        this.studentId = studentId;
+        this.courseId = courseId;
     }
 
-    public Student getStudent() {
-        return student;
+    public int getStudentId() {
+        return studentId;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
     }
 
-    public Course getCourse() {
-        return course;
+    public int getCourseId() {
+        return courseId;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
     }
 }
