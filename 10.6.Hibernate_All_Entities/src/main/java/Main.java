@@ -17,12 +17,14 @@ public class Main {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
 
-        System.out.println("1");
-        Course course = session.get(Course.class, 13);
-        System.out.println("2");
+        Course course = session.get(Course.class, 12);
+        Student student = session.get(Student.class, 3);
+        Subscription subscription = session.get(Subscription.class, new PK(course, student));
 
-        Subscription subscription = session.get(Subscription.class, new CompositeId(2, 11));
-        System.out.println(subscription.getSubscriptionDate().toString() + subscription.getSubscriptionId().toString());
+        System.out.println(subscription.getSubscriptionDate().toString());
+
+        course.getSubscriptions().forEach(i -> System.out.println(i.getSubscriptionDate().toString() + " " +
+                i.getId().getCourse().getName() + " " + i.getId().getStudent().getName()));
 
         transaction.commit();
         sessionFactory.close();

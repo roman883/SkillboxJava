@@ -1,8 +1,9 @@
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "Teachers")
-public class Teacher {
+public class Teacher implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

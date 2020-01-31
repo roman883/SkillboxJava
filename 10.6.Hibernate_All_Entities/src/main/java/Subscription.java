@@ -6,26 +6,20 @@ import java.util.Date;
 @Table(name = "Subscriptions")
 public class Subscription implements Serializable {
 
+    public Subscription() {}
+
     @EmbeddedId
-    private CompositeId subscriptionId;
+    private PK id;
 
     @Column(name = "subscription_date")
     private Date subscriptionDate;
 
-    public Subscription() {
+    public PK getId() {
+        return id;
     }
 
-    public Subscription(CompositeId subscriptionId, Date subscriptionDate) {
-        this.subscriptionId = subscriptionId;
-        this.subscriptionDate = subscriptionDate;
-    }
-
-    public CompositeId getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setSubscriptionId(CompositeId subscriptionId) {
-        this.subscriptionId = subscriptionId;
+    public void setId(PK id) {
+        this.id = id;
     }
 
     public Date getSubscriptionDate() {
@@ -36,3 +30,4 @@ public class Subscription implements Serializable {
         this.subscriptionDate = subscriptionDate;
     }
 }
+

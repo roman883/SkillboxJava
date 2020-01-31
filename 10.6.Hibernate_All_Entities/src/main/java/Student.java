@@ -1,9 +1,10 @@
 import javax.persistence.*;
-import java.util.Date;
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Table(name = "Students")
-public class Student {
+public class Student implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +17,16 @@ public class Student {
     @Column(name = "registration_date")
     private Date registrationDate;
 
+    @OneToMany(mappedBy = "id.student", cascade = CascadeType.ALL)
+    private Set<Subscription> subscriptions = new HashSet<Subscription>();
+
+    public Set<Subscription> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(Set<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public int getId() {
         return id;

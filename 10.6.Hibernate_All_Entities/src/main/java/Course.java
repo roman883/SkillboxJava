@@ -1,8 +1,10 @@
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Table(name = "Courses")
-public class Course {
+public class Course implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +31,21 @@ public class Course {
     @Column(name = "price_per_hour")
     private float pricePerHour;
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    @JoinTable(name = "Subscriptions",
-//    joinColumns = {@JoinColumn(name = "course_id")},
-//    inverseJoinColumns = {@JoinColumn(name = "student_id")})
-//    private List<Student> students;
+    @OneToMany(mappedBy = "id.course", cascade = CascadeType.ALL)
+    private Set<Subscription> subscriptions = new HashSet<Subscription>();
+
+    public Set<Subscription> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(Set<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public Course() {
     }
 
-    public Course(int id, String name, int duration, CourseType type, String description, Teacher teacher, int studentsCount, int price, float pricePerHour) {
+    public Course(int id, String name, int duration, CourseType type, String description, Teacher teacher, int studentsCount, int price, float pricePerHour, Set<Subscription> subscriptions) {
         this.id = id;
         this.name = name;
         this.duration = duration;
@@ -48,6 +55,7 @@ public class Course {
         this.studentsCount = studentsCount;
         this.price = price;
         this.pricePerHour = pricePerHour;
+        this.subscriptions = subscriptions;
     }
 
     public int getId() {
@@ -121,4 +129,5 @@ public class Course {
     public void setPricePerHour(float pricePerHour) {
         this.pricePerHour = pricePerHour;
     }
+
 }
