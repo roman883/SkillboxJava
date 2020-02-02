@@ -59,30 +59,19 @@ public class Main {
         studentList.forEach(s -> System.out.println(s.getName() + " - " + s.getAge()));
 
         // All purchases
-        String hqlCourses = "From " + Course.class.getSimpleName();
-        String hqlStudent = "From " + Student.class.getSimpleName();
         hql = "From " + Purchase.class.getSimpleName();
         List<Purchase> purchaseList = session.createQuery(hql).getResultList();
-        List<Course> courseList = session.createQuery(hqlCourses).getResultList();
-        List<Student> students = session.createQuery(hqlStudent).getResultList();
+
         for (int i = 0; i < purchaseList.size(); i++) {
             String courseName = purchaseList.get(i).getCourseName();
             String studentName = purchaseList.get(i).getStudentName();
-            Course courseTemp = null;
-            Student studentTemp = null;
-            for (int j = 0; j < courseList.size(); j++) {
-                String tempCourseName = courseList.get(j).getName();
-                if (courseName.equals(tempCourseName)) {
-                    courseTemp = courseList.get(j);
-                }
-            }
-            for (int j = 0; j < students.size(); j++) {
-                String tempStudentName = students.get(j).getName();
-                if (studentName.equals(tempStudentName)) {
-                    studentTemp = students.get(j);
-                }
-            }
-            LinkedPurchaseList linkedPurchaseList = new LinkedPurchaseList(new LinkedPurchaseListPk(courseTemp, studentTemp));
+            String hqlCourseId = "From Course Where name = :courseName";
+            String hqlStudentId = "From Student Where name = :studentName";
+            Course courseTemp = session.createQuery(hqlCourseId, Course.class)
+                    .setParameter( "courseName", courseName ).getSingleResult();
+            Student studentId = session.createQuery(hqlStudentId, Student.class)
+                    .setParameter( "studentName", studentName ).getSingleResult();
+            LinkedPurchaseList linkedPurchaseList = new LinkedPurchaseList(new LinkedPurchaseListPk(courseTemp, studentId));
             session.save(linkedPurchaseList);
             System.out.println("Added " + linkedPurchaseList.getCourse().getId() +
                     " - " + linkedPurchaseList.getStudent().getId());
