@@ -2,7 +2,6 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
 public class Main {
 
     static int newWidth = 300;
@@ -10,6 +9,7 @@ public class Main {
     static String dstFolder = "E:/ТестФото_Out";
     static String dstFolder2 = "E:/ТестФото_Out2";
     static Queue<File> filesQueue = new ConcurrentLinkedQueue<File>();
+    static final int THREADS_COUNT = 8;
 
     public static void main(String[] args) {
         File srcDir = new File(srcFolder);
@@ -28,9 +28,9 @@ public class Main {
 
         // SuperImageResizer - уменьшение с суперсэмплингом, уменьшение за несколько проходов,
         // кратно финальному размеру фото. Шаг дробный.    Implements Runnable
-        new Thread(new SuperImgResizer(filesQueue, newWidth, dstFolder, start)).start();
-        new Thread(new SuperImgResizer(filesQueue, newWidth, dstFolder, start)).start();
-        new Thread(new SuperImgResizer(filesQueue, newWidth, dstFolder, start)).start();
-        new Thread(new SuperImgResizer(filesQueue, newWidth, dstFolder, start)).start();
+
+        for (int i = 0; i < THREADS_COUNT; i++) {
+            new Thread(new SuperImgResizer(filesQueue, newWidth, dstFolder, start)).start();
+        }
     }
 }

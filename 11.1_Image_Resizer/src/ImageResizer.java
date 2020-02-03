@@ -13,7 +13,6 @@ public class ImageResizer extends Thread {
     private String dstFolder;
     private Queue<File> files;
 
-
     public ImageResizer(Queue<File> files, int newWidth, String dstFolder, long start) {
         this.files = files;
         this.newWidth = newWidth;
