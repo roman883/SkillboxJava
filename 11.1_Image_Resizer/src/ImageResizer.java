@@ -4,16 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Queue;
 
 public class ImageResizer extends Thread {
 
-    private File[] files;
     private int newWidth;
-    private String dstFolder;
     private long start;
+    private String dstFolder;
+    private Queue<File> files;
 
 
-    public ImageResizer(File[] files, int newWidth, String dstFolder, long start) {
+    public ImageResizer(Queue<File> files, int newWidth, String dstFolder, long start) {
         this.files = files;
         this.newWidth = newWidth;
         this.dstFolder = dstFolder;
@@ -22,8 +23,10 @@ public class ImageResizer extends Thread {
 
     @Override
     public void run() {
+        File file;
         try {
-            for (File file : files) {
+            while (files.peek() != null) {
+                file = files.poll();
                 BufferedImage image = ImageIO.read(file);
                 if (image == null) {
                     continue;
@@ -47,7 +50,6 @@ public class ImageResizer extends Thread {
                 Files.deleteIfExists(Path.of(dstFolder + "/" + file.getName()));
                 File newFile = new File(dstFolder + "/" + file.getName());
                 ImageIO.write(newImage, "jpg", newFile);
-
             }
         } catch (IOException ex) {
             ex.printStackTrace();

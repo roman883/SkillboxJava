@@ -4,41 +4,43 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Queue;
 
 public class SuperImgResizer implements Runnable {
 
-    File[] files;
-    int newWidth;
-    long start;
-    String dstFolder;
+    private int newWidth;
+    private long start;
+    private String dstFolder;
+    private Queue<File> files;
 
     @Override
     public void run() {
         int width;
+        File file;
         try {
-            for (File file : files) {
+            while (files.peek() != null) {
+                file = files.poll();
                 BufferedImage image = ImageIO.read(file);
+                BufferedImage newImage;
                 if (image == null) {
                     continue;
                 }
                 if (image.getWidth() >= (newWidth * 4)) { // Уменьшаем минимум в 4 раза
                     width = 4 * newWidth;
-                    nearestNeighbour(file, width);
-                    File tempFile = new File(dstFolder + "/" + file.getName());
+                    BufferedImage tempImageX4 = nearestNeighbour(image, width);
                     width /= 2;
-                    nearestNeighbour(tempFile, width);
-                    File newFile = new File(dstFolder + "/" + tempFile.getName());
+                    BufferedImage tempImage = nearestNeighbour(tempImageX4, width);
                     width = newWidth;
-                    nearestNeighbour(newFile, width);
+                    newImage = nearestNeighbour(tempImage, width);
                 } else if (image.getWidth() >= (newWidth * 2)) { // Уменьшаем в 2-4 раза
                     width = 2 * newWidth;
-                    nearestNeighbour(file, width);
-                    File tempFile = new File(dstFolder + "/" + file.getName());
+                    BufferedImage tempImage = nearestNeighbour(image, width);
                     width = newWidth;
-                    nearestNeighbour(tempFile, width);
+                    newImage = nearestNeighbour(tempImage, width);
                 } else { // Увеличиваем (или уменьшаем менее чем в 2 раза)
-                    nearestNeighbour(file, newWidth);
+                    newImage = nearestNeighbour(image, newWidth);
                 }
+                createFile(newImage, file.getName());
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -46,8 +48,7 @@ public class SuperImgResizer implements Runnable {
         System.out.println("Finished milliseconds after start: " + (System.currentTimeMillis() - start));
     }
 
-    private void nearestNeighbour(File file, int width) throws IOException {
-        BufferedImage image = ImageIO.read(file);
+    private BufferedImage nearestNeighbour(BufferedImage image, int width) throws IOException {
         int height = (int) Math.round(
                 image.getHeight() / (image.getWidth() / (double) width)
         );
@@ -63,15 +64,19 @@ public class SuperImgResizer implements Runnable {
                 newImage.setRGB(x, y, rgb);
             }
         }
-        Files.deleteIfExists(Path.of(dstFolder + "/" + file.getName()));
-        File newFile = new File(dstFolder + "/" + file.getName());
-        ImageIO.write(newImage, "jpg", newFile);
+        return newImage;
     }
 
-    public SuperImgResizer(File[] files, int newWidth, String dstFolder, long start) {
+    public SuperImgResizer(Queue<File> files, int newWidth, String dstFolder, long start) {
         this.files = files;
         this.newWidth = newWidth;
         this.start = start;
         this.dstFolder = dstFolder;
+    }
+
+    private void createFile(BufferedImage image, String fileName) throws IOException {
+        Files.deleteIfExists(Path.of(dstFolder + "/" + fileName));
+        File newFile = new File(dstFolder + "/" + fileName);
+        ImageIO.write(image, "jpg", newFile);
     }
 }
