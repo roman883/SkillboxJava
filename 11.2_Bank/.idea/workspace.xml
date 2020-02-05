@@ -179,30 +179,30 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="765" y="205" key="#com.intellij.ide.util.MemberChooser" timestamp="1580864883296">
+    <state x="765" y="205" key="#com.intellij.ide.util.MemberChooser" timestamp="1580899975418">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="205" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1580864883296" />
+    <state x="765" y="205" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1580899975418" />
     <state x="740" y="276" key="FileChooserDialogImpl" timestamp="1580739929215">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="276" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1580739929215" />
-    <state width="1877" height="348" key="GridCell.Tab.0.bottom" timestamp="1580874846504">
+    <state width="1877" height="269" key="GridCell.Tab.0.bottom" timestamp="1580902181609">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1580874846504" />
-    <state width="1877" height="348" key="GridCell.Tab.0.center" timestamp="1580874846504">
+    <state width="1877" height="269" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1580902181609" />
+    <state width="1877" height="269" key="GridCell.Tab.0.center" timestamp="1580902181609">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1580874846504" />
-    <state width="1877" height="348" key="GridCell.Tab.0.left" timestamp="1580874846504">
+    <state width="1877" height="269" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1580902181609" />
+    <state width="1877" height="269" key="GridCell.Tab.0.left" timestamp="1580902181609">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1580874846504" />
-    <state width="1877" height="348" key="GridCell.Tab.0.right" timestamp="1580874846504">
+    <state width="1877" height="269" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1580902181609" />
+    <state width="1877" height="269" key="GridCell.Tab.0.right" timestamp="1580902181609">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1580874846504" />
+    <state width="1877" height="269" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1580902181609" />
     <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1580874846505">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -219,14 +219,18 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1580874846505" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1580857258293">
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1580886862307">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1580857258293" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1580886862307" />
     <state x="1144" y="414" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1580736217487">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1144" y="414" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1580736217487" />
+    <state x="342" y="141" key="new project wizard" timestamp="1580886935143">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="342" y="141" key="new project wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1580886935143" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

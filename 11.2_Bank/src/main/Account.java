@@ -1,14 +1,10 @@
 package main;
 
-import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
-
-public class Account
+public class Account implements Comparable<Account>
 {
     private long money;
     private String accNumber;
     private boolean isBlocked;
-    private Semaphore mutex = new Semaphore(1);
 
     public long getMoney() {
         return money;
@@ -39,13 +35,8 @@ public class Account
         isBlocked = blocked;
     }
 
-    public Semaphore getMutex() {
-        return mutex;
-    }
-
-    public void setMutex(Semaphore mutex) {
-        this.mutex = mutex;
+    @Override
+    public int compareTo(Account o) {
+        return this.getAccNumber().compareTo(o.getAccNumber());
     }
 }
-
-

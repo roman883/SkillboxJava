@@ -43,16 +43,10 @@ public class Main {
                         transferAmount = 50000 + (long) (Math.random() * Math.random() * 1000000);
                     } else {
                         transferAmount = (long) (Math.random() * 50000); } // Сумма меньше 50000
-                    // System.out.println("Поток " + finalI + " " + "Переведем " + transferCounter.get() + " cчета " +
-                    // rndmClientFrom.getAccNumber() + " " + rndmClientTo.getAccNumber() + " " + transferAmount);
                     bank.transfer(rndmClientFrom.getAccNumber(), rndmClientTo.getAccNumber(), transferAmount);
                     System.out.println("Поток " + finalI + " " + "Операция перевода №" + transferCounter.get() + " "
                             + rndmClientFrom.getAccNumber() + " -> " + rndmClientTo.getAccNumber() + " - " + transferAmount);
                 }
-                // Поскольку счетов мало (10), а транзакций много, то есть вероятность что все счета будут заблокированы
-                // Вероятность крупной транзакции 5%, тогда вероятность блокировки 2,5% (то есть для каждого счета
-                // достаточно в среднем 40 транзакций чтобы попасть в блокировку
-                // для последовательной блокировки всех счетов в среднем достаточно 40 * 10 = 400 транзакций
                 System.out.println("Список заблокированных счетов:");
                 bank.getAccounts().values().forEach(j -> {
                     if (j.isBlocked()) {
@@ -60,10 +54,8 @@ public class Main {
                     }
                 });
                 System.out.println("\n");
-
             }).start();
         }
-        System.out.println("==== Парам пам");
     }
 
     private static Account getRandomAccount() {

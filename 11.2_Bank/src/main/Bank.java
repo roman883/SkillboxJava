@@ -12,7 +12,6 @@ public class Bank {
         Thread.sleep(1000);
         return random.nextBoolean();
     }
-
     /**
      * TODO: реализовать метод. Метод переводит деньги между счетами.
      * Если сумма транзакции > 50000, то после совершения транзакции,
@@ -24,48 +23,46 @@ public class Bank {
         boolean hasToBlock = false;
         Account fromAcc = getAccount(fromAccountNum);
         Account toAcc = getAccount(toAccountNum);
+        Account lowSync;
+        Account topSync;
+        if (fromAcc.compareTo(toAcc) > 0) {
+            lowSync = fromAcc;
+            topSync = toAcc;
+        } else {
+            lowSync = toAcc;
+            topSync = fromAcc;
+        }
         try {
-            while (fromAcc.getMutex().availablePermits() < 1) {
-                Thread.sleep(700);
-            }
-            fromAcc.getMutex().acquire();
-            while (toAcc.getMutex().availablePermits() < 1) {
-                fromAcc.getMutex().release();
-                Thread.sleep(1200);
-                fromAcc.getMutex().acquire();
-            }
-            toAcc.getMutex().acquire();
-            {
-                if (isBlocked(fromAcc) || isBlocked(toAcc)) {
-                    System.out.println("Операция невозможна, счет(а) заблокирован(ы)");
-                } else {
-                    if ((fromAcc.getMoney() >= amount) && (toAcc != null)) { // Проверка достаточности денег для перевода и наличия в списпке аккаунта получателя
-                        Long tempBalance = fromAcc.getMoney();
-                        tempBalance -= amount;
-                        fromAcc.setMoney(tempBalance);
-                        tempBalance = toAcc.getMoney() + amount;
-                        toAcc.setMoney(tempBalance);
-                        if (amount > 50000) {
-                            hasToBlock = isFraud(fromAccountNum, toAccountNum, amount);
+            synchronized (lowSync) {
+                synchronized (topSync) {
+                    if (isBlocked(fromAcc) || isBlocked(toAcc)) {
+                        System.out.println("Операция невозможна, счет(а) заблокирован(ы)");
+                    } else { // Проверка достаточности денег для перевода и наличия в списпке аккаунта получателя
+                        if ((fromAcc.getMoney() >= amount) && (toAcc != null)) {
+                            Long tempBalance = fromAcc.getMoney();
+                            tempBalance -= amount;
+                            fromAcc.setMoney(tempBalance);
+                            tempBalance = toAcc.getMoney() + amount;
+                            toAcc.setMoney(tempBalance);
+                            if (amount > 50000) {
+                                hasToBlock = isFraud(fromAccountNum, toAccountNum, amount);
+                            }
+                        } else {
+                            System.out.println("Невозможно осуществить перевод. Проверьте счета и достаточность средств");
                         }
-                    } else {
-                        System.out.println("Невозможно осуществить перевод. Проверьте счета и достаточность средств");
+                    }
+                    if (hasToBlock) {
+                        blockAccounts(fromAcc, toAcc);
+                    } else if (!hasToBlock && (amount > 50000)) {
+                        System.out.println("Транзакция УСПЕШНО прошла проверку службы безопасности!");
                     }
                 }
-                if (hasToBlock) {
-                    blockAccounts(fromAcc, toAcc);
-                } else if (!hasToBlock && (amount > 50000)){
-                    System.out.println("Транзакция УСПЕШНО прошла проверку службы безопасности!");
-                }
             }
-            toAcc.getMutex().release();
-            fromAcc.getMutex().release();
         } catch (InterruptedException ex) {
             System.out.println("Получили interrupted exception");
             ex.printStackTrace();
         }
     }
-
     /**
      * TODO: реализовать метод. Возвращает остаток на счёте.
      */
@@ -125,5 +122,3 @@ public class Bank {
         accounts.remove(name, account);
     }
 }
-
-
