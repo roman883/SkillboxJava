@@ -1,10 +1,10 @@
 package main;
 
-import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Bank {
-    private HashMap<String, Account> accounts;
+    private ConcurrentHashMap<String, Account> accounts;
     private final Random random = new Random();
 
     public synchronized boolean isFraud(String fromAccountNum, String toAccountNum, long amount)
@@ -20,50 +20,58 @@ public class Bank {
      * метод isFraud. Если возвращается true, то делается блокировка
      * счетов (как – на ваше усмотрение)
      */
-    public synchronized void transfer(String fromAccountNum, String toAccountNum, long amount) {
-        // Проверка блокировки аккаунтов
+    public void transfer(String fromAccountNum, String toAccountNum, long amount) {
         boolean hasToBlock = false;
-        Account fromAcc = findAccount(fromAccountNum);
-        Account toAcc = findAccount(toAccountNum);
+        Account fromAcc = getAccount(fromAccountNum);
+        Account toAcc = getAccount(toAccountNum);
         try {
-            if (isBlocked(fromAcc) || isBlocked(toAcc)) {
-                System.out.println("Операция невозможна, счет(а) заблокирован(ы)");
-            } else {
-                // Проверка достаточности денег для перевода и наличия в списпке аккаунта получателя
-                if ((fromAcc.getMoney() >= amount) && (toAcc != null)) {
-                    // Переводим
-                    Long tempBalance = fromAcc.getMoney();
-                    tempBalance -= amount;
-                    fromAcc.setMoney(tempBalance);
-                    tempBalance = toAcc.getMoney() + amount;
-                    toAcc.setMoney(tempBalance);
-                    if (amount > 50000) {
-                        hasToBlock = isFraud(fromAccountNum, toAccountNum, amount);
-                    }
+            while (fromAcc.getMutex().availablePermits() < 1) {
+                Thread.sleep(700);
+            }
+            fromAcc.getMutex().acquire();
+            while (toAcc.getMutex().availablePermits() < 1) {
+                fromAcc.getMutex().release();
+                Thread.sleep(1200);
+                fromAcc.getMutex().acquire();
+            }
+            toAcc.getMutex().acquire();
+            {
+                if (isBlocked(fromAcc) || isBlocked(toAcc)) {
+                    System.out.println("Операция невозможна, счет(а) заблокирован(ы)");
                 } else {
-                    System.out.println("Невозможно осуществить перевод. Проверьте счета и достаточность средств");
+                    if ((fromAcc.getMoney() >= amount) && (toAcc != null)) { // Проверка достаточности денег для перевода и наличия в списпке аккаунта получателя
+                        Long tempBalance = fromAcc.getMoney();
+                        tempBalance -= amount;
+                        fromAcc.setMoney(tempBalance);
+                        tempBalance = toAcc.getMoney() + amount;
+                        toAcc.setMoney(tempBalance);
+                        if (amount > 50000) {
+                            hasToBlock = isFraud(fromAccountNum, toAccountNum, amount);
+                        }
+                    } else {
+                        System.out.println("Невозможно осуществить перевод. Проверьте счета и достаточность средств");
+                    }
+                }
+                if (hasToBlock) {
+                    blockAccounts(fromAcc, toAcc);
+                } else if (!hasToBlock && (amount > 50000)){
+                    System.out.println("Транзакция УСПЕШНО прошла проверку службы безопасности!");
                 }
             }
-        } catch (
-                InterruptedException ex) {
+            toAcc.getMutex().release();
+            fromAcc.getMutex().release();
+        } catch (InterruptedException ex) {
             System.out.println("Получили interrupted exception");
             ex.printStackTrace();
         }
-        if (hasToBlock) {
-            blockAccounts(fromAcc, toAcc);
-        }
-        else {
-            System.out.println("Транзакция УСПЕШНО прошла проверку службы безопасности!");
-        }
     }
-
 
     /**
      * TODO: реализовать метод. Возвращает остаток на счёте.
      */
     public Long getBalance(String accountNum) {
-        if (findAccount(accountNum) != null) {
-            return findAccount(accountNum).getMoney();
+        if (getAccount(accountNum) != null) {
+            return getAccount(accountNum).getMoney();
         } else {
             return null;
         }
@@ -79,7 +87,7 @@ public class Bank {
         System.out.println("Следующие счета заблокированы: " + fromAccountNumber.getAccNumber() + " " + toAccountNumber.getAccNumber());
     }
 
-    public Account findAccount(String accountNum) {
+    public Account getAccount(String accountNum) {
         for (Account account : accounts.values()) {
             if (account.getAccNumber().equals(accountNum)) {
                 return account;
@@ -89,19 +97,19 @@ public class Bank {
         return null;
     }
 
-    public Bank(HashMap<String, Account> accounts) {
+    public Bank(ConcurrentHashMap<String, Account> accounts) {
         this.accounts = accounts;
     }
 
     public Bank() {
-        accounts = new HashMap<>();
+        accounts = new ConcurrentHashMap<>();
     }
 
-    public HashMap<String, Account> getAccounts() {
+    public ConcurrentHashMap<String, Account> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(HashMap<String, Account> accounts) {
+    public void setAccounts(ConcurrentHashMap<String, Account> accounts) {
         this.accounts = accounts;
     }
 

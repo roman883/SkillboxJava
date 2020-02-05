@@ -48,22 +48,22 @@ public class BankTest extends TestCase {
 
     public void testTransferBlocked() { // Тест переводом с направлением в службу безопасности
         bank.transfer("4081765644648", "4081712564567", 62000);
-        Account petrovAccount = bank.findAccount("4081712564567");
-        Account ivanovAccount = bank.findAccount("4081765644648");
-        if (!bank.findAccount("4081712564567").isBlocked()) {
+        Account petrovAccount = bank.getAccount("4081712564567");
+        Account ivanovAccount = bank.getAccount("4081765644648");
+        if (!bank.getAccount("4081712564567").isBlocked()) {
             bank.blockAccounts(ivanovAccount, petrovAccount);
         }
         Boolean expected = true;
-        Boolean actual = bank.findAccount("4081765644648").isBlocked();
+        Boolean actual = bank.getAccount("4081765644648").isBlocked();
         assertEquals(expected, actual);
     }
 
     public void testBlockAccounts() {
-        Account petrovAccount = bank.findAccount("4081712564567");
-        Account ivanovAccount = bank.findAccount("4081765644648");
+        Account petrovAccount = bank.getAccount("4081712564567");
+        Account ivanovAccount = bank.getAccount("4081765644648");
         bank.blockAccounts(ivanovAccount, petrovAccount);
         Boolean expected = true;
-        Boolean actual = bank.findAccount("4081712564567").isBlocked();
+        Boolean actual = bank.getAccount("4081712564567").isBlocked();
         assertEquals(expected, actual);
     }
 }
