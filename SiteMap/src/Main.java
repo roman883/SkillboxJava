@@ -37,13 +37,18 @@ public class Main {
 
     private static void startWorkThread() {
         workThread = new Thread(() -> {
-            forkJoinPool = new ForkJoinPool();
+            int numberOfThreads = setNumberOfThreads();
+            if (numberOfThreads == 0) {
+                forkJoinPool = new ForkJoinPool();
+            } else {
+                forkJoinPool = new ForkJoinPool(numberOfThreads);
+            }
             startInfoThread();
             Page mainPage = forkJoinPool.invoke(new Parser(url));
             System.out.println("================================");
             isWorkFinished = true;
             System.out.println(mainPage.getPageLevel() + " " + mainPage.getUrl());
-            mainPage.getOuterLinksList().forEach(i -> System.out.println(i.getPageLevel() + " " + i.getUrl()));
+            mainPage.getSubPagesList().forEach(i -> System.out.println(i.getPageLevel() + " " + i.getUrl()));
             System.out.println("**********************\n");
             buildStringsFromPage(mainPage).forEach(System.out::print);
             System.out.println("Работа завершена " + (int) ((System.currentTimeMillis() - start) / 1000) + " c");
@@ -92,8 +97,8 @@ public class Main {
             tabString += tab;
         }
         resultList.add(tabString + page.getUrl() + "\n"); // С urlString - отобразить уровни
-        if (page.getOuterLinksList() != null) {
-            for (Page outPage : page.getOuterLinksList()) {
+        if (page.getSubPagesList() != null) {
+            for (Page outPage : page.getSubPagesList()) {
                 ArrayList<String> tempStringList = buildStringsFromPage(outPage);
                 resultList.addAll(tempStringList);
             }
@@ -110,6 +115,21 @@ public class Main {
                 return true;
             } else if (answer.equals("N") || answer.equals("NO")) {
                 return false;
+            } else {
+                System.out.println("Извините, ответ не распознан");
+            }
+        }
+    }
+
+    private static int setNumberOfThreads() {
+        for (;;) {
+            System.out.println("Введите количество создаваемых потоков (\"0\" - установит значение по умолчанию)");
+            Scanner scanner = new Scanner(System.in);
+            int answer = scanner.nextInt();
+            if (answer == 0) {
+                return 0;
+            } else if (answer > 0) {
+                return answer;
             } else {
                 System.out.println("Извините, ответ не распознан");
             }

@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Page {
 
     private String url;
-    private ArrayList<Page> outerLinksList;
+    private CopyOnWriteArrayList<Page> subPagesList;
     private int pageLevel;
 
     public Page(String url, int pageLevel) {
@@ -11,9 +12,9 @@ public class Page {
         this.pageLevel = pageLevel;
     }
 
-    public Page(String url, ArrayList<Page> outerLinksList) {
+    public Page(String url, CopyOnWriteArrayList<Page> subPagesList) {
         this.url = url;
-        this.outerLinksList = outerLinksList;
+        this.subPagesList = subPagesList;
     }
 
     public int getPageLevel() {
@@ -32,23 +33,21 @@ public class Page {
         this.url = url;
     }
 
-    public ArrayList<Page> getOuterLinksList() {
-        if (outerLinksList == null) {
+    public CopyOnWriteArrayList<Page> getSubPagesList() {
+        if (subPagesList == null) {
             return null;
         }
-        return outerLinksList;
+        return subPagesList;
     }
 
-    public void setOuterLinksList(ArrayList<Page> outerLinksList) {
-        this.outerLinksList = outerLinksList;
+    public void setSubPagesList(CopyOnWriteArrayList<Page> subPagesList) {
+        this.subPagesList = subPagesList;
     }
 
-    public void addOuterLink(Page page) {
-        if (this.outerLinksList == null) {
-            this.outerLinksList = new ArrayList<>();
+    public void addSubPage(Page page) {
+        if (this.subPagesList == null) {
+            this.subPagesList = new CopyOnWriteArrayList<>();
         }
-        this.outerLinksList.add(page);
+        this.subPagesList.add(page);
     }
 }
-
-
