@@ -3,12 +3,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
@@ -16,8 +12,8 @@ public class Parser extends RecursiveTask<Page> {
 
     private Page page;
     private String rootUrl;
-    private CopyOnWriteArraySet<String> visitedLinks;
-    private Queue<Page> queuePages;
+    private volatile Set<String> visitedLinks;
+    private volatile Queue<Page> queuePages;
     private static final String[] USER_AGENT_LIST = {
             "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36" +
                     " (KHTML, like Gecko) Chrome/66.0.3359.170 Safari/537.36 OPR/53.0.2907.68,gzip(gfe)",
@@ -33,46 +29,39 @@ public class Parser extends RecursiveTask<Page> {
     public Parser(String rootUrl) {
         this.page = new Page(rootUrl, 0);
         this.rootUrl = rootUrl;
-        this.visitedLinks = new CopyOnWriteArraySet<>();
+        this.visitedLinks = Collections.synchronizedSet(new HashSet<>());
         this.queuePages = new ConcurrentLinkedQueue<>();
-        this.queuePages.add(this.page);
+        this.visitedLinks.add(rootUrl);
     }
 
-    public Parser(Page page, String rootUrl, CopyOnWriteArraySet<String> visitedLinks) {
+    public Parser(Page page, String rootUrl, Set<String> visitedLinks, Queue<Page> queuePages) {
         this.page = page;
         this.rootUrl = rootUrl;
         this.visitedLinks = visitedLinks;
-        this.queuePages = new ConcurrentLinkedQueue<>();
-        this.queuePages.add(page);
+        this.queuePages = queuePages;
     }
 
     @Override
     protected Page compute() {
-        String currentUrl;
-        HashSet<String> links;
-        currentUrl = getUrlFromQueue();
-        links = getLinks(currentUrl); // HashSet исключит дубликаты ссылок с одной страницы
+        String currentUrl = page.getUrl();
+        HashSet<String> links = getLinks(currentUrl);
         ArrayList<Parser> taskList = new ArrayList<>();
-        for (String link : links) { // Для каждой уникальной ссылки с одной страницы
-            Page newPage = new Page(link, (page.getPageLevel() + 1));
-            queuePages.add(newPage);        } // создаем очередь из новых ссылок
+        for (String link : links) {
+            if (!visitedLinks.contains(link)) {
+                Page newPage = new Page(link, (page.getPageLevel() + 1));
+                queuePages.add(newPage);
+                visitedLinks.add(link);
+            }
+        }
         while (queuePages.peek() != null) {
             Page tempPage = queuePages.poll();
-            if (!isVisitedContains(tempPage.getUrl())) {
-                Parser task = new Parser(tempPage, rootUrl, visitedLinks); // создается задача
-                page.addSubPage(tempPage);
-                task.fork();
-                taskList.add(task);
-            }
+            Parser task = new Parser(tempPage, rootUrl, visitedLinks, queuePages); // создается задача
+            page.addSubPage(tempPage);
+            task.fork();
+            taskList.add(task);
         }
         taskList.forEach(ForkJoinTask::join);
         return page;
-    }
-
-    private synchronized String getUrlFromQueue() {
-        String currentUrl = Objects.requireNonNull(queuePages.poll()).getUrl();
-        visitedLinks.add(currentUrl);
-        return currentUrl;
     }
 
     private HashSet<String> getLinks(String url) {
@@ -107,11 +96,7 @@ public class Parser extends RecursiveTask<Page> {
     private boolean isLinkFitsUs(String link) {
         return link.startsWith(rootUrl) && !link.contains("index") && !link.endsWith(".pdf") && !link.contains("#")
                 && !link.isEmpty() && !link.endsWith(".jpg") && !link.endsWith(".png")
-                && !isVisitedContains(link) && !link.endsWith(".jpeg") && !link.endsWith(".doc") && !link.endsWith(".ico");
-    }
-
-    private synchronized boolean isVisitedContains(String url) {
-        return visitedLinks.contains(url);
+                && !link.endsWith(".jpeg") && !link.endsWith(".doc") && !link.endsWith(".ico");
     }
 
     private String[] generateRandomUserAgentReferrer() {

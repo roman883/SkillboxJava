@@ -24,7 +24,7 @@ public class Main {
 
         start = System.currentTimeMillis();
         getUrl();
-        System.out.println("\nАдрес успешно распознан, создаем карту сайта...");
+        System.out.println("\nАдрес успешно распознан");
         startWorkThread();
     }
 
@@ -43,6 +43,7 @@ public class Main {
             } else {
                 forkJoinPool = new ForkJoinPool(numberOfThreads);
             }
+            System.out.println("\nСоздаем карту сайта...");
             startInfoThread();
             Page mainPage = forkJoinPool.invoke(new Parser(url));
             System.out.println("================================");
@@ -149,17 +150,6 @@ public class Main {
             }
             writer.close();
             System.out.println("Файл " + filePath + " записан.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void writeStringToFile(String string) {
-        File file = new File("data/results.txt");
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(string);
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
