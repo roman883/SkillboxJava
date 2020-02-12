@@ -7,13 +7,13 @@ $(function(){
             .append('<div>' + taskCode + '</div>');
     };
 
-    // Loading tasks on load page
-    $.get('/tasks/', function(response)
-    {
-        for(i in response) {
-            appendTask(response[i]);
-        }
-    });
+//    // Loading tasks on load page
+//    $.get('/tasks/', function(response)
+//    {
+//        for(i in response) {
+//            appendTask(response[i]);
+//        }
+//    });
 
     // Show adding task form
     $('#show-add-task-form').click(function(){
@@ -36,11 +36,13 @@ $(function(){
                     url: '/tasks/' + taskId,
                     success: function(response) // если успешно, то добавляем в appendtask и форму скрываем
                     {
-                      var deleteLink = '<a href="#" class="delete-link" data-id="' + response.id + '">' + ' Удалить </a>';
-                      var editLink = '<a href="#" class="edit-link" data-id="' + response.id + '">' + ' Заменить задачу </a>';
+                        var spaceText = '<span>&nbsp;&nbsp;</span>';
+                      var deleteLink = '<a href="#" class="delete-link" data-id="' + response.id + '">' + ' Удалить</a>';
+                      var editLink = '<a href="#" class="edit-link" data-id="' + response.id + '">' + ' Заменить задачу</a>';
                       var patchLink = '<a href="#" class="patch-link" data-id="' + response.id + '">' + ' Изменить </a>';
                        var code = '<span>Описание: ' + response.description + '</span><br>';
-                       link.parent().append(code).append(patchLink).append(editLink).append(deleteLink); // берем ссылку, родительский метод и добавляем в конец наш код
+                       link.parent().append(code).append(spaceText).append(patchLink).append(spaceText)
+                       .append(editLink).append(spaceText).append(deleteLink); // берем ссылку, родительский метод и добавляем в конец наш код
                     },
                     error: function(response)
                     {
