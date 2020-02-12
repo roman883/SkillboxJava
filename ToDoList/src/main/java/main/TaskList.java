@@ -1,15 +1,16 @@
 package main;
 
-import response.Task;
+import main.model.Task;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskList {
 
-    private static int currentId = 1;
-    private static HashMap<Integer, Task> taskList = new HashMap<>();
+    private static AtomicInteger currentId = new AtomicInteger(1);
+    private static ConcurrentHashMap<Integer, Task> taskList = new ConcurrentHashMap<>();
 
     public static List<Task> getAllTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
@@ -18,7 +19,7 @@ public class TaskList {
     }
 
     public static int addTask(Task task) {
-        int id = currentId++;
+        int id = currentId.getAndIncrement();
         task.setId(id);
         taskList.put(id, task);
         return id;
