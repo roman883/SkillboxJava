@@ -36,7 +36,7 @@ $(function(){
                     url: '/tasks/' + taskId,
                     success: function(response) // если успешно, то добавляем в appendtask и форму скрываем
                     {
-                        var spaceText = '<span>&nbsp;&nbsp;</span>';
+                      var spaceText = '<span>&nbsp;&nbsp;</span>';
                       var deleteLink = '<a href="#" class="delete-link" data-id="' + response.id + '">' + ' Удалить</a>';
                       var editLink = '<a href="#" class="edit-link" data-id="' + response.id + '">' + ' Заменить задачу</a>';
                       var patchLink = '<a href="#" class="patch-link" data-id="' + response.id + '">' + ' Изменить </a>';
@@ -89,7 +89,7 @@ $(function(){
             {
                 $('#task-form').css('display', 'none');
                 var task = {};
-                task.id = response; // возвращает не объект а число
+                task.id = response.id;
                 var dataArray = $('#task-form form').serializeArray();
                 for(i in dataArray) {
                     task[dataArray[i]['name']] = dataArray[i]['value'];
@@ -117,7 +117,7 @@ $(function(){
                        alert('Задача успешно изменена! Обновите страницу');
                        $('#task-put-form').css('display', 'none');
                        var task = {};
-                       task.id = response; // возвращает не объект а число
+                       task.id = response.id;
                        var dataArray = $('#task-put-form form').serializeArray();
                        for(i in dataArray) {
                            task[dataArray[i]['name']] = dataArray[i]['value'];
@@ -153,7 +153,7 @@ $(function(){
                            alert('Задача успешно изменена! Обновите страницу');
                            $('#task-patch-form').css('display', 'none');
                            var task = {};
-                           task.id = response; // возвращает не объект а число
+                           task.id = response.id;
                            var dataArray = $('#task-patch-form form').serializeArray();
                            for(i in dataArray) {
                                task[dataArray[i]['name']] = dataArray[i]['value'];

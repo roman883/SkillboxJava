@@ -26,7 +26,7 @@ public class DefaultController {
         taskRepository.findAll().forEach(tasks::add);
         model.addAttribute("tasks", tasks);
         model.addAttribute("tasksCount", tasks.size());
-        model.addAttribute("someParameter", someParameter);
+//        model.addAttribute("someParameter", someParameter);
             return "index";
 
     }

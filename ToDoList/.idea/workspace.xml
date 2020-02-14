@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f8547cd3-e21e-4212-802f-dd2714a023a0" name="Default Changelist" comment="" />
+    <list default="true" id="f8547cd3-e21e-4212-802f-dd2714a023a0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/DefaultController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/DefaultController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/main0.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/main0.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/DefaultController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/DefaultController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/TaskController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/TaskController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/TaskList.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/TaskList.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/model/Task.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/model/Task.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main/model/TaskRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/model/TaskRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/js/main0.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/js/main0.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,6 +29,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="MavenImportPreferences">
     <option name="importingSettings">
       <MavenImportingSettings>
@@ -29,6 +45,7 @@
     <option name="jreName" value="11" />
   </component>
   <component name="ProjectId" id="1XSyPi6PKXOjhuA1RIpXZl9FEdZ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -37,6 +54,7 @@
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
@@ -102,38 +120,47 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="613" y="446" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581479125187" />
-    <state width="1877" height="341" key="GridCell.Tab.0.bottom" timestamp="1581515665639">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="186" y="92" key="DiffContextDialog" timestamp="1581648476725">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="186" y="92" key="DiffContextDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581648476725" />
+    <state width="1875" height="341" key="GridCell.Tab.0.bottom" timestamp="1581647528444">
+      <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="341" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581515665639" />
-    <state width="1875" height="281" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1581403414773" />
-    <state width="1877" height="341" key="GridCell.Tab.0.center" timestamp="1581515665639">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1875" height="341" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1581647528444" />
+    <state width="1875" height="341" key="GridCell.Tab.0.center" timestamp="1581647528444">
+      <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="341" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581515665639" />
-    <state width="1875" height="281" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1581403414772" />
-    <state width="1877" height="341" key="GridCell.Tab.0.left" timestamp="1581515665638">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1875" height="341" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1581647528444" />
+    <state width="1875" height="341" key="GridCell.Tab.0.left" timestamp="1581647528444">
+      <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="341" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581515665638" />
-    <state width="1875" height="281" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1581403414772" />
-    <state width="1877" height="341" key="GridCell.Tab.0.right" timestamp="1581515665639">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1875" height="341" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1581647528444" />
+    <state width="1875" height="341" key="GridCell.Tab.0.right" timestamp="1581647528444">
+      <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="341" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581515665639" />
-    <state width="1875" height="281" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1581403414773" />
+    <state width="1875" height="341" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1581647528444" />
     <state x="440" y="95" key="SettingsEditor" timestamp="1581479951982">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="440" y="95" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1581479951982" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1581513163576">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1581648409258">
+      <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581513163576" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581648409258" />
     <state x="602" y="136" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1581399950311">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="602" y="136" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/2.0.1918.1040@2.0.1918.1040" timestamp="1581399950311" />
+    <state x="721" y="234" key="git4idea.branch.GitSmartOperationDialog" timestamp="1581648479071">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="721" y="234" key="git4idea.branch.GitSmartOperationDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581648479071" />
     <state x="667" y="140" key="refactoring.ChangeSignatureDialog" timestamp="1581340031485">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
