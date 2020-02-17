@@ -23,9 +23,7 @@ public class RepositoryService {
 
     public ResponseEntity addTask(Task task) {
         Task tempTask;
-        synchronized (taskRepository) {
-            tempTask = taskRepository.save(task);
-        }
+        tempTask = taskRepository.save(task);
         return new ResponseEntity(tempTask, HttpStatus.CREATED);
     }
 
@@ -41,12 +39,10 @@ public class RepositoryService {
     public ResponseEntity putTask(int id, String name, String description) {
         try {
             Task task;
-            synchronized (taskRepository) {
-                task = taskRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-                task.setDescription(description);
-                task.setName(name);
-                taskRepository.save(task);
-            }
+            task = taskRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+            task.setDescription(description);
+            task.setName(name);
+            taskRepository.save(task);
             return new ResponseEntity(task, HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -56,16 +52,14 @@ public class RepositoryService {
     public ResponseEntity patchTask(int id, String name, String description) {
         try {
             Task task;
-            synchronized (taskRepository) {
-                task = taskRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-                if (!description.equals("")) {
-                    task.setDescription(description);
-                }
-                if (!name.equals("")) {
-                    task.setName(name);
-                }
-                taskRepository.save(task);
+            task = taskRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+            if (!description.equals("")) {
+                task.setDescription(description);
             }
+            if (!name.equals("")) {
+                task.setName(name);
+            }
+            taskRepository.save(task);
             return new ResponseEntity(task, HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -73,12 +67,24 @@ public class RepositoryService {
     }
 
     public ResponseEntity deleteTask(int id) {
-        synchronized (taskRepository) {
-            if (taskRepository.existsById(id)) {
-                taskRepository.deleteById(id);
-                return ResponseEntity.status(HttpStatus.OK).body(null);
-            }
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(null);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    public ResponseEntity deleteAllTasks() {
+        if (taskRepository.count() > 0) {
+            String allTasksCount = String.valueOf(taskRepository.count());
+            try {
+                taskRepository.deleteAll();
+                return ResponseEntity.status(HttpStatus.OK).body(allTasksCount);
+            } catch (Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }

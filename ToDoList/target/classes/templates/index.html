@@ -19,8 +19,6 @@
         <input type="text" name="description" value="">
         <hr>
         <button class="btn" id="save-task">Сохранить</button>
-<!--        <hr>-->
-<!--        <button class="close-button" id="close-add-task-form">Закрыть</button>-->
     </form>
 </div>
 
@@ -33,8 +31,6 @@
         <input type="text" name="description" value="">
         <hr>
         <button class="btn" id="edit-task">Сохранить</button>
-<!--        <hr>-->
-<!--        <button class="close-button" id="close-task-put-form">Закрыть</button>-->
     </form>
 </div>
 
@@ -47,20 +43,19 @@
         <input type="text" name="description" value="">
         <hr>
         <button class="btn" id="patch-task">Сохранить</button>
-<!--        <hr>-->
-<!--        <button class="close-button" id="close-task-patch-form">Закрыть</button>-->
     </form>
 </div>
 
 
 <h1>Список задач (<span th:text="${tasksCount}">0</span>)</h1>
 <button class="open-button" id="show-add-task-form">Добавить задачу</button>
+<button class="clear-button" id="clear-all-tasks-button">Очистить список задач</button>
 <br><br>
 <div class="task-list" id="task-list">
     <div th:each="task : ${tasks}">
         <a href="#" class="task-link" th:attr="data-id=${task.id}" th:text="${task.name}"></a>
     </div>
 </div>
-<p th:text="${someParameter}"></p>
+<!--<p th:text="${someParameter}"></p>-->
 </body>
 </html>

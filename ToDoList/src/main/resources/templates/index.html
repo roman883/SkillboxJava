@@ -49,6 +49,7 @@
 
 <h1>Список задач (<span th:text="${tasksCount}">0</span>)</h1>
 <button class="open-button" id="show-add-task-form">Добавить задачу</button>
+<button class="clear-button" id="clear-all-tasks-button">Очистить список задач</button>
 <br><br>
 <div class="task-list" id="task-list">
     <div th:each="task : ${tasks}">

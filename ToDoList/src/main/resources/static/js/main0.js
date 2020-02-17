@@ -53,7 +53,7 @@ $(function(){
              $.ajax({ // методом DELETE
                         method: "DELETE",
                         url: '/tasks/' + taskId,
-                        success: function(response) // если успешно, то добавляем в appendTask и форму скрываем
+                        success: function(response)
                         {
                            alert('Задача успешно удалена! Пожалуйста обновите страницу.');
                         },
@@ -163,4 +163,29 @@ $(function(){
                             return false;
                     });
                     })
+
+    // CLEAR TASK LIST
+    $('#clear-all-tasks-button').click(function(){
+            $.ajax({
+                method: "DELETE",
+                url: '/tasks/',
+                success: function(response)
+                {
+                    var stringAlert = 'Список задачи очищен! Удалено задач: ' + response + ' Пожалуйста обновите страницу.';
+                    alert(stringAlert);
+                },
+                 error: function(response)
+                {
+                 if(response.status == 404) {
+                    alert('Задачи не найдены!');
+                 } else if (response.status == 500) {
+                    alert('Не удалось очистить список задач!');
+                 }
+                 else {
+                    alert('Что-то пошло не так!');
+                    }
+                 }
+                });
+                return true;
+        });
 })
