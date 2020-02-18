@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import main.model.Task;
 import service.RepositoryService;
 
+import java.util.ArrayList;
+
 @RestController
 @ComponentScan("service")
 public class TaskController {
@@ -19,22 +21,22 @@ public class TaskController {
     }
 
     @GetMapping(value = "/tasks/") // @RequestMapping(value = "/tasks/", method = RequestMethod.GET)
-    public ResponseEntity list() {
+    public ResponseEntity<ArrayList<Task>> list() {
         return repositoryService.getAllTasks();
     }
 
     @PostMapping(value = "/tasks/")
-    public ResponseEntity add(Task task) {
+    public ResponseEntity<Task> add(Task task) {
         return repositoryService.addTask(task);
     }
 
     @GetMapping("/tasks/{id}")
-    public ResponseEntity get(@PathVariable int id) {
+    public ResponseEntity<Task> get(@PathVariable int id) {
        return repositoryService.getTask(id);
     }
 
     @PutMapping(value = "/tasks/{id}", params = {"name", "description"})
-    public @ResponseBody ResponseEntity put(
+    public @ResponseBody ResponseEntity<Task> put(
             @PathVariable int id,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "description") String description) {
@@ -42,8 +44,7 @@ public class TaskController {
     }
 
     @PatchMapping(value = "/tasks/{id}", params = {"name", "description"})
-    public @ResponseBody
-    ResponseEntity patch(
+    public @ResponseBody ResponseEntity<Task> patch(
             @PathVariable int id,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "description") String description) {
@@ -51,7 +52,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/tasks/{id}")
-    public ResponseEntity delete(@PathVariable int id) {
+    public ResponseEntity<?> delete(@PathVariable int id) {
         return repositoryService.deleteTask(id);
     }
 }

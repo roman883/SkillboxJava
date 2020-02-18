@@ -25,13 +25,12 @@ public class TaskListController {
     }
 
     @DeleteMapping("/tasks/")
-    public ResponseEntity delete() {
+    public ResponseEntity<String> delete() {
         return repositoryService.deleteAllTasks();
     }
 
     @RequestMapping("/")
     public String index(Model model) {
-
         ArrayList<Task> tasks = (ArrayList<Task>) repositoryService.getAllTasks().getBody();
         model.addAttribute("tasks", tasks);
         model.addAttribute("tasksCount", tasks.size());

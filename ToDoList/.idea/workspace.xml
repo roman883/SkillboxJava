@@ -3,23 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f8547cd3-e21e-4212-802f-dd2714a023a0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main/DefaultController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/DefaultController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/TaskController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/TaskController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/TaskListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/TaskListController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/service/RepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/RepositoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/main0.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/main0.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/DefaultController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/TaskController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/TaskController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/TaskList.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/TaskList.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/model/Task.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/model/Task.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main/model/TaskRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main/model/TaskRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/service/RepositoryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/RepositoryService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/js/main0.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/js/main0.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/toDoList-1.0-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/toDoList-1.0-SNAPSHOT.jar.original" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,25 +130,25 @@
     </state>
     <state x="613" y="446" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581479125187" />
     <state x="614" y="446" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581643579232" />
-    <state width="1875" height="300" key="GridCell.Tab.0.bottom" timestamp="1581906306449">
-      <screen x="2" y="0" width="1918" height="1040" />
+    <state width="1877" height="300" key="GridCell.Tab.0.bottom" timestamp="1581992549036">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="341" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581493414819" />
+    <state width="1877" height="300" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1581992549036" />
     <state width="1875" height="300" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1581906306449" />
-    <state width="1875" height="300" key="GridCell.Tab.0.center" timestamp="1581906306449">
-      <screen x="2" y="0" width="1918" height="1040" />
+    <state width="1877" height="300" key="GridCell.Tab.0.center" timestamp="1581992549036">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="341" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581493414819" />
+    <state width="1877" height="300" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1581992549036" />
     <state width="1875" height="300" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1581906306449" />
-    <state width="1875" height="300" key="GridCell.Tab.0.left" timestamp="1581906306449">
-      <screen x="2" y="0" width="1918" height="1040" />
+    <state width="1877" height="300" key="GridCell.Tab.0.left" timestamp="1581992549036">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="341" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581493414819" />
+    <state width="1877" height="300" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1581992549036" />
     <state width="1875" height="300" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1581906306449" />
-    <state width="1875" height="300" key="GridCell.Tab.0.right" timestamp="1581906306449">
-      <screen x="2" y="0" width="1918" height="1040" />
+    <state width="1877" height="300" key="GridCell.Tab.0.right" timestamp="1581992549036">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="341" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581493414819" />
+    <state width="1877" height="300" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1581992549036" />
     <state width="1875" height="300" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1581906306449" />
     <state x="440" y="95" key="SettingsEditor" timestamp="1581479951982">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -172,11 +158,11 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="94" y="92" width="1734" height="856" key="com.intellij.dvcs.ui.CompareBranchesDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581649155751" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1581906061058">
-      <screen x="2" y="0" width="1918" height="1040" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1581992401559">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581496106217" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581906061058" />
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581992401559" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1581906991469" />
     <state x="602" y="136" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1581399950311">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>

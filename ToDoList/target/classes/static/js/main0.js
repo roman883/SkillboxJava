@@ -171,7 +171,7 @@ $(function(){
                 url: '/tasks/',
                 success: function(response)
                 {
-                    var stringAlert = 'Список задачи очищен! Удалено задач:' + response + ' Пожалуйста обновите страницу.';
+                    var stringAlert = 'Список задачи очищен! Удалено задач: ' + response + ' Пожалуйста обновите страницу.';
                     alert(stringAlert);
                 },
                  error: function(response)
