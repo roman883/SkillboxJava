@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3e5b963a-394b-4764-bd53-7b1322b3e460" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="11" />
+  </component>
+  <component name="ProjectId" id="1Y0QLdP0czTNpOjrcOPi4Uqr1el" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="settings.editor.selected.configurable" value="com.intellij.jarRepository.settings.RemoteRepositoriesConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="Shop" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3e5b963a-394b-4764-bd53-7b1322b3e460" name="Default Changelist" comment="" />
+      <created>1582076976464</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1582076976464</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="691" y="276" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1582084739032">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="691" y="276" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582084739032" />
+    <state width="1875" height="348" key="GridCell.Tab.0.bottom" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.0.center" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.0.left" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.0.right" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1582182714699">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714699" />
+    <state width="1875" height="348" key="GridCell.Tab.1.center" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.1.left" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="348" key="GridCell.Tab.1.right" timestamp="1582182714698">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="600" height="424" key="javadoc.popup" timestamp="1582095776428">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="537" height="264" key="javadoc.popup.new" timestamp="1582095790082">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="537" height="264" key="javadoc.popup.new/2.0.1918.1040@2.0.1918.1040" timestamp="1582095790082" />
+    <state width="600" height="424" key="javadoc.popup/2.0.1918.1040@2.0.1918.1040" timestamp="1582095776428" />
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1582100125541">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup/2.0.1918.1040@2.0.1918.1040" timestamp="1582100125541" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="Main.shopCollection" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>
