@@ -62,7 +62,7 @@ public class Main {
                 }
                 document.append(SHOP_NAME, command[1]).append(ITEM_LIST, Collections.emptyList());
                 shopCollection.insertOne(document);
-                System.out.println("Добавлен магазин " + document);
+                System.out.println("Добавлен магазин " + document.get(SHOP_NAME));
                 break;
             case (INSERT_ITEM_COMMAND):
                 Document foundItem = getItem(command[1]); // Проверка наличия такого товара в базе
@@ -72,7 +72,7 @@ public class Main {
                 }
                 document.append(ITEM_NAME, command[1]).append(ITEM_PRICE, Integer.parseInt(command[2]));
                 itemCollection.insertOne(document);
-                System.out.println("Добавлен товар " + document);
+                System.out.println("Добавлен товар " + document.get(ITEM_NAME));
                 break;
             case (INSERT_ITEM_TO_SHOP_COMMAND):
                 foundItem = getItem(command[1]);
@@ -104,6 +104,11 @@ public class Main {
                     System.out.println("\t- наименьшая цена товара - " + d.get("minPrice"));
                     System.out.println("\t- средняя цена товара - " + d.get("avgPrice"));
                 }
+                AggregateIterable<Document> itemListBelow100 = getItemsBelow100();
+                for (Document d : itemListBelow100) {
+                    System.out.println("Данные для магазина " + d.get("_id") + ":");
+                    System.out.println("\t- общее количество наименований товара, с ценой ниже 100 - " + d.get("countItems"));
+                }
                 System.out.println("-------------------------------");
                 break;
             case (CLEAN_COMMAND):
@@ -126,6 +131,17 @@ public class Main {
                         Accumulators.avg("avgPrice", "$itemList." + ITEM_PRICE),
                         Accumulators.max("maxPrice", "$itemList." + ITEM_PRICE),
                         Accumulators.min("minPrice", "$itemList." + ITEM_PRICE))));
+    }
+
+    private static AggregateIterable<Document> getItemsBelow100() {
+        return shopCollection.aggregate(Arrays.asList(
+                Aggregates.lookup(                                      // Соединяем с данными из коллекции по товарам по названию товара
+                        itemCollection.getNamespace().getCollectionName(), ITEM_LIST, ITEM_NAME, "itemList"),
+                // разбиваем полученные массивы с документами с ценами товаров
+                Aggregates.unwind("$" + "itemList", new UnwindOptions().preserveNullAndEmptyArrays(true)),
+                Aggregates.match(lt("itemList." + ITEM_PRICE, 100)),
+                Aggregates.group("$" + SHOP_NAME,                   // группируем статистику по магазинам
+                        Accumulators.sum("countItems", 1))));
     }
 
     private static String getInputLine() {

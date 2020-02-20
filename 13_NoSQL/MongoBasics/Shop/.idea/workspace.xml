@@ -69,22 +69,22 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="691" y="276" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582084739032" />
-    <state width="1875" height="348" key="GridCell.Tab.0.bottom" timestamp="1582182714698">
+    <state width="1875" height="248" key="GridCell.Tab.0.bottom" timestamp="1582184436178">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="348" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
-    <state width="1875" height="348" key="GridCell.Tab.0.center" timestamp="1582182714698">
+    <state width="1875" height="248" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582184436178" />
+    <state width="1875" height="248" key="GridCell.Tab.0.center" timestamp="1582184436178">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="348" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
-    <state width="1875" height="348" key="GridCell.Tab.0.left" timestamp="1582182714698">
+    <state width="1875" height="248" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582184436178" />
+    <state width="1875" height="248" key="GridCell.Tab.0.left" timestamp="1582184436178">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="348" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
-    <state width="1875" height="348" key="GridCell.Tab.0.right" timestamp="1582182714698">
+    <state width="1875" height="248" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582184436178" />
+    <state width="1875" height="248" key="GridCell.Tab.0.right" timestamp="1582184436178">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="348" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state width="1875" height="248" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582184436178" />
     <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1582182714699">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
@@ -101,6 +101,10 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1875" height="348" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582182714698" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582182979038">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582182979038" />
     <state width="600" height="424" key="javadoc.popup" timestamp="1582095776428">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
