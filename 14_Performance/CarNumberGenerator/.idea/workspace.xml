@@ -27,6 +27,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571378817833" />
     <property name="dynamic.classpath" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -34,8 +35,7 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="recentsLimit" value="5" />
-    <property name="settings.editor.selected.configurable" value="File.Encoding" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -49,7 +49,7 @@
       <recent name="C:\Users\Danya\Documents\Development\Idea Projects\CarNumberGenerator\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.LoaderThreadsOptim">
+  <component name="RunManager" selected="Application.GenerateWriteMultiThreads">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -97,16 +97,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Concatenation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Concatenation" />
+    <configuration name="GenerateWriteMultiThreads" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="GenerateWriteMultiThreads" />
       <module name="CarNumberGenerator" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Loader" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Loader" />
+    <configuration name="Generator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Generator" />
       <module name="CarNumberGenerator" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -124,7 +124,15 @@
     <configuration name="LoaderThreadsOptim" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="LoaderThreadsOptim" />
       <module name="CarNumberGenerator" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="VM_PARAMETERS" value="-Xmx2048m" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="CarNumberGenerator" />
+      <option name="VM_PARAMETERS" value="-Xmx1024m" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -161,19 +169,33 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.Loader" />
-      <item itemvalue="Application.Concatenation" />
       <item itemvalue="Application.LoaderThreads" />
       <item itemvalue="Application.LoaderThreadsOptim" />
+      <item itemvalue="Application.Generator" />
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.GenerateWriteMultiThreads" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.GenerateWriteMultiThreads" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Generator" />
         <item itemvalue="Application.LoaderThreadsOptim" />
         <item itemvalue="Application.LoaderThreads" />
-        <item itemvalue="Application.Loader" />
-        <item itemvalue="Application.Concatenation" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -189,26 +211,83 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1875" height="156" key="GridCell.Tab.0.bottom" timestamp="1582260766055">
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582421346413">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="156" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582260766055" />
-    <state width="1875" height="156" key="GridCell.Tab.0.center" timestamp="1582260766055">
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582421346413" />
+    <state x="488" y="74" key="#com.intellij.ide.util.MemberChooser" timestamp="1582419459388">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="488" y="74" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1582419459388" />
+    <state x="531" y="253" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1582416309849">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="531" y="253" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1366.728@0.0.1366.728" timestamp="1582416309849" />
+    <state x="716" y="224" key="#xdebugger.evaluate" timestamp="1582338248748">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="156" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582260766055" />
-    <state width="1875" height="156" key="GridCell.Tab.0.left" timestamp="1582260766055">
+    <state x="716" y="224" key="#xdebugger.evaluate/2.0.1918.1040@2.0.1918.1040" timestamp="1582338248748" />
+    <state width="430" height="466" key="DebuggerActiveHint" timestamp="1582338363105">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="156" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582260766055" />
-    <state width="1875" height="156" key="GridCell.Tab.0.right" timestamp="1582260766055">
+    <state width="430" height="466" key="DebuggerActiveHint/2.0.1918.1040@2.0.1918.1040" timestamp="1582338363105" />
+    <state width="1875" height="253" key="GridCell.Tab.0.bottom" timestamp="1582434110986">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="156" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582260766055" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582249018864">
+    <state width="1323" height="179" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1582420532174" />
+    <state width="1875" height="253" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.center" timestamp="1582434110986">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1582420532173" />
+    <state width="1875" height="253" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.left" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1582420532173" />
+    <state width="1875" height="253" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.right" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1582420532174" />
+    <state width="1875" height="253" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1582374811952">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811952" />
+    <state width="1875" height="348" key="GridCell.Tab.1.center" timestamp="1582374811951">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811951" />
+    <state width="1875" height="348" key="GridCell.Tab.1.left" timestamp="1582374811951">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811951" />
+    <state width="1875" height="348" key="GridCell.Tab.1.right" timestamp="1582374811952">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811952" />
+    <state x="441" y="95" key="SettingsEditor" timestamp="1582360807670">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="441" y="95" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1582360807670" />
+    <state x="466" y="242" key="com.intellij.ide.util.TipDialog" timestamp="1582416284860">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="466" y="242" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1582416284860" />
     <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582249018864" />
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1582360544467">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup/2.0.1918.1040@2.0.1918.1040" timestamp="1582360544467" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="letters" />
+        <watch expression="((OutputStreamWriter)((BufferedWriter)printWriter.out).out).writeBuffer" language="JAVA" custom="java.io.OutputStreamWriter,java.io.BufferedWriter" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />

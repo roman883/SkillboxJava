@@ -45,7 +45,7 @@ public class LoaderThreadsOptim {
                     return builder;
                 }
             });
-        list.add(futureTask);
+            list.add(futureTask);
         }
         // Наполнили ArrayList Future<StringBuilder>-ами и теперь все разом записываем
         PrintWriter printWriter = new PrintWriter("res/numbers.threads.txt");
