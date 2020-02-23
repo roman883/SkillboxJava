@@ -5,6 +5,8 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,8 +22,9 @@ public class Loader
 
     public static void main(String[] args) throws Exception
     {
-        String fileName = "res/data-1M.xml";
+        String fileName = "res/data-18M.xml";
 
+        long memoryUsageDOM = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Current memory
         parseFile(fileName);
 
         //Printing results
@@ -40,13 +43,37 @@ public class Loader
                 System.out.println("\t" + voter + " - " + count);
             }
         }
+        memoryUsageDOM = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageDOM;
+        System.out.println("===============\nИспользовано памяти DOM-парсер - " + memoryUsageDOM / (1_048_576) + " MБ");
+
+        // SAXparser
+        long memoryUsageSAX = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Сейчас памяти занято
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        XmlHandler handler = new XmlHandler();
+        saxParser.parse(new File(fileName), handler);
+        handler.duplicatedVoters();
+        memoryUsageSAX = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageSAX;
+        System.out.println("===============\nИспользовано памяти SAX-парсер - " + memoryUsageSAX / (1_048_576) + " MБ");
+
+        // SAXparser в качестве хранилища массив
+        long memoryUsageSAXArray = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Сейчас памяти занято
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        SAXParser newSAXParser = saxParserFactory.newSAXParser();
+        XmlHandlerArray handlerArray = new XmlHandlerArray();
+        newSAXParser.parse(new File(fileName), handlerArray);
+        handlerArray.duplicatedVoters();
+        memoryUsageSAXArray = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageSAXArray;
+//        System.out.println("===============\nИспользовано памяти DOM-парсер - " + memoryUsageDOM / (1_048_576) + " MБ");
+//        System.out.println("===============\nИспользовано памяти SAX-парсер - " + memoryUsageSAX / (1_048_576) + " MБ");
+        System.out.println("===============\nИспользовано памяти SAX-парсера с хранилищем в массиве - " + memoryUsageSAXArray / (1_048_576) + " MБ");
     }
 
     private static void parseFile(String fileName) throws Exception
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new File(fileName));
+        Document doc = db.parse(new File(fileName)); // DOM (Document Object Model)
 
         findEqualVoters(doc);
         fixWorkTimes(doc);
