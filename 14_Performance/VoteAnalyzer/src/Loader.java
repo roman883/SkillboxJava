@@ -1,120 +1,77 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.Scanner;
 
-public class Loader
-{
-    private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private static SimpleDateFormat visitDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+public class Loader {
 
-    private static HashMap<Integer, WorkTime> voteStationWorkTimes = new HashMap<>();
-    private static HashMap<Voter, Integer> voterCounts = new HashMap<>();
+    public static void main(String[] args) throws Exception {
+        String fileName = "E:/data-1572M.xml";
 
-    public static void main(String[] args) throws Exception
-    {
-        String fileName = "res/data-18M.xml";
-
-        long memoryUsageDOM = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Current memory
+        long time = System.currentTimeMillis(); // Общее время работы
+        long memoryUsage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Current memory
+        // SAXparser - parse and upload
+        long timeParseAndUpload = System.currentTimeMillis();
         parseFile(fileName);
+        System.out.println("=> Файл спарсен и загружен в БД за " + (System.currentTimeMillis() - timeParseAndUpload) + " мс");
 
-        //Printing results
-        System.out.println("Voting station work times: ");
-        for(Integer votingStation : voteStationWorkTimes.keySet())
-        {
-            WorkTime workTime = voteStationWorkTimes.get(votingStation);
-            System.out.println("\t" + votingStation + " - " + workTime);
+        System.out.println("=> Проголосовали более одного раза:");
+        DBConnection.printVoterCounts();
+
+        // Поиск по БД
+        String personName = "Ванчиков Теймураз";
+        searchPerson(personName);
+
+        System.out.println("=> Поиск станции по номеру в БД:");
+        Integer stationNumber = 18;
+        System.out.println(DBConnection.serchStation(stationNumber));
+        System.out.println("------------------");
+
+        showAllStations();
+
+        memoryUsage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsage;
+        System.out.println("===============\n=> Использовано памяти - " + memoryUsage / (1_048_576) + " MБ");
+        System.out.println("=> Общее время работы " + (System.currentTimeMillis() - time) + " мс");
+    }
+
+    private static void searchPerson(String name) throws SQLException {
+        long timeCustomSelectWorks = System.currentTimeMillis();
+        int searchResult = DBConnection.CustomSelect(name);
+        System.out.println("Поиск человека по БД отработал за " + (System.currentTimeMillis() - timeCustomSelectWorks) + " мс");
+        if (searchResult == -1) {
+            System.out.println(name + " - Отсутствует в БД");
+        } else {
+            System.out.println("Для " + name + ", id: " + searchResult);
         }
+        System.out.println("-----------------------");
+    }
 
-        System.out.println("Duplicated voters: ");
-        for(Voter voter : voterCounts.keySet())
-        {
-            Integer count = voterCounts.get(voter);
-            if(count > 1) {
-                System.out.println("\t" + voter + " - " + count);
+    private static void parseFile(String fileName) throws Exception {
+        // Парсим файл с данными и загружаем в БД. Используем SAXparser, multiInsert, StringBuilder
+        // При загрузке задаем индекс - имя и составной индекс - имя+дата_рождения
+        SAXParserFactory factoryX = SAXParserFactory.newInstance();
+        SAXParser SAXparserX = factoryX.newSAXParser();
+        XmlHandler handlerX = new XmlHandler();
+        SAXparserX.parse(new File(fileName), handlerX);
+        DBConnection.uploadLastPartStringbuilders();
+    }
+
+    private static void showAllStations() throws SQLException {
+        System.out.println("Вы хотите вывести время работы всех станций? (Y/N)");
+        while (true) {
+            Scanner scanner = new Scanner(System.in);
+            String answer = scanner.nextLine();
+            if (answer.trim().toUpperCase().equals("Y")) {
+                DBConnection.printStations();
+                break;
             }
-        }
-        memoryUsageDOM = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageDOM;
-        System.out.println("===============\nИспользовано памяти DOM-парсер - " + memoryUsageDOM / (1_048_576) + " MБ");
-
-        // SAXparser
-        long memoryUsageSAX = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Сейчас памяти занято
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser saxParser = factory.newSAXParser();
-        XmlHandler handler = new XmlHandler();
-        saxParser.parse(new File(fileName), handler);
-        handler.duplicatedVoters();
-        memoryUsageSAX = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageSAX;
-        System.out.println("===============\nИспользовано памяти SAX-парсер - " + memoryUsageSAX / (1_048_576) + " MБ");
-
-        // SAXparser в качестве хранилища массив
-        long memoryUsageSAXArray = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); // Сейчас памяти занято
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-        SAXParser newSAXParser = saxParserFactory.newSAXParser();
-        XmlHandlerArray handlerArray = new XmlHandlerArray();
-        newSAXParser.parse(new File(fileName), handlerArray);
-        handlerArray.duplicatedVoters();
-        memoryUsageSAXArray = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - memoryUsageSAXArray;
-//        System.out.println("===============\nИспользовано памяти DOM-парсер - " + memoryUsageDOM / (1_048_576) + " MБ");
-//        System.out.println("===============\nИспользовано памяти SAX-парсер - " + memoryUsageSAX / (1_048_576) + " MБ");
-        System.out.println("===============\nИспользовано памяти SAX-парсера с хранилищем в массиве - " + memoryUsageSAXArray / (1_048_576) + " MБ");
-    }
-
-    private static void parseFile(String fileName) throws Exception
-    {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new File(fileName)); // DOM (Document Object Model)
-
-        findEqualVoters(doc);
-        fixWorkTimes(doc);
-    }
-
-    private static void findEqualVoters(Document doc) throws Exception
-    {
-        NodeList voters = doc.getElementsByTagName("voter");
-        int votersCount = voters.getLength();
-        for(int i = 0; i < votersCount; i++)
-        {
-            Node node = voters.item(i);
-            NamedNodeMap attributes = node.getAttributes();
-
-            String name = attributes.getNamedItem("name").getNodeValue();
-            Date birthDay = birthDayFormat.parse(attributes.getNamedItem("birthDay").getNodeValue());
-
-            Voter voter = new Voter(name, birthDay);
-            Integer count = voterCounts.get(voter);
-            voterCounts.put(voter, count == null ? 1 : count + 1);
-        }
-    }
-
-    private static void fixWorkTimes(Document doc) throws Exception
-    {
-        NodeList visits = doc.getElementsByTagName("visit");
-        int visitCount = visits.getLength();
-        for(int i = 0; i < visitCount; i++)
-        {
-            Node node = visits.item(i);
-            NamedNodeMap attributes = node.getAttributes();
-
-            Integer station = Integer.parseInt(attributes.getNamedItem("station").getNodeValue());
-            Date time = visitDateFormat.parse(attributes.getNamedItem("time").getNodeValue());
-            WorkTime workTime = voteStationWorkTimes.get(station);
-            if(workTime == null)
-            {
-                workTime = new WorkTime();
-                voteStationWorkTimes.put(station, workTime);
+            else if (answer.trim().toUpperCase().equals("N")) {
+                break;
             }
-            workTime.addVisitTime(time.getTime());
+            else {
+                System.out.println("Ответ не распознан");
+            }
         }
     }
 }

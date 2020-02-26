@@ -27,12 +27,6 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="3" />
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="877" />
-  </component>
   <component name="ProjectId" id="1YC8xNE1KHEh9Cr3FxN9BflbfUi" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -46,8 +40,8 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571898024206" />
     <property name="dynamic.classpath" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/mysql-connector-java-8.0.19.jar!/" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="recentsLimit" value="5" />
@@ -55,16 +49,17 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 14\VoteAnalyzer\lib" />
       <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\src" />
+      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\res" />
+      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\lib" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\src" />
-      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\res" />
-      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\VoteAnalyzer\lib" />
     </key>
   </component>
   <component name="RunManager">
@@ -118,7 +113,7 @@
     <configuration name="Loader" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Loader" />
       <module name="VoteAnalyzer" />
-      <option name="VM_PARAMETERS" value="-Xmx1024M" />
+      <option name="VM_PARAMETERS" value="-Xmx128M" />
       <RunnerSettings RunnerId="JProfiler">
         <option name="WINDOW" value="false" />
       </RunnerSettings>
@@ -189,10 +184,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582447061102">
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582692599972">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582447061102" />
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582692599972" />
     <state x="725" y="324" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1582444298213">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
@@ -201,22 +196,26 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="766" y="205" key="#com.intellij.ide.util.MemberChooser/2.0.1918.1040@2.0.1918.1040" timestamp="1582447436187" />
-    <state width="1875" height="347" key="GridCell.Tab.0.bottom" timestamp="1582460253942">
+    <state x="667" y="262" key="FileChooserDialogImpl" timestamp="1582673292820">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="347" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582460253942" />
-    <state width="1875" height="347" key="GridCell.Tab.0.center" timestamp="1582460253942">
+    <state x="667" y="262" key="FileChooserDialogImpl/2.0.1918.1040@2.0.1918.1040" timestamp="1582673292820" />
+    <state width="1875" height="365" key="GridCell.Tab.0.bottom" timestamp="1582695067500">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="347" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582460253942" />
-    <state width="1875" height="347" key="GridCell.Tab.0.left" timestamp="1582460253942">
+    <state width="1875" height="365" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582695067500" />
+    <state width="1875" height="365" key="GridCell.Tab.0.center" timestamp="1582695067500">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="347" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582460253942" />
-    <state width="1875" height="347" key="GridCell.Tab.0.right" timestamp="1582460253942">
+    <state width="1875" height="365" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582695067500" />
+    <state width="1875" height="365" key="GridCell.Tab.0.left" timestamp="1582695067500">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state width="1875" height="347" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582460253942" />
+    <state width="1875" height="365" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582695067500" />
+    <state width="1875" height="365" key="GridCell.Tab.0.right" timestamp="1582695067500">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="365" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582695067500" />
     <state width="1875" height="347" key="GridCell.Tab.1.bottom" timestamp="1582460253943">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
@@ -233,10 +232,19 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1875" height="347" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582460253943" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582435473980">
+    <state x="441" y="95" key="SettingsEditor" timestamp="1582673296454">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582435473980" />
+    <state x="441" y="95" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1582673296454" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582685105481">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1582502871097" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582685105481" />
+    <state x="342" y="216" key="new project wizard" timestamp="1582502908033">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="342" y="216" key="new project wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1582502908033" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />

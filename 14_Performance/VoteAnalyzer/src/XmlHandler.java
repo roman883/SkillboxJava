@@ -2,50 +2,28 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.sql.SQLException;
 
 public class XmlHandler extends DefaultHandler {
-
-    private Voter voter;
-    private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private HashMap<Voter, Integer> voterCounts;
-
-    public XmlHandler() {
-        voterCounts = new HashMap<>();
-    }
+    int limit = 5_000_000;
+    int number = 0;
+    int visitNumber = 0;
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-
         try {
-            if (qName.equals("voter") && voter == null) {
-                Date birthDay = birthDayFormat.parse(attributes.getValue("birthDay"));
-                voter = new Voter(attributes.getValue("name"), birthDay);
-            } else if (qName.equals("visit") && voter != null) {
-                int count = voterCounts.getOrDefault(voter, 0);
-                voterCounts.put(voter, count + 1);
+            if (qName.equals("voter") && number < limit) {
+                String name = attributes.getValue("name");
+                String birthDate = attributes.getValue("birthDay");
+                DBConnection.countVoter(name, birthDate);
+                number++;
+            } else if (qName.equals("visit") && visitNumber < limit) {
+                Integer station = Integer.parseInt(attributes.getValue("station"));
+                String time = attributes.getValue("time");
+                DBConnection.fixWorkTime(station, time);
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("voter")) {
-            voter = null;
-        }
-    }
-
-    public void duplicatedVoters() {
-        for (Voter voter : voterCounts.keySet()) {
-            int count = voterCounts.get(voter);
-            if (count > 1) {
-                System.out.println(voter.toString() + " - " + count);
-            }
         }
     }
 }

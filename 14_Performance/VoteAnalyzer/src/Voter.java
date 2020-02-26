@@ -5,13 +5,11 @@ public class Voter
 {
     private String name;
     private Date birthDay;
-    private int voteCounts; // добавлен счетчик голосов
 
     public Voter(String name, Date birthDay)
     {
         this.name = name;
         this.birthDay = birthDay;
-        this.voteCounts = 0;
     }
 
     @Override
@@ -47,11 +45,4 @@ public class Voter
         return birthDay;
     }
 
-    public int getVoteCounts() {
-        return voteCounts;
-    }
-
-    public void setVoteCounts(int voteCounts) {
-        this.voteCounts = voteCounts;
-    }
 }
