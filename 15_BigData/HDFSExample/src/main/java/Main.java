@@ -1,43 +1,47 @@
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-
-import java.io.BufferedWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-
 public class Main
 {
     private static String symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static void main(String[] args) throws Exception
     {
-        Configuration configuration = new Configuration();
-        configuration.set("dfs.client.use.datanode.hostname", "true");
         System.setProperty("HADOOP_USER_NAME", "root");
 
-        FileSystem hdfs = FileSystem.get(
-            new URI("hdfs://HOST_NAME:8020"), configuration
-        );
-        Path file = new Path("hdfs://HOST_NAME:8020/test/file.txt");
+        FileAccess fileAccess = new FileAccess("hdfs://119f0f2a516c:8020");
+        String pathDirectoryCreate = "test902/56/";
+        String path2 = "test901";
+        String path3 = "test902/fileTest2.txt";
+        fileAccess.create(pathDirectoryCreate);
+        fileAccess.create(path2);
+        fileAccess.create(path3);
+        fileAccess.create("test902/00/fileTest3.txt");
 
-        if (hdfs.exists(file)) {
-            hdfs.delete(file, true);
+//        fileAccess.delete(pathDirectoryCreate);
+        String content = getRandomWord();
+        System.out.println("=======================");
+        System.out.println(content);
+        System.out.println("======================");
+        fileAccess.append(path3, content);
+
+        System.out.println("\nЧитаем файл");
+        System.out.println(fileAccess.read(path3));
+        fileAccess.read(path2);
+        if (fileAccess.isDirectory(path3)) {
+            System.out.println(path3 + " это папка");
+        } else {
+            System.out.println(path3 + " это файл");
         }
-
-        OutputStream os = hdfs.create(file);
-        BufferedWriter br = new BufferedWriter(
-            new OutputStreamWriter(os, "UTF-8")
-        );
-
-        for(int i = 0; i < 10_000_000; i++) {
-            br.write(getRandomWord() + " ");
+        if (fileAccess.isDirectory(path2)) {
+            System.out.println(path2 + " это папка");
+        } else {
+            System.out.println(path2 + " это файл");
         }
+        System.out.println("Выводим все файлы: ");
+        fileAccess.list("test902").forEach(System.out::println);
 
-        br.flush();
-        br.close();
-        hdfs.close();
+        fileAccess.delete(pathDirectoryCreate);
+        fileAccess.delete(path2);
+        fileAccess.delete(path3);
+        fileAccess.hdfs.close();
     }
 
     private static String getRandomWord()
