@@ -21,6 +21,7 @@ public class XmlHandler extends DefaultHandler {
                 Integer station = Integer.parseInt(attributes.getValue("station"));
                 String time = attributes.getValue("time");
                 DBConnection.fixWorkTime(station, time);
+                visitNumber++;
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

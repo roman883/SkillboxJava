@@ -50,11 +50,12 @@ public class Loader {
     private static void parseFile(String fileName) throws Exception {
         // Парсим файл с данными и загружаем в БД. Используем SAXparser, multiInsert, StringBuilder
         // При загрузке задаем индекс - имя и составной индекс - имя+дата_рождения
+        DBConnection.createPrepStatements();
         SAXParserFactory factoryX = SAXParserFactory.newInstance();
         SAXParser SAXparserX = factoryX.newSAXParser();
         XmlHandler handlerX = new XmlHandler();
         SAXparserX.parse(new File(fileName), handlerX);
-        DBConnection.uploadLastPartStringbuilders();
+        DBConnection.uploadLastPart();
     }
 
     private static void showAllStations() throws SQLException {
