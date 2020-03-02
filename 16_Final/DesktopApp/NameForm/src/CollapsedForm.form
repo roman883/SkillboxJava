@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="CollapsedForm">
+  <grid id="27dc6" binding="collapsedPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="512" height="400"/>
+    </constraints>
+    <properties>
+      <maximumSize width="500" height="170"/>
+      <minimumSize width="500" height="130"/>
+      <preferredSize width="500" height="130"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="13d3c" binding="mainPanel" layout-manager="BorderLayout" hgap="15" vgap="5">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <maximumSize width="500" height="170"/>
+          <minimumSize width="500" height="130"/>
+          <preferredSize width="500" height="130"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="f5eab" layout-manager="FlowLayout" hgap="5" vgap="15" flow-align="0">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <maximumSize width="256" height="72"/>
+              <minimumSize width="256" height="72"/>
+              <preferredSize width="256" height="72"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="7eddc" class="javax.swing.JLabel" binding="CollapsedLabel">
+                <constraints/>
+                <properties>
+                  <horizontalAlignment value="2"/>
+                  <horizontalTextPosition value="2"/>
+                  <labelFor value="cfb44"/>
+                  <text value="Фамилия Имя Отчество"/>
+                  <verticalAlignment value="3"/>
+                </properties>
+              </component>
+              <component id="e7cd2" class="javax.swing.JTextPane" binding="textPane">
+                <constraints/>
+                <properties>
+                  <editable value="false"/>
+                  <maximumSize width="320" height="60"/>
+                  <minimumSize width="320" height="20"/>
+                  <preferredSize width="320" height="20"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="17351" binding="buttonPanel" layout-manager="FlowLayout" hgap="5" vgap="15" flow-align="1">
+            <constraints border-constraint="East"/>
+            <properties>
+              <maximumSize width="100" height="60"/>
+              <minimumSize width="100" height="60"/>
+              <preferredSize width="100" height="60"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="f4c6" class="javax.swing.JButton" binding="actionButton">
+                <constraints/>
+                <properties>
+                  <horizontalAlignment value="0"/>
+                  <horizontalTextPosition value="0"/>
+                  <maximumSize width="85" height="30"/>
+                  <minimumSize width="85" height="30"/>
+                  <preferredSize width="85" height="30"/>
+                  <text value="Expand"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

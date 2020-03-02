@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="NameForm">
+  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="15" vgap="5">
+    <constraints>
+      <xy x="20" y="20" width="512" height="400"/>
+    </constraints>
+    <properties>
+      <maximumSize width="500" height="170"/>
+      <minimumSize width="500" height="130"/>
+      <preferredSize width="500" height="130"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="f19fb" layout-manager="FlowLayout" hgap="5" vgap="15" flow-align="0">
+        <constraints border-constraint="West"/>
+        <properties>
+          <maximumSize width="100" height="72"/>
+          <minimumSize width="100" height="72"/>
+          <preferredSize width="100" height="72"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="70925" class="javax.swing.JLabel" binding="lastNameLabel">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <horizontalTextPosition value="2"/>
+              <labelFor value="a8845"/>
+              <maximumSize width="80" height="20"/>
+              <minimumSize width="80" height="20"/>
+              <preferredSize width="80" height="20"/>
+              <text value="Фамилия"/>
+              <verticalAlignment value="0"/>
+            </properties>
+          </component>
+          <component id="901b8" class="javax.swing.JLabel" binding="nameLabel">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <horizontalTextPosition value="2"/>
+              <labelFor value="bd5b9"/>
+              <maximumSize width="80" height="20"/>
+              <minimumSize width="80" height="20"/>
+              <preferredSize width="80" height="20"/>
+              <requestFocusEnabled value="true"/>
+              <text value="Имя"/>
+            </properties>
+          </component>
+          <component id="3d5f4" class="javax.swing.JLabel" binding="middleNameLabel">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <horizontalTextPosition value="2"/>
+              <labelFor value="755c8"/>
+              <maximumSize width="80" height="20"/>
+              <minimumSize width="80" height="20"/>
+              <preferredSize width="80" height="20"/>
+              <text value="Отчество"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="c24c8" layout-manager="FlowLayout" hgap="5" vgap="15" flow-align="0">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <maximumSize width="256" height="72"/>
+          <minimumSize width="256" height="72"/>
+          <preferredSize width="256" height="72"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="a8845" class="javax.swing.JTextField" binding="lastNameTextField">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <maximumSize width="256" height="20"/>
+              <minimumSize width="256" height="20"/>
+              <preferredSize width="256" height="20"/>
+              <text value=""/>
+              <toolTipText value="введите фамилию"/>
+            </properties>
+          </component>
+          <component id="bd5b9" class="javax.swing.JTextField" binding="nameTextField">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <maximumSize width="256" height="20"/>
+              <minimumSize width="256" height="20"/>
+              <preferredSize width="256" height="20"/>
+              <text value=""/>
+              <toolTipText value="введите имя"/>
+            </properties>
+          </component>
+          <component id="755c8" class="javax.swing.JTextField" binding="middleNameTextField">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="2"/>
+              <maximumSize width="256" height="20"/>
+              <minimumSize width="256" height="20"/>
+              <preferredSize width="256" height="20"/>
+              <text value=""/>
+              <toolTipText value="введите отчество"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="274ff" binding="buttonPanel" layout-manager="FlowLayout" hgap="5" vgap="15" flow-align="1">
+        <constraints border-constraint="East"/>
+        <properties>
+          <maximumSize width="100" height="60"/>
+          <minimumSize width="100" height="60"/>
+          <preferredSize width="100" height="60"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="c5ae6" class="javax.swing.JButton" binding="actionButton">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <maximumSize width="85" height="30"/>
+              <minimumSize width="85" height="30"/>
+              <preferredSize width="85" height="30"/>
+              <text value="Collapse"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
