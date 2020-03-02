@@ -69,19 +69,28 @@ public class NameCollapser {
         @Override
         public void actionPerformed(ActionEvent e) {
             String[] temp = collapsedForm.getTextPane().getText().split("\\s+");
-            String lastName = temp[0];
-            String name = temp[1];
-            String middleName = "";
-            if (temp.length == 3) {
-                middleName = temp[2];
+            if (temp.length == 2 || temp.length == 3) {
+                String lastName = temp[0];
+                String name = temp[1];
+                String middleName = "";
+                if (temp.length == 3) {
+                    middleName = temp[2];
+                }
+                frame.setVisible(false);
+                frame.remove(collapsedPanel);
+                nameForm.getLastNameTextField().setText(lastName);
+                nameForm.getNameTextField().setText(name);
+                nameForm.getMiddleNameTextField().setText(middleName);
+                frame.add(namePanel, BorderLayout.NORTH);
+                frame.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(
+                        collapsedForm.getMainPanel(),
+                        "Фамилия и имя обязательны к заполнению",
+                        "Ошибка",
+                        JOptionPane.PLAIN_MESSAGE
+                );
             }
-            frame.setVisible(false);
-            frame.remove(collapsedPanel);
-            nameForm.getLastNameTextField().setText(lastName);
-            nameForm.getNameTextField().setText(name);
-            nameForm.getMiddleNameTextField().setText(middleName);
-            frame.add(namePanel, BorderLayout.NORTH);
-            frame.setVisible(true);
         }
     }
 }

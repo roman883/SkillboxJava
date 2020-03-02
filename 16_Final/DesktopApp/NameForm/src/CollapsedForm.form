@@ -42,7 +42,7 @@
               <component id="e7cd2" class="javax.swing.JTextPane" binding="textPane">
                 <constraints/>
                 <properties>
-                  <editable value="false"/>
+                  <editable value="true"/>
                   <maximumSize width="320" height="60"/>
                   <minimumSize width="320" height="20"/>
                   <preferredSize width="320" height="20"/>
