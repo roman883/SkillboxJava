@@ -19,25 +19,15 @@ public class PostRepositoryService {
     @Autowired
     private PostRepository postRepository;
 
-//    public ResponseEntity<List<Post>> getAllPosts() {
-//        ArrayList<Post> posts = new ArrayList<>();
-//        postRepository.findAll().forEach(posts::add);
-//        return new ResponseEntity<>(posts, HttpStatus.OK);
-//    }
-
     public ResponseEntity<Post> getPost(int id) {
         Optional<Post> optionalPost = postRepository.findById(id);
         return optionalPost.isPresent() ?
                 new ResponseEntity<>(optionalPost.get(), HttpStatus.OK)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
-
-
-
-//    public ResponseEntity<User> getUser(int id) {
-//        Optional<User> optionalUser = userRepository.findById(id);
-//        return optionalUser.isPresent() ?
-//                new ResponseEntity<>(optionalUser.get(), HttpStatus.OK)
-//                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//    public ResponseEntity<List<Post>> getAllPosts() {
+//        ArrayList<Post> posts = new ArrayList<>();
+//        postRepository.findAll().forEach(posts::add);
+//        return new ResponseEntity<>(posts, HttpStatus.OK);
 //    }
 }

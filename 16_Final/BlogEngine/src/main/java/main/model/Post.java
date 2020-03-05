@@ -7,8 +7,6 @@ import java.util.Date;
 @Table(name = "posts")
 public class Post {
 
-    // Hibernate requires no-args constructor
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -43,4 +41,5 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
+    // Hibernate requires no-args constructor
 }

@@ -21,6 +21,4 @@ public class UserRepositoryService {
                 new ResponseEntity<>(optionalUser.get(), HttpStatus.OK)
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
-
-
 }

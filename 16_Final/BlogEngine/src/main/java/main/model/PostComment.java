@@ -14,7 +14,6 @@ public class PostComment {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id", nullable = true)
-//    @Column(name = "parent_id", nullable = true)
     private PostComment parent;
 
     @ManyToOne(cascade = CascadeType.ALL)
