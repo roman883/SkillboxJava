@@ -77,5 +77,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.hibernate</groupId>-->
+<!--            <artifactId>hibernate-agroal</artifactId>-->
+<!--            <version>5.3.15.Final</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
     </dependencies>
 </project>

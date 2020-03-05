@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1c392377-0462-4686-963c-341260b7892d" name="Default" comment="" />
+    <list default="true" id="1c392377-0462-4686-963c-341260b7892d" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiGeneralController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/controller/ApiAuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiAuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/controller/ApiGeneralController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/controller/ApiPostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiPostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/controller/DefaultController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/DefaultController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/app.8fb8e253.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/app.8fb8e253.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/baseButton.db512ccd.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/baseButton.db512ccd.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/captcha.1debce1e.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/captcha.1debce1e.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/chunk-vendors.f6e7cea4.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/chunk-vendors.f6e7cea4.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/editPost.bd6f56bc.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/editPost.bd6f56bc.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/inputEmail.b9145bc9.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/inputEmail.b9145bc9.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/inputPassword.3e872fcf.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/inputPassword.3e872fcf.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/profile.0098122f.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/profile.0098122f.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/settings.a7422fbb.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/resources/static/js/settings.a7422fbb.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/controller/ApiAuthController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/controller/ApiGeneralController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/controller/ApiPostController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/controller/DefaultController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/main/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/main/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/app.8fb8e253.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/app.8fb8e253.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/baseButton.db512ccd.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/baseButton.db512ccd.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/captcha.1debce1e.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/captcha.1debce1e.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/chunk-vendors.f6e7cea4.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/chunk-vendors.f6e7cea4.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/editPost.bd6f56bc.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/editPost.bd6f56bc.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/inputEmail.b9145bc9.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/inputEmail.b9145bc9.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/inputPassword.3e872fcf.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/inputPassword.3e872fcf.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/profile.0098122f.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/profile.0098122f.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/settings.a7422fbb.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/target/classes/static/js/settings.a7422fbb.js.map" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,6 +54,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -28,6 +65,7 @@
     </option>
   </component>
   <component name="ProjectId" id="1YC8xNE1KHEh9Cr3FxN9BflbfUi" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -236,11 +274,11 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="441" y="95" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1582673296454" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582848049662">
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1583290886215">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1582502871097" />
-    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582848049662" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1583290886215" />
     <state x="342" y="216" key="new project wizard" timestamp="1582502908033">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
