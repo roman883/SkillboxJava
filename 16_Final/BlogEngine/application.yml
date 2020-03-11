@@ -7,16 +7,16 @@
 
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver # com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver # com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/blogdb?serverTimezone=UTC
     useJDBCCompliantTimeZoneShift: true
     username: root
     password: testtest
   jpa:
-    show-sql: true
+    show_sql: true # в логах видны sql запросы, false в режиме норм работы (show-sql)
     hibernate:
-      ddl-auto: update # update
+      ddl-auto: update # update работает только так, валидэйт не проходит
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
