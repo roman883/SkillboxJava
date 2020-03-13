@@ -24,11 +24,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
         if (query.equals("")) {
-            for (Tag tag : allTags) {
-                String tagName = tag.getName();
-                double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);
-                queryTagsMap.put(tagName, tempTagCount + 1.0);
-            }
+            return getTagsWithoutQuery();
         } else {
             for (Tag tag : allTags) {
                 if (tag.getName().contains(query)) {
@@ -73,5 +69,31 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     @Override
     public void deleteTag(Tag tag) {
         tagRepository.delete(tag);
+    }
+
+    @Override
+    public ResponseEntity<String> getTagsWithoutQuery() {
+        ArrayList<Tag> allTags = new ArrayList<>();
+        HashMap<String, Double> queryTagsMap = new HashMap<>();
+        tagRepository.findAll().forEach(allTags::add);
+        for (Tag tag : allTags) {
+            String tagName = tag.getName();
+            double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);
+            queryTagsMap.put(tagName, tempTagCount + 1.0);
+        }
+        Double mostFrequentTag = Collections.max(queryTagsMap.values());
+        for (String key : queryTagsMap.keySet()) {
+            Double weight = (queryTagsMap.get(key) / mostFrequentTag);
+            queryTagsMap.put(key, weight); // Меняем количество на вес тэга
+        }
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        for (String key : queryTagsMap.keySet()) {
+            JSONObject json = new JSONObject();
+            json.put("name", key).put("weight", queryTagsMap.get(key));
+            jsonArray.put(json);
+        }
+        jsonObject.put("tags", jsonArray);
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 }

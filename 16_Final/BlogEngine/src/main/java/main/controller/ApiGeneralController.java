@@ -41,7 +41,7 @@ public class ApiGeneralController {
         this.postVoteRepoService = postVoteRepositoryServiceImpl;
     }
 
-    @GetMapping(value = "/api/init/")
+    @GetMapping(value = "/api/init")
     public @ResponseBody
     ResponseEntity<GeneralData> getData() {
         return generalDataService.getData();
@@ -53,7 +53,7 @@ public class ApiGeneralController {
         return postRepoService.uploadImage(image, request.getSession(), userRepoService); //TODO куда загружать фото? и как?
     }
 
-    @PostMapping(value = "/api/comment/", params = {"parent_id", "post_id", "text"})
+    @PostMapping(value = "/api/comment", params = {"parent_id", "post_id", "text"})
     public @ResponseBody
     ResponseEntity<?> addComment(@RequestParam(value = "parent_id") Integer parentId,
                                  @RequestParam(value = "post_id") Integer postId,
@@ -63,10 +63,16 @@ public class ApiGeneralController {
                 userRepoService, postRepoService);
     }
 
-    @GetMapping(value = "/api/tag/", params = {"query"})
+    @GetMapping(value = "/api/tag", params = {"query"})
     public @ResponseBody
     ResponseEntity<String> getTags(@RequestParam(value = "query") String query) {
         return tagRepoService.getTags(query);
+    }
+
+    @GetMapping(value = "/api/tag")
+    public @ResponseBody
+    ResponseEntity<String> getTagsWithoutQuery() {
+        return tagRepoService.getTagsWithoutQuery();
     }
 
     @PostMapping(value = "/api/moderation", params = {"post_id", "decision"}) // Точно ли ничего не надо возвращать??
@@ -77,7 +83,7 @@ public class ApiGeneralController {
         return postRepoService.moderatePost(postId, decision, request.getSession(), userRepoService);
     }
 
-    @GetMapping(value = "/api/calendar/", params = {"year"}) // или years и много лет должно быть???
+    @GetMapping(value = "/api/calendar", params = {"year"}) // или years и много лет должно быть???
     public @ResponseBody
     ResponseEntity<String> countPostByYear(@RequestParam(value = "year") Integer year) {
         return postRepoService.countPostsByYear(year);
@@ -107,13 +113,13 @@ public class ApiGeneralController {
                 postVoteRepoService, postRepoService);
     }
 
-    @GetMapping(value = "/api/settings/")
+    @GetMapping(value = "/api/settings")
     public @ResponseBody
     ResponseEntity<String> getGlobalSettings(HttpServletRequest request) {
         return globalSettingsRepoService.getGlobalSettings(request.getSession(), userRepoService);
     }
 
-    @PutMapping(value = "/api/settings/", params = {"MULTIUSER_MODE", "POST_PREMODERATION", "STATISTICS_IS_PUBLIC"})
+    @PutMapping(value = "/api/settings", params = {"MULTIUSER_MODE", "POST_PREMODERATION", "STATISTICS_IS_PUBLIC"})
     //TODO Как получать параметры Global Settings и как их устанавливать??
     public @ResponseBody
     ResponseEntity<String> setGlobalSettings(@RequestParam(value = "MULTIUSER_MODE") Boolean multiUserMode,

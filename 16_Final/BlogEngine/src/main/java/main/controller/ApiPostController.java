@@ -37,7 +37,7 @@ public class ApiPostController {
         this.tagToPostRepoService = tagToPostRepoService;
     }
 
-    @GetMapping(value = "/api/post/", params = {"offset", "limit", "mode"}) // или /posts/? рекомендуется во множественном числе
+    @GetMapping(value = "/api/post", params = {"offset", "limit", "mode"}) // или /posts/? рекомендуется во множественном числе
     public @ResponseBody
     ResponseEntity<String> get(@RequestParam(value = "offset") int offset,  // Может иметь defaultValue = "10"
                        @RequestParam(value = "limit") int limit,
@@ -45,7 +45,7 @@ public class ApiPostController {
         return postRepoService.getPostsWithParams(offset, limit, mode);
     }
 
-    @GetMapping(value = "/api/post/search/", params = {"offset", "query", "limit"})
+    @GetMapping(value = "/api/post/search", params = {"offset", "query", "limit"})
     public @ResponseBody
     ResponseEntity<String> searchPosts(@RequestParam(value = "offset") int offset,
                        @RequestParam(value = "query") String query,
