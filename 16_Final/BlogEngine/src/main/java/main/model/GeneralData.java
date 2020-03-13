@@ -3,7 +3,7 @@ package main.model;
 // Синглтон
 public class GeneralData {
 
-    private String title = "DevPub";
+    private String title = "DevPub"; //TODO Верно ли, что поля не статичные?
     private String subtitle = "Рассказы разработчиков";
     private String phone = "+7 903 666-44-55";
     private String email = "mail@mail.ru";

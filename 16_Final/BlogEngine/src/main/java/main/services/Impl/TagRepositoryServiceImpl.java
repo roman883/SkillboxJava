@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TagRepositoryServiceImpl implements TagRepositoryService {
@@ -24,26 +21,26 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     @Override
     public ResponseEntity<String> getTags(String query) {
         ArrayList<Tag> allTags = new ArrayList<>();
-        HashMap<String, Integer> queryTagsMap = new HashMap<>();
+        HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
         if (query.equals("")) {
-            for (Tag t : allTags) {
-                String tag = t.getName();
-                int tempTagCount = queryTagsMap.getOrDefault(tag, 0);
-                queryTagsMap.put(tag, tempTagCount + 1);
+            for (Tag tag : allTags) {
+                String tagName = tag.getName();
+                double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);
+                queryTagsMap.put(tagName, tempTagCount + 1.0);
             }
         } else {
-            for (Tag t : allTags) {
-                if (t.getName().contains(query)) {
-                    String tag = t.getName();
-                    int tempTagCount = queryTagsMap.getOrDefault(tag, 0);
-                    queryTagsMap.put(tag, tempTagCount + 1);
+            for (Tag tag : allTags) {
+                if (tag.getName().contains(query)) {
+                    String tagName = tag.getName();
+                    double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);
+                    queryTagsMap.put(tagName, tempTagCount + 1.0);
                 }
             }
         }
-        int mostFrequentTag = Collections.max(queryTagsMap.values());
+        Double mostFrequentTag = Collections.max(queryTagsMap.values());
         for (String key : queryTagsMap.keySet()) {
-            Integer weight = queryTagsMap.get(key) / mostFrequentTag;
+            Double weight = (queryTagsMap.get(key) / mostFrequentTag);
             queryTagsMap.put(key, weight); // Меняем количество на вес тэга
         }
         JSONObject jsonObject = new JSONObject();
@@ -53,7 +50,28 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
             json.put("name", key).put("weight", queryTagsMap.get(key));
             jsonArray.put(json);
         }
-        jsonObject.put("`tags`", jsonArray);
+        jsonObject.put("tags", jsonArray);
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+    }
+
+    @Override
+    public Set<Tag> getAllTags() {
+        HashSet<Tag> tags = new HashSet<>();
+        tagRepository.findAll().forEach(tags::add);
+        return tags;
+    }
+
+    @Override
+    public Tag addTag(Tag tag) {
+        if (tag == null) {
+            return null;
+        } else {
+            return tagRepository.save(tag);
+        }
+    }
+
+    @Override
+    public void deleteTag(Tag tag) {
+        tagRepository.delete(tag);
     }
 }

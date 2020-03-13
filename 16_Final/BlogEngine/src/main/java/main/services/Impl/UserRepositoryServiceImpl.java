@@ -23,7 +23,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     @Autowired
     private UserRepository userRepository;
-    private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя
+    private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя, по заданию не в БД
 
     @Override
     public ResponseEntity<User> getUser(int id) {
@@ -34,7 +34,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<?> login(String email, String password, PostRepositoryService postRepositoryService, HttpSession session) {
+    public ResponseEntity<?> login(String email, String password, HttpSession session) {
         ArrayList<User> userList = getAllUsersList();
         String resultString = "result";
         for (User user : userList) {
@@ -46,7 +46,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                     json.put(resultString, true);
                     JSONObject userJson = new JSONObject();
                     json.put("user", userJson);
-                    int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
+//                    int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
+                    int moderationCount = user.getPostsModerated().size();
                     boolean hasSettings = false;
                     if (user.isModerator()) {
                         hasSettings = true;
@@ -68,19 +69,20 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<String> checkAuth(HttpSession session, PostRepositoryService postRepositoryService) {
+    public ResponseEntity<String> checkAuth(HttpSession session) {
         if (!sessionIdToUserId.containsKey(session.getId().toString())) {
-            String jsonResult = "{\"result\":true}"; //TODO переделать на JSONObject?
+            String jsonResult = "{\"result\":false}"; //TODO переделать на JSONObject?
             return new ResponseEntity<>(jsonResult, HttpStatus.UNAUTHORIZED);
         } else {
-            int userId = sessionIdToUserId.get(session.toString());
+            int userId = sessionIdToUserId.get(session.getId().toString());
             User user = getUser(userId).getBody();
             if (user != null) {
                 JSONObject json = new JSONObject();
                 json.put("result", true);
                 JSONObject userJson = new JSONObject();
                 json.put("user", userJson);
-                int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
+//                int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
+                int moderationCount = user.getPostsModerated().size();
                 boolean hasSettings = false;
                 if (user.isModerator()) {
                     hasSettings = true;
@@ -112,7 +114,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                         Math.pow((Math.random() * Math.random()), 100 * (Math.random()))).hashCode());
                 user.setCode(hash); // запоминаем код в базе
                 String link = "/login/change-password/" + hash;
-                // TODO отправка ссылки на email пользователя!!
+                // TODO отправка ссылки на email пользователя!! И Занесение в БД к юзеру! А также в капчу
                 json.put("result", true);
                 return new ResponseEntity<>(json.toString(), HttpStatus.OK);
             }
@@ -122,7 +124,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<String> changePassword(String code, String password, String captcha, String captchaSecret, CaptchaRepositoryService captchaRepositoryService) {
+    public ResponseEntity<String> changePassword(String code, String password, String captcha, String captchaSecret,
+                                                 CaptchaRepositoryService captchaRepositoryService) {
         JSONObject json = new JSONObject(); // TODO реализовать проверку длины пароля и наличия букв/цифр/символов в пароле во всех методах
         if (code == null || password == null || captcha == null || captchaSecret == null) {
             return new ResponseEntity<>("Введены не все данные", HttpStatus.BAD_REQUEST);
@@ -147,7 +150,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         JSONObject errorsJson = new JSONObject();
         json.put("errors", errorsJson);
         errorsJson.put("code", "Ссылка для восстановления пароля устарела.\n" +
-                "<a href=”/auth/restore”>Запросить ссылку снова</a>`")
+                "<a href=\"/auth/restore\">Запросить ссылку снова</a>")
                 .put("password", "Пароль короче 6-ти символов")
                 .put("captcha", "Код с картинки введён неверно");
         return new ResponseEntity<>(json.toString(), HttpStatus.BAD_REQUEST);
@@ -155,23 +158,22 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     @Override
     public ResponseEntity<?> register(String email, String name, String password, String captcha, String captcha_secret) {
-        if (email == null || name == null || password == null || captcha == null || captcha_secret == null
-                || email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captcha_secret.equals("")) { // TODO проверки сделать
+        if (email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captcha_secret.equals("")) { // TODO проверки сделать на длину пароля, формат Email
             ResultSignUpDTO resultSignUpDTO = new ResultSignUpDTO();
             return new ResponseEntity<ResultSignUpDTO>(resultSignUpDTO, HttpStatus.BAD_REQUEST);
         } else {    // если проверки прошли, создаем пользователя и возвращаем положительный результат
-            Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());         // тек дата и время
+            Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());
             String hashedPassword = Integer.toString(password.hashCode());
             User user = new User(false, registrationDateTime, name, email, hashedPassword);
             userRepository.save(user); // И можно получить id
             String jsonResult = "{\"result\":true}"; //TODO переделать на JSONObject?
-            return new ResponseEntity<>(jsonResult, HttpStatus.OK);
-            //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен??
+            return new ResponseEntity<>(jsonResult, HttpStatus.OK);  //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен??
         }
     }
 
     @Override
-    public ResponseEntity<String> editProfile(File photo, Byte removePhoto, String name, String email, String password, HttpSession session) {
+    public ResponseEntity<String> editProfile(File photo, Byte removePhoto, String name, String email, String password,
+                                              HttpSession session) {
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -191,7 +193,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 hasSameName = true;
             }
         }
-        if (hasSameName || hasSameEmail) { // Такой пользователь уже есть в базе
+        if (hasSameName || hasSameEmail) { // Такой пользователь уже есть в базе //TODO проверку размера фото, введенного когда капчи
             JSONObject result = new JSONObject();
             JSONObject errors = new JSONObject();
             errors.put("email", "Этот e-mail уже зарегистрирован")
@@ -202,7 +204,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             result.put("result", false).put("errors", errors);
             return new ResponseEntity<>(result.toString(), HttpStatus.OK);
         }
-        if (photo != null) {
+        if (photo != null) { // фото есть, тогда устанавливаем путь к загруженному фото пользователю
             // TODO как загрузить фото на сервер и получить путь? Заменить ниже
             String photoUrl = "dsds";
             user.setPhoto(photoUrl);
@@ -225,8 +227,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<String> getMyStatistics(HttpSession session, PostVoteRepositoryService postVoteRepositoryService,
-                                                  PostRepositoryService postRepositoryService) {
+    public ResponseEntity<String> getMyStatistics(HttpSession session) {
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -236,41 +237,31 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
         }
         LocalDateTime firstPostTime = null;
-        ArrayList<Post> allPosts = postRepositoryService.getAllPosts();
-        int postsCount = 0;
+        Set<Post> myPosts = user.getPosts();
+        int postsCount = myPosts.size();
         int allLikesCount = 0;
         int allDislikeCount = 0;
         int viewsCount = 0;
-        for (Post p : allPosts) {
-            if (p.getUser().getId() == userId) {
-                LocalDateTime currentPostTime = p.getTime().toLocalDateTime();
-                if (firstPostTime == null) {
-                    firstPostTime = currentPostTime;
-                } else if (firstPostTime.isAfter(currentPostTime)) {
-                    firstPostTime = currentPostTime;
-                }
-                viewsCount += p.getViewCount();
-                postsCount += 1;
-                int currentPostId = p.getId();
-                //TODO или добавить поля хранения лайков/дизлайков для каждого поста и т.п.
-                HashSet<PostVote> postVotes = postVoteRepositoryService.getAllPostVotes();
-                for (PostVote like : postVotes) {
-                    if (like.getPost().getId() == currentPostId) {
-                        if (like.getValue() == 1) {
-                            allLikesCount += 1;
-                        } else if (like.getValue() == -1) {
-                            allDislikeCount += 1;
-                        }
-                    }
+        for (Post p : myPosts) {
+            LocalDateTime currentPostTime = p.getTime().toLocalDateTime();
+            if (firstPostTime == null) {
+                firstPostTime = currentPostTime;
+            } else if (firstPostTime.isAfter(currentPostTime)) {
+                firstPostTime = currentPostTime;
+            }
+            viewsCount += p.getViewCount();
+            Set<PostVote> currentPostVotes = p.getPostVotes();
+            for (PostVote like : currentPostVotes) {
+                if (like.getValue() == 1) {
+                    allLikesCount += 1;
+                } else if (like.getValue() == -1) {
+                    allDislikeCount += 1;
                 }
             }
         }
         String firstPublicationDate;
-        if (firstPostTime == null) { // Постов не было
-            firstPublicationDate = "Еще не было";
-        } else {
-            firstPublicationDate = firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        }
+        firstPublicationDate = firstPostTime == null ? "Еще не было"
+                : firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         JSONObject result = new JSONObject();
         result.put("Постов", postsCount).put("Лайков", allLikesCount).put("Дизлайков", allDislikeCount)
                 .put("Просмотров", viewsCount).put("Первая публикация", firstPublicationDate);
@@ -278,11 +269,10 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity getAllStatistics(HttpSession session, //TODO вынести в отдельные методы дублированные блоки кода (проверка пользователя, поиск статистики)
+    public ResponseEntity<String> getAllStatistics(HttpSession session,
                                            GlobalSettingsRepositoryService globalSettingsRepositoryService,
                                            PostVoteRepositoryService postVoteRepositoryService,
                                            PostRepositoryService postRepositoryService) {
-        //TODO получение данных GlobalSettings
         HashSet<GlobalSettings> settingsSet = globalSettingsRepositoryService.getAllGlobalSettingsSet();
         boolean isStatisticsIsPublic = false;
         for (GlobalSettings s : settingsSet) {
@@ -312,22 +302,17 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 firstPostTime = currentPostTime;
             }
             viewsCount += p.getViewCount();
-            //TODO или добавить поля хранения лайков/дизлайков для каждого поста и т.п.
-            HashSet<PostVote> postVotes = postVoteRepositoryService.getAllPostVotes();
-            for (PostVote like : postVotes) {
-                if (like.getValue() == 1) {
-                    allLikesCount += 1;
-                } else if (like.getValue() == -1) {
-                    allDislikeCount += 1;
-                }
+        }
+        HashSet<PostVote> postVotes = postVoteRepositoryService.getAllPostVotes();
+        for (PostVote like : postVotes) {
+            if (like.getValue() == 1) {
+                allLikesCount += 1;
+            } else if (like.getValue() == -1) {
+                allDislikeCount += 1;
             }
         }
-        String firstPublicationDate;
-        if (firstPostTime == null) { // Постов не было
-            firstPublicationDate = "Еще не было";
-        } else {
-            firstPublicationDate = firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        }
+        String firstPublicationDate = firstPostTime == null ? "Еще не было" :
+                firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         JSONObject result = new JSONObject();
         result.put("Постов", postsCount).put("Лайков", allLikesCount).put("Дизлайков", allDislikeCount)
                 .put("Просмотров", viewsCount).put("Первая публикация", firstPublicationDate);

@@ -7,29 +7,38 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.sql.Date;
 import java.sql.Time;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public interface PostRepositoryService {
 
-    ResponseEntity getPost(int id);
+    ResponseEntity<String> getPost(int id, TagRepositoryService tagRepositoryService,
+                           PostCommentRepositoryService postCommentRepositoryService,
+                           PostVoteRepositoryService postVoteRepositoryService);
 
-    ResponseEntity getPostsWithParams(int offset, int limit, String mode);
+    ResponseEntity<String> getPostsWithParams(int offset, int limit, String mode);
 
-    ResponseEntity searchPosts(int offset, String query, int limit);
+    ResponseEntity<String> searchPosts(int offset, String query, int limit);
 
-    ResponseEntity getPostsByDate(Date date, int offset, int limit);
+    ResponseEntity<String> getPostsByDate(Date date, int offset, int limit);
 
-    ResponseEntity getPostsByTag(int limit, String tag, int offset);
+    ResponseEntity<String> getPostsByTag(int limit, String tag, int offset, TagRepositoryService tagRepositoryService);
 
-    ResponseEntity getPostsForModeration(String status, int offset, int limit);
+    ResponseEntity<String> getPostsForModeration(String status, int offset, int limit, HttpSession session,
+                                         UserRepositoryService userRepositoryService);
 
-    ResponseEntity getMyPosts(String status, int offset, int limit);
+    ResponseEntity<String> getMyPosts(String status, int offset, int limit, HttpSession session,
+                                      UserRepositoryService userRepositoryService);
 
-    ResponseEntity post(Time time, byte active, String title, String text, String tags);
+    ResponseEntity<String> post(String time, byte active, String title, String text, String tags, HttpSession session,
+                        UserRepositoryService userRepositoryService, TagRepositoryService tagRepositoryService,
+                        TagToPostRepositoryService tagToPostRepositoryService) throws ParseException;
 
-    ResponseEntity uploadImage(File image);
+    ResponseEntity<String> uploadImage(File image, HttpSession session, UserRepositoryService userRepositoryService);
 
-    ResponseEntity editPost(int id, Time time, byte active, String title, String text, String tags);
+    ResponseEntity<String> editPost(int id, String time, byte active, String title, String text, String tags, HttpSession session,
+                            UserRepositoryService userRepositoryService, TagRepositoryService tagRepositoryService,
+                            TagToPostRepositoryService tagToPostRepositoryService);
 
     ResponseEntity<String> moderatePost(int postId, String decision, HttpSession session, UserRepositoryService userRepositoryService);
 
@@ -38,4 +47,6 @@ public interface PostRepositoryService {
     int getModerationCount(int moderatorUserId);
 
     ArrayList<Post> getAllPosts();
+
+    Post getPostById(int postId);
 }

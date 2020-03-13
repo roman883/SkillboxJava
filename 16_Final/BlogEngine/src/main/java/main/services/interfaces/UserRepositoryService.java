@@ -13,10 +13,9 @@ public interface UserRepositoryService {
 
     ResponseEntity<User> getUser(int id);
 
-    ResponseEntity<?> login(String email, String password, PostRepositoryService postRepositoryService,
-                            HttpSession session);
+    ResponseEntity<?> login(String email, String password, HttpSession session);
 
-    ResponseEntity<String> checkAuth(HttpSession session, PostRepositoryService postRepositoryService);
+    ResponseEntity<String> checkAuth(HttpSession session);
 
     ResponseEntity<String> restorePassword(String email);
 
@@ -28,8 +27,7 @@ public interface UserRepositoryService {
     ResponseEntity<String> editProfile(File photo, Byte removePhoto, String name, String email, String password,
                                        HttpSession session);
 
-    ResponseEntity<String> getMyStatistics(HttpSession session, PostVoteRepositoryService postVoteRepositoryService,
-                                   PostRepositoryService postRepositoryService);
+    ResponseEntity<String> getMyStatistics(HttpSession session);
 
     ResponseEntity getAllStatistics(HttpSession session,
                                     GlobalSettingsRepositoryService globalSettingsRepositoryService,

@@ -53,13 +53,13 @@ public class ApiAuthController {
     public @ResponseBody
     ResponseEntity<?> login(@RequestParam(value = "email") String email,
                             @RequestParam(value = "password") String password, HttpServletRequest request) {
-        return userRepoService.login(email, password, postRepoService, request.getSession());
+        return userRepoService.login(email, password, request.getSession());
     }
 
     @GetMapping(value = "/api/auth/check")
     public @ResponseBody
     ResponseEntity<String> checkAuth(HttpServletRequest request) {
-        return userRepoService.checkAuth(request.getSession(), postRepoService);
+        return userRepoService.checkAuth(request.getSession());
     }
 
     @PostMapping(value = "/api/auth/restore", params = {"email"})

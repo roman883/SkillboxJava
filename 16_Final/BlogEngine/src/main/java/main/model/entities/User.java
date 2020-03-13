@@ -3,6 +3,8 @@ package main.model.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -47,6 +49,19 @@ public class User implements Serializable {
         this.email = email;
         this.hashedPassword = hashedPassword;
     }
+
+    // Доп поля - связи
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Post> posts = new HashSet<Post>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<PostVote> postVotes = new HashSet<PostVote>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<PostComment> postComments = new HashSet<PostComment>();
+
+    @OneToMany(mappedBy = "moderatorId", cascade = CascadeType.ALL)
+    private Set<Post> postsModerated = new HashSet<Post>();
 
     public User() {
     }
@@ -114,5 +129,37 @@ public class User implements Serializable {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Set<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(Set<Post> posts) {
+        this.posts = posts;
+    }
+
+    public Set<PostVote> getPostVotes() {
+        return postVotes;
+    }
+
+    public void setPostVotes(Set<PostVote> postVotes) {
+        this.postVotes = postVotes;
+    }
+
+    public Set<PostComment> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(Set<PostComment> postComments) {
+        this.postComments = postComments;
+    }
+
+    public Set<Post> getPostsModerated() {
+        return postsModerated;
+    }
+
+    public void setPostsModerated(Set<Post> postsModerated) {
+        this.postsModerated = postsModerated;
     }
 }

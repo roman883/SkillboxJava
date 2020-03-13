@@ -10,6 +10,8 @@ public interface PostCommentRepositoryService {
 
     ArrayList<PostComment> getAllComments();
 
-    ResponseEntity<?> addComment(int parentId, int postId, String text, HttpSession session,
+    ResponseEntity<?> addComment(Integer parentId, Integer postId, String text, HttpSession session,
                               UserRepositoryService userRepoService, PostRepositoryService postRepositoryService);
+
+    PostComment getPostCommentById(int id);
 }

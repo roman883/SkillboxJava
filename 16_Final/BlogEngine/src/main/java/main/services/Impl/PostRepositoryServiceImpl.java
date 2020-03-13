@@ -1,11 +1,9 @@
 package main.services.Impl;
 
 import main.model.ModerationStatus;
-import main.model.entities.Post;
-import main.model.entities.User;
+import main.model.entities.*;
 import main.model.repositories.PostRepository;
-import main.services.interfaces.PostRepositoryService;
-import main.services.interfaces.UserRepositoryService;
+import main.services.interfaces.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,17 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class PostRepositoryServiceImpl implements PostRepositoryService {
@@ -27,11 +33,41 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     @Autowired
     private PostRepository postRepository;
 
-    public ResponseEntity<?> getPost(int id) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        return optionalPost.isPresent() ?
-                new ResponseEntity<>(optionalPost.get(), HttpStatus.OK)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    public ResponseEntity<String> getPost(int id, TagRepositoryService tagRepositoryService,
+                                          PostCommentRepositoryService postCommentRepositoryService,
+                                          PostVoteRepositoryService postVoteRepositoryService) {
+        Post post = getPostById(id);
+        if (post == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        if (!post.isActive() || !post.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+                || post.getTime().toLocalDateTime().isAfter(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        JSONObject result = createResultJsonObjectByPost(post);
+        result.remove("announce");
+        result.remove("commentCount");
+        result.put("text", post.getText()); //TODO Конвертировать в HTML?
+        JSONArray commentsArray = new JSONArray();
+        for (PostComment comment : post.getPostComments()) {
+            JSONObject commentObject = new JSONObject();
+            commentObject.put("id", comment.getId()).put("time", comment.getTime().toLocalDateTime());
+            User user = comment.getUser();
+            JSONObject userObject = new JSONObject();
+            userObject.put("id", user.getId()).put("name", user.getName()).put("photo", user.getPhoto());
+            commentObject.put("user", userObject).put("text", comment.getText()); //TODO Конвертировать в HTML?
+            commentsArray.put(commentObject);
+        }
+        result.put("comments", commentsArray);
+        ArrayList<String> postTags = new ArrayList<>();
+        for (TagToPost t : post.getTagsToPostsSet()) {
+            String tagName = t.getTag().getName();
+            if (!postTags.contains(tagName)) {
+                postTags.add(tagName);
+            }
+        }
+        result.put("tags", new JSONArray(postTags)); // TODO проверить, можно ли так добавлять
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
     public Post getPostById(int id) {
@@ -40,45 +76,394 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 optionalPost.get() : null;
     }
 
-    public ResponseEntity getPostsWithParams(int offset, int limit, String mode) {
-//        ArrayList<Post> posts = new ArrayList<>();
-//        postRepository.findAll().forEach(posts::add);
-        return null; // new ResponseEntity<>(posts, HttpStatus.OK);
+    public ResponseEntity<String> getPostsWithParams(int offset, int limit, String mode) { //TODO проверки входных значений?
+        List<Post> allPosts = getAllPosts();
+        int count = allPosts.size();
+        switch (mode.toLowerCase()) { // Сортировка
+            case ("recent"):
+                Comparator<Post> compareByTimeNewFirst = new Comparator<Post>() {
+                    public int compare(Post o1, Post o2) {
+                        return o2.getTime().compareTo(o1.getTime());
+                    }
+                };
+                allPosts.sort(compareByTimeNewFirst);
+                break;
+            case ("popular"):
+                Comparator<Post> compareByCommentsCount = (o1, o2) -> o2.getPostComments().size() - o1.getPostComments().size();
+                allPosts.sort(compareByCommentsCount);
+                break;
+            case ("best"):
+                Comparator<Post> compareByLikesCount = (o1, o2) -> {
+                    int o1likesCount = (int) o1.getPostVotes().stream().filter(like -> like.getValue() == 1).count();
+                    int o2LikesCount = (int) o2.getPostVotes().stream().filter(like -> like.getValue() == 1).count();
+                    return o2LikesCount - o1likesCount;
+                };
+                allPosts.sort(compareByLikesCount);
+                break;
+            case ("early"):
+                Comparator<Post> compareByTimeOldFirst = Comparator.comparing(Post::getTime);
+                allPosts.sort(compareByTimeOldFirst);
+                break;
+        }
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            int index = offset + i;
+            if (index == count) {
+                break;
+            }
+            Post currentPost = allPosts.get(index);
+            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())) {
+                postsToShow.add(currentPost);
+            }
+        }
+        JSONObject result = new JSONObject();
+        JSONArray postsArray = new JSONArray();
+        for (Post p : postsToShow) {
+            JSONObject postObject = createResultJsonObjectByPost(p);
+            postsArray.put(postObject);
+        }
+        result.put("count", count).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity searchPosts(int offset, String query, int limit) {
-        return null;
+    public ResponseEntity<String> searchPosts(int offset, String query, int limit) {
+        ArrayList<Post> allPosts = getAllPosts();
+        int count = allPosts.size();
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        if (query.equals("")) {
+            postsToShow = allPosts;
+        } else {
+            for (int i = 0; i < limit; i++) {
+                int index = offset + i;
+                if (index == count) {
+                    break;
+                }
+                Post currentPost = allPosts.get(index);
+                if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+                        && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
+                        && currentPost.getText().contains(query)) {
+                    postsToShow.add(currentPost);
+                }
+            }
+        }
+        JSONObject result = new JSONObject();
+        JSONArray postsArray = new JSONArray();
+        for (Post p : postsToShow) {
+            JSONObject postObject = createResultJsonObjectByPost(p);
+            postsArray.put(postObject);
+        }
+        result.put("count", count).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity getPostsByDate(Date date, int offset, int limit) {
-        return null;
+    public ResponseEntity<String> getPostsByDate(Date date, int offset, int limit) {
+        // TODO дата может приходить как строка “2019-10-15”
+        if (date == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        ArrayList<Post> allPosts = getAllPosts();
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            int index = offset + i;
+            if (index == allPosts.size()) {
+                break;
+            }
+            Post currentPost = allPosts.get(index);
+            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
+                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date.toLocalDate())) {
+                postsToShow.add(currentPost);
+            }
+        }
+        JSONArray postsArray = new JSONArray();
+        for (Post post : postsToShow) {
+            postsArray.put(createResultJsonObjectByPost(post));
+        }
+        JSONObject result = new JSONObject();
+        result.put("count", postsToShow.size()).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity getPostsByTag(int limit, String tag, int offset) {
-        return null;
+    public ResponseEntity<String> getPostsByTag(int limit, String tag, int offset, TagRepositoryService tagRepositoryService) {
+        if (tag.equals("")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Set<Tag> allTags = tagRepositoryService.getAllTags();
+        ArrayList<Post> allPostsByTag = new ArrayList<>();
+        allTags.stream().filter(t -> t.getName().contains(tag))
+                .forEach(m -> m.getTagsToPostsSet()
+                        .forEach(k -> allPostsByTag.add(k.getPost())));
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            int index = offset + i;
+            if (index == allPostsByTag.size()) {
+                break;
+            }
+            Post currentPost = allPostsByTag.get(index);
+            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())) {
+                postsToShow.add(currentPost);
+            }
+        }
+        JSONArray postsArray = new JSONArray();
+        for (Post post : postsToShow) {
+            postsArray.put(createResultJsonObjectByPost(post));
+        }
+        JSONObject result = new JSONObject();
+        result.put("count", postsToShow.size()).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity getPostsForModeration(String status, int offset, int limit) {
-        return null;
+    public ResponseEntity<String> getPostsForModeration(String status, int offset, int limit, HttpSession session,
+                                                        UserRepositoryService userRepositoryService) {
+        // Авторизован ли пользователь
+        if (status.equals("")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Integer userId = userRepositoryService.getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userRepositoryService.getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        if (!user.isModerator()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
+        }
+        // Пост при создании не имеет moderator_id, показываем всем модераторам все новые посты
+        ArrayList<Post> queriedPosts = new ArrayList<>();
+        switch (status) {
+            case ("new"):
+                queriedPosts = getAllPosts().stream()
+                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.NEW))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+            case ("declined"):
+                queriedPosts = getAllPosts().stream()
+                        .filter(u -> u.getModeratorId().equals(userId))
+                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.DECLINED))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+            case ("accepted"):
+                queriedPosts = getAllPosts().stream()
+                        .filter(u -> u.getModeratorId().equals(userId))
+                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+        }
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            int index = offset + i;
+            if (index == queriedPosts.size()) {
+                break;
+            }
+            Post currentPost = queriedPosts.get(index);
+            if (currentPost.isActive()) {
+                postsToShow.add(currentPost);
+            }
+        }
+        JSONArray postsArray = new JSONArray();
+        for (Post post : postsToShow) {
+            JSONObject tempPostObject = createResultJsonObjectByPost(post);
+            tempPostObject.remove("dislikeCount");
+            tempPostObject.remove("commentCount");
+            tempPostObject.remove("likeCount");
+            tempPostObject.remove("viewCount");
+            postsArray.put(tempPostObject);
+        }
+        JSONObject result = new JSONObject();
+        result.put("count", postsToShow.size()).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity getMyPosts(String status, int offset, int limit) {
-        return null;
+    public ResponseEntity<String> getMyPosts(String status, int offset, int limit, HttpSession session,
+                                             UserRepositoryService userRepositoryService) {
+        if (status.equals("")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Integer userId = userRepositoryService.getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userRepositoryService.getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        Set<Post> allMyPosts = user.getPosts();
+        ArrayList<Post> queriedPosts = new ArrayList<>();
+        switch (status) {
+            case ("inactive"):
+                queriedPosts = allMyPosts.stream().filter(p -> !p.isActive())
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+            case ("pending"):
+                queriedPosts = allMyPosts.stream()
+                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.NEW))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+            case ("declined"):
+                queriedPosts = allMyPosts.stream()
+                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.DECLINED))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+            case ("published"):
+                queriedPosts = allMyPosts.stream()
+                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                break;
+        }
+        ArrayList<Post> postsToShow = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            int index = offset + i;
+            if (index == queriedPosts.size()) {
+                break;
+            }
+            postsToShow.add(queriedPosts.get(index));
+        }
+        JSONArray postsArray = new JSONArray();
+        for (Post post : postsToShow) {
+            JSONObject tempPostObject = createResultJsonObjectByPost(post);
+            tempPostObject.remove("user");
+            postsArray.put(tempPostObject);
+        }
+        JSONObject result = new JSONObject();
+        result.put("count", postsToShow.size()).put("posts", postsArray);
+        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity post(Time time, byte active, String title, String text, String tags) {
-        return null;
+    public ResponseEntity<String> post(String timeString, byte active, String title, String text, String tags, HttpSession session,
+                                       UserRepositoryService userRepositoryService, TagRepositoryService tagRepositoryService,
+                                       TagToPostRepositoryService tagToPostRepositoryService) { //TODO time может быть строкой
+        LocalDateTime time = null;
+        try {
+            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeString).toInstant(), ZoneId.systemDefault());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500) {
+            JSONObject falseResult = new JSONObject();
+            JSONObject errorsObject = new JSONObject();
+            errorsObject.put("title", "Заголовок не установлен").put("text", "Текст публикации слишком короткий");
+            falseResult.put("result", false).put("errors", errorsObject);
+            return new ResponseEntity<>(falseResult.toString(), HttpStatus.BAD_REQUEST);
+        }
+        if (time == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // время не распознано
+        }
+        if (time.isBefore(LocalDateTime.now())) {
+            time = LocalDateTime.now();
+        }
+        Integer userId = userRepositoryService.getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userRepositoryService.getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        String[] tagsSplit = tags.split(",");
+        boolean isActive = false;
+        if (active == 1) {
+            isActive = true;
+        }
+        Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
+        Post currentPost = postRepository.save(new Post(isActive, ModerationStatus.NEW, user, timestamp, title, text));
+        for (String currentTagName : tagsSplit) {
+            if (!currentTagName.isBlank()) {
+                Tag currentTag = tagRepositoryService.addTag(new Tag(currentTagName));
+                tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
+            }
+        }
+        JSONObject resultString = new JSONObject();
+        resultString.put("result", true);
+        return new ResponseEntity<>(resultString.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity uploadImage(File image) {
-        return null;
+    public ResponseEntity<String> uploadImage(File image, HttpSession session, UserRepositoryService userRepositoryService) {
+        if (image == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Integer userId = userRepositoryService.getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userRepositoryService.getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
+        String firstFolder = randomHash.substring(0, randomHash.length() / 6);
+        String secondFolder = randomHash.substring(firstFolder.length(), firstFolder.length() + randomHash.length() / 6);
+        String thirdFolder = randomHash.substring(secondFolder.length(), secondFolder.length() + randomHash.length() / 6);
+        String fileName = randomHash.substring(thirdFolder.length());
+        StringBuilder builder = new StringBuilder("/upload/").append(firstFolder).append("/")
+                .append(secondFolder).append("/").append(thirdFolder).append("/")
+                .append(fileName).append(".jpg");
+        String pathToUpload = builder.toString();
+        // TODO сделать как-то загрузку файла на сервер
+        return new ResponseEntity<>(pathToUpload, HttpStatus.OK);
     }
 
-    public ResponseEntity editPost(int id, Time time, byte active, String title, String text, String tags) {
-        return null;
+    public ResponseEntity<String> editPost(int id, String timeString, byte active, String title, String text, String tags,
+                                   HttpSession session, UserRepositoryService userRepositoryService,
+                                   TagRepositoryService tagRepositoryService,
+                                   TagToPostRepositoryService tagToPostRepositoryService) {
+        LocalDateTime time = null;
+        try {
+            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeString).toInstant(), ZoneId.systemDefault());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Post currentPost = getPostById(id);
+        if (currentPost == null || title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500) {
+            JSONObject falseResult = new JSONObject();
+            JSONObject errorsObject = new JSONObject();
+            errorsObject.put("title", "Заголовок не установлен").put("text", "Текст публикации слишком короткий");
+            falseResult.put("result", false).put("errors", errorsObject);
+            return new ResponseEntity<>(falseResult.toString(), HttpStatus.BAD_REQUEST);
+        }
+        if (time.isBefore(LocalDateTime.now())) {
+            time = LocalDateTime.now();
+        }
+        Integer userId = userRepositoryService.getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = userRepositoryService.getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        String[] tagsSplit = tags.split(",");
+        boolean isActive = false;
+        if (active == 1) {
+            isActive = true;
+        }
+        Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
+        currentPost.setActive(isActive);
+        currentPost.setTime(timestamp);
+        currentPost.setTitle(title);
+        currentPost.setText(text);
+        currentPost.setModerationStatus(ModerationStatus.NEW);
+        postRepository.save(currentPost); // Пост пересохранили, меняем теги и связи с тегами, удаляя старые и добавляя новые
+        currentPost.getTagsToPostsSet().forEach(tag2post -> {
+            tagRepositoryService.deleteTag(tag2post.getTag());
+            tagToPostRepositoryService.deleteTagToPost(tag2post);
+        }); // Нужно ли отдельно удалять все теги?
+        for (String currentTagName : tagsSplit) {         // удалили все теги и тег-ту-посты, добавляем новые
+            if (!currentTagName.isBlank()) {
+                Tag currentTag = tagRepositoryService.addTag(new Tag(currentTagName));
+                tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
+            }
+        }
+        JSONObject resultString = new JSONObject();
+        resultString.put("result", true);
+        return new ResponseEntity<>(resultString.toString(), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> moderatePost(int postId, String decision, HttpSession session, UserRepositoryService userRepositoryService) {
+    public ResponseEntity<String> moderatePost(int postId, String decision, HttpSession session,
+                                               UserRepositoryService userRepositoryService) {
         // Если пользователь залогинен
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
@@ -88,9 +473,9 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Пользователь не найден, хотя сессия есть
         }
-        if (!user.isModerator()) {
+        if (!user.isModerator()) {  // Не модератор
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } // Не модератор
+        }
         Post post = getPostById(postId);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Пост не найден
@@ -139,7 +524,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     }
 
     @Override
-    public int getModerationCount(int moderatorUserId) {
+    public int getModerationCount(int moderatorUserId) { // TODO удалить, храним данные по модерируемым постам в сете в объекте User
         AtomicInteger count = new AtomicInteger();
         postRepository.findAll().forEach(p -> {
             if (p.getModeratorId() == moderatorUserId) {
@@ -154,5 +539,31 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         ArrayList<Post> posts = new ArrayList<>();
         postRepository.findAll().forEach(posts::add);
         return posts;
+    }
+
+    private JSONObject createResultJsonObjectByPost(Post p) {
+        String timeString = getTimeString(p.getTime().toLocalDateTime());
+        JSONObject postObject = new JSONObject();
+        postObject.put("id", p.getId()).put("time", timeString);
+        JSONObject userObject = new JSONObject();
+        userObject.put("id", p.getUser().getId()).put("name", p.getUser().getName());
+        postObject.put("user", userObject).put("title", p.getTitle())
+                .put("announce", "Текст анонса поста без HTML-тэгов") //TODO откуда брать???
+                .put("likeCount", p.getPostVotes().stream().filter(l -> l.getValue() == 1).count())
+                .put("dislikeCount", p.getPostVotes().stream().filter(l -> l.getValue() == -1).count())
+                .put("commentCount", p.getPostComments().size()).put("viewCount", p.getViewCount());
+        return postObject;
+    }
+
+    private String getTimeString(LocalDateTime objectCreatedTime) {
+        StringBuilder timeString = new StringBuilder();
+        if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(1))) {
+            timeString.append("Сегодня, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        } else if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(2))) {
+            timeString.append("Вчера, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        } else {
+            timeString.append(objectCreatedTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm")));
+        }
+        return timeString.toString();
     }
 }

@@ -1,33 +1,40 @@
 package main.model.entities;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "post_votes")
-public class PostVote {
+public class PostVote implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
     private int id;
 
-//    @Column(name = "user_id")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @Column(name = "post_id")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
-    private Date time;
+    private Timestamp time;
 
     @Column(nullable = false, columnDefinition="TINYINT(1)")  // скрыта или активна публикация: 0 или 1
     private byte value;     //  value TINYINT NOT NULL - лайк или дизлайк: 1 или -1
 
+    public PostVote() {}
+
+    public PostVote(User user, Post post, Timestamp timestamp, byte value) {
+        this.user = user;
+        this.post = post;
+        this.time = timestamp;
+        this.value = value;
+    }
 
     // Геттеры и сеттеры
     public int getId() {
@@ -54,11 +61,11 @@ public class PostVote {
         this.post = post;
     }
 
-    public Date getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 

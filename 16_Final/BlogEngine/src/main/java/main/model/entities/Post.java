@@ -3,11 +3,14 @@ package main.model.entities;
 import main.model.ModerationStatus;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
-public class Post {
+public class Post implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,7 +46,36 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostVote> postVotes = new HashSet<PostVote>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostComment> postComments = new HashSet<PostComment>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TagToPost> tagsToPostsSet = new HashSet<TagToPost>();
+
     // Hibernate requires no-args constructor
+    public Post() {}
+
+    public Post(boolean isActive, ModerationStatus moderationStatus, User user, Timestamp time, String title, String text, Set<TagToPost> tagsToPostsSet) {
+        this.isActive = isActive;
+        this.moderationStatus = moderationStatus;
+        this.user = user;
+        this.time = time;
+        this.title = title;
+        this.text = text;
+        this.tagsToPostsSet = tagsToPostsSet;
+    }
+
+    public Post(boolean isActive, ModerationStatus moderationStatus, User user, Timestamp time, String title, String text) {
+        this.isActive = isActive;
+        this.moderationStatus = moderationStatus;
+        this.user = user;
+        this.time = time;
+        this.title = title;
+        this.text = text;
+    }
 
     // Геттеры и сеттеры
     public int getId() {
@@ -116,5 +148,29 @@ public class Post {
 
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public Set<PostVote> getPostVotes() {
+        return postVotes;
+    }
+
+    public void setPostVotes(Set<PostVote> postVotes) {
+        this.postVotes = postVotes;
+    }
+
+    public Set<PostComment> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(Set<PostComment> postComments) {
+        this.postComments = postComments;
+    }
+
+    public Set<TagToPost> getTagsToPostsSet() {
+        return tagsToPostsSet;
+    }
+
+    public void setTagsToPostsSet(Set<TagToPost> tagsToPostsSet) {
+        this.tagsToPostsSet = tagsToPostsSet;
     }
 }

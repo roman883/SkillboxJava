@@ -1,6 +1,6 @@
 package main;
 
-// Синглтон
+// или удалить, используется только один раз
 public class Errors {
 
     private String email = "Этот e-mail уже зарегистрирован";

@@ -1,10 +1,11 @@
 package main.model.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tag2post")
-public class TagToPost {
+public class TagToPost implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -15,10 +16,16 @@ public class TagToPost {
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne() //Каскад убрал, чтобы пользователи без тегов существовали
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    public TagToPost() {}
+
+    public TagToPost(Tag tag, Post post) {
+        this.tag = tag;
+        this.post = post;
+    }
 
     // Геттеры и сеттеры
 
@@ -46,7 +53,3 @@ public class TagToPost {
         this.post = post;
     }
 }
-
-// id INT NOT NULL AUTO_INCREMENT
-//● post_id INT NOT NULL - пост
-//● tag_id INT NOT NULL - тэг

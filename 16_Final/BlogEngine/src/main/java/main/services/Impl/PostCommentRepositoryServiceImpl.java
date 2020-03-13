@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class PostCommentRepositoryServiceImpl implements PostCommentRepositoryService {
@@ -32,28 +33,37 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
     }
 
     @Override
-    public ResponseEntity<?> addComment(int parentId, int postId, String text, HttpSession session,
-                                     UserRepositoryService userRepoService, PostRepositoryService postRepositoryService) {
+    public ResponseEntity<?> addComment(Integer parentId, Integer postId, String text, HttpSession session,
+                                        UserRepositoryService userRepoService, PostRepositoryService postRepositoryService) {
         // проверка авторизации
         Integer userId = userRepoService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ошибка, не авторизован
         }
-        ArrayList<PostComment> comments = getAllComments();
+        // Get postById get commentById
         PostComment parentComment = null;
-        for (PostComment comment : comments) {
-            if (comment.getId() == parentId) {
-                parentComment = comment;
-            }
-        }
-        ArrayList<Post> posts = postRepositoryService.getAllPosts();
         Post parentPost = null;
-        for (Post post : posts) {
-            if (post.getId() == postId)  {
-                parentPost = post;
-            }
+        if (parentId != null) {
+            parentComment = getPostCommentById(parentId);
         }
-        if (parentComment == null && parentPost == null) { // не найдены ни пост, ни коммент с таким id
+        if (postId != null) {
+            parentPost = postRepositoryService.getPostById(postId);
+        }
+//        ArrayList<PostComment> comments = getAllComments(); //TODO убрать, если все ок работает
+////        PostComment parentComment = null;
+//        for (PostComment comment : comments) {
+//            if (comment.getId() == parentId) {
+//                parentComment = comment;
+//            }
+//        }
+//        ArrayList<Post> posts = postRepositoryService.getAllPosts();
+////        Post parentPost = null;
+//        for (Post post : posts) {
+//            if (post.getId() == postId)  {
+//                parentPost = post;
+//            }
+//        }
+        if (parentComment == null && parentPost == null) { // не найдены ни пост, ни коммент с таким id на которые добавляем коммент
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         if (text.equals("")) {
@@ -63,12 +73,17 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             json.put("errors", errorsJson);
             errorsJson.put("text", "Текст комментария не задан или слишком короткий");
             return new ResponseEntity<>(json.toString(), HttpStatus.OK);
-        }
-        // Если все ок, создаем комментарий и возвращаем id
+        } // Если все ок, создаем комментарий и возвращаем id
         User user = userRepoService.getUser(userId).getBody();
         Timestamp time = Timestamp.valueOf(LocalDateTime.now());
-        PostComment newComment = postCommentRepository.save(new PostComment(parentComment, user, parentPost, time));
-        JSONObject json = new JSONObject().put("`id`", newComment.getId());
+        PostComment newComment = postCommentRepository.save(new PostComment(parentComment, user, parentPost, time, text));
+        JSONObject json = new JSONObject().put("id", newComment.getId());
         return new ResponseEntity<>(json.toString(), HttpStatus.OK);
+    }
+
+    @Override
+    public PostComment getPostCommentById(int id) {
+        Optional<PostComment> optionalComment = postCommentRepository.findById(id);
+        return optionalComment.isPresent() ? optionalComment.get() : null;
     }
 }

@@ -1,5 +1,6 @@
 package main.services.Impl;
 
+import main.model.entities.TagToPost;
 import main.model.repositories.TagToPostRepository;
 import main.services.interfaces.TagToPostRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,4 +11,18 @@ public class TagToPostRepositoryServiceImpl implements TagToPostRepositoryServic
 
     @Autowired
     private TagToPostRepository tagToPostRepository;
+
+    @Override
+    public TagToPost addTagToPost(TagToPost tagToPost) {
+        if (tagToPost == null) {
+            return null;
+        } else {
+            return tagToPostRepository.save(tagToPost);
+        }
+    }
+
+    @Override
+    public void deleteTagToPost(TagToPost tagToPost) {
+        tagToPostRepository.delete(tagToPost);
+    }
 }
