@@ -3,6 +3,8 @@ package main.services.Impl;
 import main.model.ModerationStatus;
 import main.model.entities.*;
 import main.model.repositories.PostRepository;
+import main.model.responses.ResponseAPI;
+import main.model.responses.ResponsePost;
 import main.services.interfaces.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,12 +16,10 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -33,41 +33,18 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     @Autowired
     private PostRepository postRepository;
 
-    public ResponseEntity<String> getPost(int id, TagRepositoryService tagRepositoryService,
-                                          PostCommentRepositoryService postCommentRepositoryService,
-                                          PostVoteRepositoryService postVoteRepositoryService) {
+
+    public ResponseEntity<ResponseAPI> getPost(int id) {
         Post post = getPostById(id);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         if (!post.isActive() || !post.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                || post.getTime().toLocalDateTime().isAfter(LocalDateTime.now())) {
+                || post.getTime().toLocalDateTime().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        JSONObject result = createResultJsonObjectByPost(post);
-        result.remove("announce");
-        result.remove("commentCount");
-        result.put("text", post.getText()); //TODO Конвертировать в HTML?
-        JSONArray commentsArray = new JSONArray();
-        for (PostComment comment : post.getPostComments()) {
-            JSONObject commentObject = new JSONObject();
-            commentObject.put("id", comment.getId()).put("time", comment.getTime().toLocalDateTime());
-            User user = comment.getUser();
-            JSONObject userObject = new JSONObject();
-            userObject.put("id", user.getId()).put("name", user.getName()).put("photo", user.getPhoto());
-            commentObject.put("user", userObject).put("text", comment.getText()); //TODO Конвертировать в HTML?
-            commentsArray.put(commentObject);
-        }
-        result.put("comments", commentsArray);
-        ArrayList<String> postTags = new ArrayList<>();
-        for (TagToPost t : post.getTagsToPostsSet()) {
-            String tagName = t.getTag().getName();
-            if (!postTags.contains(tagName)) {
-                postTags.add(tagName);
-            }
-        }
-        result.put("tags", new JSONArray(postTags)); // TODO проверить, можно ли так добавлять
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePost(post);
+        return new ResponseEntity<ResponseAPI>(responseAPI, HttpStatus.OK);
     }
 
     public Post getPostById(int id) {

@@ -1,20 +1,18 @@
 package main.services.interfaces;
 
 import main.model.entities.Post;
+import main.model.responses.ResponseAPI;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.sql.Date;
-import java.sql.Time;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 public interface PostRepositoryService {
 
-    ResponseEntity<String> getPost(int id, TagRepositoryService tagRepositoryService,
-                           PostCommentRepositoryService postCommentRepositoryService,
-                           PostVoteRepositoryService postVoteRepositoryService);
+    ResponseEntity<ResponseAPI> getPost(int id);
 
     ResponseEntity<String> getPostsWithParams(int offset, int limit, String mode);
 

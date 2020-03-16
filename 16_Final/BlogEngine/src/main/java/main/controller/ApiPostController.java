@@ -1,5 +1,6 @@
 package main.controller;
 
+import main.model.responses.ResponseAPI;
 import main.services.Impl.*;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,8 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post/{id}")
     public @ResponseBody
-    ResponseEntity<String> get(@PathVariable int id) {
-        return postRepoService.getPost(id, tagRepoService, commentRepoService, postVoteRepoService);
+    ResponseEntity<ResponseAPI> get(@PathVariable int id) {
+        return postRepoService.getPost(id);
     }
 
     @GetMapping(value = "/api/post/byDate", params = {"date", "offset", "limit"})
