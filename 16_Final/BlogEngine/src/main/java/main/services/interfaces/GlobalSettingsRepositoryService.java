@@ -8,10 +8,10 @@ import java.util.HashSet;
 
 public interface GlobalSettingsRepositoryService {
 
-    ResponseEntity<String> getGlobalSettings(HttpSession session, UserRepositoryService userRepositoryService);
+    ResponseEntity<?> getGlobalSettings(HttpSession session);
 
-    ResponseEntity<String> setGlobalSettings(Boolean multiUserMode, Boolean postPremoderation, Boolean statisticsIsPublic,
-                                     HttpSession session, UserRepositoryService userRepositoryService);
+    ResponseEntity<?> setGlobalSettings(Boolean multiUserMode, Boolean postPremoderation, Boolean statisticsIsPublic,
+                                     HttpSession session);
 
     HashSet<GlobalSettings> getAllGlobalSettingsSet();
 }

@@ -1,10 +1,3 @@
-#spring.datasource.url: jdbc:mysql://localhost:3306/blogDB?serverTimezone=UTC
-#spring.datasource.username: root
-#spring.datasource.password: testtest
-#spring.jpa.hibernate.ddl-auto: update #update - later
-#
-#
-
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # com.mysql.jdbc.Driver
@@ -15,7 +8,7 @@ spring:
   jpa:
     show_sql: true # в логах видны sql запросы, false в режиме норм работы (show-sql)
     hibernate:
-      ddl-auto: update # update работает только так, валидэйт не проходит
+      ddl-auto: validate # update работает только так, валидэйт не проходит
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

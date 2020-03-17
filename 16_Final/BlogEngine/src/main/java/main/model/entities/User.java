@@ -17,7 +17,7 @@ public class User implements Serializable {
 
     // @Size(max = 3)
     //@Column(name = "      ", columnDefinition="TINYINT(3) UNSIGNED default '40'")
-    @Column(name = "is_moderator", nullable = false, columnDefinition="TINYINT(1)")        // является ли пользователь модератором
+    @Column(name = "is_moderator", nullable = false)        // является ли пользователь модератором  //columnDefinition="TINYINT(1)"
     private boolean isModerator;            // (может ли править глобальные настройки сайта и модерировать посты)
 
     @Column(name = "reg_time", nullable = false, columnDefinition = "DATETIME")

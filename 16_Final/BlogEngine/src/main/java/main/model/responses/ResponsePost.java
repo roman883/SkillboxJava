@@ -4,6 +4,7 @@ import main.model.entities.Post;
 import main.model.entities.PostComment;
 import main.model.entities.TagToPost;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -37,8 +38,8 @@ public class ResponsePost implements ResponseAPI {
             int commentAuthorId = comment.getUser().getId();
             String commentAuthorName = comment.getUser().getName();
             String commentAuthorPhoto = comment.getUser().getPhoto();
-            PostCommentAuthorAPI commentAuthor =
-                    new PostCommentAuthorAPI(commentAuthorId, commentAuthorName, commentAuthorPhoto);
+            PostCommentAPI.PostCommentAuthorAPI commentAuthor =
+                    new PostCommentAPI.PostCommentAuthorAPI(commentAuthorId, commentAuthorName, commentAuthorPhoto);
             int commentId = comment.getId();
             String commentTime = getTimeString(comment.getTime().toLocalDateTime());
             String commentText = comment.getText();
@@ -55,9 +56,10 @@ public class ResponsePost implements ResponseAPI {
 
     private String getTimeString(LocalDateTime objectCreatedTime) {
         StringBuilder timeString = new StringBuilder();
-        if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(1))) {
+        if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay())
+                && objectCreatedTime.isBefore(LocalDateTime.now())) {
             timeString.append("Сегодня, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(2))) {
+        } else if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay().minusDays(1))) {
             timeString.append("Вчера, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         } else {
             timeString.append(objectCreatedTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm")));
@@ -158,5 +160,116 @@ public class ResponsePost implements ResponseAPI {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    private static class PostAuthorAPI {
+
+        private int id;
+        private String name;
+
+        public PostAuthorAPI(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    private static class PostCommentAPI {
+
+        private int id;
+        private String time;
+        private PostCommentAuthorAPI user;
+        private String text;
+
+        public PostCommentAPI(int id, String time, PostCommentAuthorAPI user, String text) {
+            this.id = id;
+            this.time = time;
+            this.user = user;
+            this.text = text;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public void setTime(String time) {
+            this.time = time;
+        }
+
+        public PostCommentAuthorAPI getUser() {
+            return user;
+        }
+
+        public void setUser(PostCommentAuthorAPI user) {
+            this.user = user;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        private static class PostCommentAuthorAPI {
+
+            private int id;
+            private String name;
+            private String photo;
+
+            public PostCommentAuthorAPI(int id, String name, String photo) {
+                this.id = id;
+                this.name = name;
+                this.photo = photo;
+            }
+
+            public int getId() {
+                return id;
+            }
+
+            public void setId(int id) {
+                this.id = id;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getPhoto() {
+                return photo;
+            }
+
+            public void setPhoto(String photo) {
+                this.photo = photo;
+            }
+        }
     }
 }

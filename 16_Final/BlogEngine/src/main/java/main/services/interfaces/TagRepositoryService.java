@@ -1,13 +1,14 @@
 package main.services.interfaces;
 
 import main.model.entities.Tag;
+import main.model.responses.ResponseAPI;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 
 public interface TagRepositoryService {
 
-    ResponseEntity<String> getTags(String query);
+    ResponseEntity<ResponseAPI> getTags(String query);
 
     Set<Tag> getAllTags();
 
@@ -15,5 +16,5 @@ public interface TagRepositoryService {
 
     void deleteTag(Tag tag);
 
-    ResponseEntity<String> getTagsWithoutQuery();
+    ResponseEntity<ResponseAPI> getTagsWithoutQuery();
 }

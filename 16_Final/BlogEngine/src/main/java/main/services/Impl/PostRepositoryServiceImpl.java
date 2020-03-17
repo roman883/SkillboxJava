@@ -3,8 +3,7 @@ package main.services.Impl;
 import main.model.ModerationStatus;
 import main.model.entities.*;
 import main.model.repositories.PostRepository;
-import main.model.responses.ResponseAPI;
-import main.model.responses.ResponsePost;
+import main.model.responses.*;
 import main.services.interfaces.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,13 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -29,9 +32,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostRepositoryServiceImpl implements PostRepositoryService {
+    private static final String ROOT_PATH_TO_UPLOAD = "images";
 
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private TagRepositoryService tagRepositoryService;
+    @Autowired
+    private UserRepositoryService userRepositoryService;
+    @Autowired
+    private TagToPostRepositoryService tagToPostRepositoryService;
 
 
     public ResponseEntity<ResponseAPI> getPost(int id) {
@@ -40,7 +50,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         if (!post.isActive() || !post.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                || post.getTime().toLocalDateTime().isBefore(LocalDateTime.now())) {
+                || !post.getTime().toLocalDateTime().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         ResponseAPI responseAPI = new ResponsePost(post);
@@ -53,7 +63,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 optionalPost.get() : null;
     }
 
-    public ResponseEntity<String> getPostsWithParams(int offset, int limit, String mode) { //TODO проверки входных значений?
+    public ResponseEntity<ResponseAPI> getPostsWithParams(int offset, int limit, String mode) { //TODO проверки входных значений?
         List<Post> allPosts = getAllPosts();
         int count = allPosts.size();
         switch (mode.toLowerCase()) { // Сортировка
@@ -94,17 +104,11 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 postsToShow.add(currentPost);
             }
         }
-        JSONObject result = new JSONObject();
-        JSONArray postsArray = new JSONArray();
-        for (Post p : postsToShow) {
-            JSONObject postObject = createResultJsonObjectByPost(p);
-            postsArray.put(postObject);
-        }
-        result.put("count", count).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePosts(count, postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> searchPosts(int offset, String query, int limit) {
+    public ResponseEntity<ResponseAPI> searchPosts(int offset, String query, int limit) {
         ArrayList<Post> allPosts = getAllPosts();
         int count = allPosts.size();
         ArrayList<Post> postsToShow = new ArrayList<>();
@@ -124,18 +128,18 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 }
             }
         }
-        JSONObject result = new JSONObject();
-        JSONArray postsArray = new JSONArray();
-        for (Post p : postsToShow) {
-            JSONObject postObject = createResultJsonObjectByPost(p);
-            postsArray.put(postObject);
-        }
-        result.put("count", count).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePosts(postsToShow.size(), postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> getPostsByDate(Date date, int offset, int limit) {
-        // TODO дата может приходить как строка “2019-10-15”
+    public ResponseEntity<ResponseAPI> getPostsByDate(String dateString, int offset, int limit) {
+        LocalDate date = null;
+        try {
+            date = LocalDate.ofInstant(new SimpleDateFormat("yyyy-MM-dd")
+                    .parse(dateString).toInstant(), ZoneId.systemDefault());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (date == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -149,20 +153,15 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             Post currentPost = allPosts.get(index);
             if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
                     && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
-                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date.toLocalDate())) {
+                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date)) {
                 postsToShow.add(currentPost);
             }
         }
-        JSONArray postsArray = new JSONArray();
-        for (Post post : postsToShow) {
-            postsArray.put(createResultJsonObjectByPost(post));
-        }
-        JSONObject result = new JSONObject();
-        result.put("count", postsToShow.size()).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePosts(postsToShow.size(), postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> getPostsByTag(int limit, String tag, int offset, TagRepositoryService tagRepositoryService) {
+    public ResponseEntity<ResponseAPI> getPostsByTag(int limit, String tag, int offset) {
         if (tag.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -183,17 +182,12 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 postsToShow.add(currentPost);
             }
         }
-        JSONArray postsArray = new JSONArray();
-        for (Post post : postsToShow) {
-            postsArray.put(createResultJsonObjectByPost(post));
-        }
-        JSONObject result = new JSONObject();
-        result.put("count", postsToShow.size()).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePosts(postsToShow.size(), postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> getPostsForModeration(String status, int offset, int limit, HttpSession session,
-                                                        UserRepositoryService userRepositoryService) {
+    public ResponseEntity<ResponseAPI> getPostsForModeration(String status, int offset, int limit,
+                                                             HttpSession session) {
         // Авторизован ли пользователь
         if (status.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -241,22 +235,11 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 postsToShow.add(currentPost);
             }
         }
-        JSONArray postsArray = new JSONArray();
-        for (Post post : postsToShow) {
-            JSONObject tempPostObject = createResultJsonObjectByPost(post);
-            tempPostObject.remove("dislikeCount");
-            tempPostObject.remove("commentCount");
-            tempPostObject.remove("likeCount");
-            tempPostObject.remove("viewCount");
-            postsArray.put(tempPostObject);
-        }
-        JSONObject result = new JSONObject();
-        result.put("count", postsToShow.size()).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponsePostsForModeration(postsToShow.size(), postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> getMyPosts(String status, int offset, int limit, HttpSession session,
-                                             UserRepositoryService userRepositoryService) {
+    public ResponseEntity<ResponseAPI> getMyPosts(String status, int offset, int limit, HttpSession session) {
         if (status.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -299,20 +282,12 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             }
             postsToShow.add(queriedPosts.get(index));
         }
-        JSONArray postsArray = new JSONArray();
-        for (Post post : postsToShow) {
-            JSONObject tempPostObject = createResultJsonObjectByPost(post);
-            tempPostObject.remove("user");
-            postsArray.put(tempPostObject);
-        }
-        JSONObject result = new JSONObject();
-        result.put("count", postsToShow.size()).put("posts", postsArray);
-        return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+        ResponseAPI responseAPI = new ResponseMyPosts(postsToShow.size(), postsToShow);
+        return new ResponseEntity<>(responseAPI, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> post(String timeString, byte active, String title, String text, String tags, HttpSession session,
-                                       UserRepositoryService userRepositoryService, TagRepositoryService tagRepositoryService,
-                                       TagToPostRepositoryService tagToPostRepositoryService) { //TODO time может быть строкой
+    public ResponseEntity<ResponseAPI> post(String timeString, byte active, String title, String text, String tags,
+                                            HttpSession session) {
         LocalDateTime time = null;
         try {
             time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeString).toInstant(), ZoneId.systemDefault());
@@ -320,11 +295,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             e.printStackTrace();
         }
         if (title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500) {
-            JSONObject falseResult = new JSONObject();
-            JSONObject errorsObject = new JSONObject();
-            errorsObject.put("title", "Заголовок не установлен").put("text", "Текст публикации слишком короткий");
-            falseResult.put("result", false).put("errors", errorsObject);
-            return new ResponseEntity<>(falseResult.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseFailPost(), HttpStatus.BAD_REQUEST);
         }
         if (time == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // время не распознано
@@ -353,12 +324,10 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
             }
         }
-        JSONObject resultString = new JSONObject();
-        resultString.put("result", true);
-        return new ResponseEntity<>(resultString.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> uploadImage(File image, HttpSession session, UserRepositoryService userRepositoryService) {
+    public ResponseEntity<String> uploadImage(MultipartFile image, HttpSession session) {
         if (image == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -370,23 +339,28 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
         }
-        String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
-        String firstFolder = randomHash.substring(0, randomHash.length() / 6);
-        String secondFolder = randomHash.substring(firstFolder.length(), firstFolder.length() + randomHash.length() / 6);
-        String thirdFolder = randomHash.substring(secondFolder.length(), secondFolder.length() + randomHash.length() / 6);
-        String fileName = randomHash.substring(thirdFolder.length());
-        StringBuilder builder = new StringBuilder("/upload/").append(firstFolder).append("/")
-                .append(secondFolder).append("/").append(thirdFolder).append("/")
-                .append(fileName).append(".jpg");
-        String pathToUpload = builder.toString();
-        // TODO сделать как-то загрузку файла на сервер
-        return new ResponseEntity<>(pathToUpload, HttpStatus.OK);
+        if (!Files.exists(Path.of(ROOT_PATH_TO_UPLOAD))) {
+            try {
+                Files.createDirectory(Path.of(ROOT_PATH_TO_UPLOAD));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String fullDestPath;
+        File newFile = null;
+        do {
+            fullDestPath = getPathStringToUpload();
+            if (!Files.exists(Path.of(fullDestPath))) {
+                newFile = new File(fullDestPath);
+            }
+        } while (newFile == null);
+        copyFile(image, newFile);
+        // TODO сделать как-то загрузку файла на сервер, а не в папку
+        return new ResponseEntity<>(fullDestPath, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> editPost(int id, String timeString, byte active, String title, String text, String tags,
-                                   HttpSession session, UserRepositoryService userRepositoryService,
-                                   TagRepositoryService tagRepositoryService,
-                                   TagToPostRepositoryService tagToPostRepositoryService) {
+    public ResponseEntity<ResponseAPI> editPost(int id, String timeString, byte active, String title, String text,
+                                                String tags, HttpSession session) {
         LocalDateTime time = null;
         try {
             time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeString).toInstant(), ZoneId.systemDefault());
@@ -395,13 +369,9 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         }
         Post currentPost = getPostById(id);
         if (currentPost == null || title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500) {
-            JSONObject falseResult = new JSONObject();
-            JSONObject errorsObject = new JSONObject();
-            errorsObject.put("title", "Заголовок не установлен").put("text", "Текст публикации слишком короткий");
-            falseResult.put("result", false).put("errors", errorsObject);
-            return new ResponseEntity<>(falseResult.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseFailPost(), HttpStatus.BAD_REQUEST);
         }
-        if (time.isBefore(LocalDateTime.now())) {
+        if (time == null || time.isBefore(LocalDateTime.now())) {
             time = LocalDateTime.now();
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
@@ -434,13 +404,10 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
             }
         }
-        JSONObject resultString = new JSONObject();
-        resultString.put("result", true);
-        return new ResponseEntity<>(resultString.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> moderatePost(int postId, String decision, HttpSession session,
-                                               UserRepositoryService userRepositoryService) {
+    public ResponseEntity<ResponseAPI> moderatePost(int postId, String decision, HttpSession session) {
         // Если пользователь залогинен
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
@@ -470,7 +437,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    public ResponseEntity<String> countPostsByYear(Integer year) {
+    public ResponseEntity<ResponseAPI> countPostsByYear(Integer year) {
         ArrayList<Post> allPosts = getAllPosts();
         HashMap<Date, Integer> postsCountByDate = new HashMap<>();
         TreeSet<Integer> allYears = new TreeSet<>();
@@ -489,15 +456,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 postsCountByDate.put(postDate, postCount + 1);
             }
         }
-        JSONObject result = new JSONObject();
-        JSONArray yearsArray = new JSONArray();
-        allYears.forEach(yearsArray::put);
-        JSONObject postsObject = new JSONObject();
-        for (Date d : postsCountByDate.keySet()) {
-            postsObject.put(String.valueOf(d), postsCountByDate.get(d));
-        }
-        result.put("years", yearsArray).put("posts", postsObject);
-        return new ResponseEntity<String>(result.toString(), HttpStatus.OK); //TODO проблема с получением в ResponseEntity объекто JSONObject, приходится возвращать json.toString()
+        return new ResponseEntity<ResponseAPI>(new ResponsePostsCalendar(postsCountByDate, allYears), HttpStatus.OK);
     }
 
     @Override
@@ -534,13 +493,46 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
 
     private String getTimeString(LocalDateTime objectCreatedTime) {
         StringBuilder timeString = new StringBuilder();
-        if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(1))) {
+        if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay())
+                && objectCreatedTime.isBefore(LocalDateTime.now())) {
             timeString.append("Сегодня, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else if (objectCreatedTime.isAfter(LocalDateTime.now().minusDays(2))) {
+        } else if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay().minusDays(1))) {
             timeString.append("Вчера, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         } else {
             timeString.append(objectCreatedTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm")));
         }
         return timeString.toString();
+    }
+
+    private void copyFile(MultipartFile source, File dest) {
+        try {
+            byte[] bytes = source.getBytes();
+            Files.write(dest.toPath(), bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        try (InputStream inputStream = new FileInputStream(source);
+//        OutputStream outputStream = new FileOutputStream(dest)) { // Autocloseable потоки //TODO переделать на потоки?
+//            byte[] bytes = source.getBytes();
+//            int length = bytes.length;
+//            while ((length = inputStream.read(bytes)) > 0) {
+//                outputStream.write(bytes, 0, length);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    private String getPathStringToUpload() {
+        String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
+        String firstFolder = randomHash.substring(0, randomHash.length() / 6);
+        String secondFolder = randomHash.substring(firstFolder.length(), firstFolder.length() + randomHash.length() / 6);
+        String thirdFolder = randomHash.substring(secondFolder.length(), secondFolder.length() + randomHash.length() / 6);
+        String fileName = randomHash.substring(thirdFolder.length());
+        StringBuilder builder = new StringBuilder("/upload/").append(firstFolder).append("/")
+                .append(secondFolder).append("/").append(thirdFolder).append("/")
+                .append(fileName).append(".jpg");
+        String pathToUpload = builder.toString();
+        return "/" + ROOT_PATH_TO_UPLOAD + pathToUpload;
     }
 }

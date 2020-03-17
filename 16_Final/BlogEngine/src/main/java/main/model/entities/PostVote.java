@@ -24,7 +24,7 @@ public class PostVote implements Serializable {
     @Column(nullable = false, columnDefinition = "DATETIME")
     private Timestamp time;
 
-    @Column(nullable = false, columnDefinition="TINYINT(1)")  // скрыта или активна публикация: 0 или 1
+    @Column(nullable = false)  // скрыта или активна публикация: 0 или 1 //columnDefinition="TINYINT(1)"
     private byte value;     //  value TINYINT NOT NULL - лайк или дизлайк: 1 или -1
 
     public PostVote() {}

@@ -1,15 +1,17 @@
 package main.controller;
 
-import main.model.GeneralData;
+import main.model.responses.ResponseAPI;
 import main.services.Impl.*;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 
 @RestController
 @ComponentScan("service")
@@ -21,7 +23,6 @@ public class ApiGeneralController {
     private final TagRepositoryService tagRepoService;
     private final GeneralDataService generalDataService;
     private final PostCommentRepositoryService commentRepoService;
-    private final PostVoteRepositoryService postVoteRepoService;
 
     @Autowired
     public ApiGeneralController(PostRepositoryServiceImpl postRepoServiceImpl,
@@ -29,8 +30,7 @@ public class ApiGeneralController {
                                 GlobalSettingsRepositoryServiceImpl globalSettingsRepoServiceImpl,
                                 TagRepositoryServiceImpl tagRepoServiceImpl,
                                 GeneralDataServiceImpl generalDataServiceImpl,
-                                PostCommentRepositoryServiceImpl postCommentRepoServiceImpl,
-                                PostVoteRepositoryServiceImpl postVoteRepositoryServiceImpl
+                                PostCommentRepositoryServiceImpl postCommentRepoServiceImpl
     ) {
         this.postRepoService = postRepoServiceImpl;
         this.userRepoService = userRepoServiceImpl;
@@ -38,60 +38,64 @@ public class ApiGeneralController {
         this.tagRepoService = tagRepoServiceImpl;
         this.generalDataService = generalDataServiceImpl;
         this.commentRepoService = postCommentRepoServiceImpl;
-        this.postVoteRepoService = postVoteRepositoryServiceImpl;
     }
 
     @GetMapping(value = "/api/init")
-    public @ResponseBody
-    ResponseEntity<GeneralData> getData() {
+    public @ResponseBody ResponseEntity<ResponseAPI> getData() {
         return generalDataService.getData();
     }
 
     @PostMapping(value = "/api/image", params = {"image"})
     public @ResponseBody
-    ResponseEntity<String> uploadImage(@RequestParam(value = "image") File image, HttpServletRequest request) {
-        return postRepoService.uploadImage(image, request.getSession(), userRepoService); //TODO куда загружать фото? и как?
+    ResponseEntity<String> uploadImage(@RequestParam(value = "image") MultipartFile file,
+                                       HttpServletRequest request) {
+        ResponseEntity<String> responseEntity = null;
+        try {
+            responseEntity = postRepoService.uploadImage(file, request.getSession()); //TODO куда загружать фото? и как? ОГРАНИЧЕНИЕ РАЗМЕРА ФАЙЛА 1 МБ стандартно
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return responseEntity;
     }
 
     @PostMapping(value = "/api/comment", params = {"parent_id", "post_id", "text"})
     public @ResponseBody
-    ResponseEntity<?> addComment(@RequestParam(value = "parent_id") Integer parentId,
+    ResponseEntity<ResponseAPI> addComment(@RequestParam(value = "parent_id") Integer parentId,
                                  @RequestParam(value = "post_id") Integer postId,
                                  @RequestParam(value = "text") String text,
                                  HttpServletRequest request) {
-        return commentRepoService.addComment(parentId, postId, text, request.getSession(),
-                userRepoService, postRepoService);
+        return commentRepoService.addComment(parentId, postId, text, request.getSession());
     }
 
     @GetMapping(value = "/api/tag", params = {"query"})
     public @ResponseBody
-    ResponseEntity<String> getTags(@RequestParam(value = "query") String query) {
+    ResponseEntity<ResponseAPI> getTags(@RequestParam(value = "query") String query) {
         return tagRepoService.getTags(query);
     }
 
     @GetMapping(value = "/api/tag")
     public @ResponseBody
-    ResponseEntity<String> getTagsWithoutQuery() {
+    ResponseEntity<ResponseAPI> getTagsWithoutQuery() {
         return tagRepoService.getTagsWithoutQuery();
     }
 
     @PostMapping(value = "/api/moderation", params = {"post_id", "decision"}) // Точно ли ничего не надо возвращать??
     public @ResponseBody
-    ResponseEntity<String> moderatePost(@RequestParam(value = "post_id") int postId,
+    ResponseEntity<ResponseAPI> moderatePost(@RequestParam(value = "post_id") int postId,
                                         @RequestParam(value = "decision") String decision,
                                         HttpServletRequest request) {
-        return postRepoService.moderatePost(postId, decision, request.getSession(), userRepoService);
+        return postRepoService.moderatePost(postId, decision, request.getSession());
     }
 
     @GetMapping(value = "/api/calendar", params = {"year"}) // или years и много лет должно быть???
     public @ResponseBody
-    ResponseEntity<String> countPostByYear(@RequestParam(value = "year") Integer year) {
+    ResponseEntity<ResponseAPI> countPostByYear(@RequestParam(value = "year") Integer year) {
         return postRepoService.countPostsByYear(year);
     }
 
     @PostMapping(value = "/api/profile/my", params = {"photo", "removePhoto", "name", "email", "password"})
     public @ResponseBody
-    ResponseEntity<String> editProfile(@RequestParam(value = "photo") File photo,
+    ResponseEntity<ResponseAPI> editProfile(@RequestParam(value = "photo") File photo,
                                        @RequestParam(value = "removePhoto") Byte removePhoto,
                                        @RequestParam(value = "name") String name,
                                        @RequestParam(value = "email") String email,
@@ -102,31 +106,30 @@ public class ApiGeneralController {
 
     @GetMapping(value = "/api/statistics/my")
     public @ResponseBody
-    ResponseEntity<String> getMyStatistics(HttpServletRequest request) {
+    ResponseEntity<?> getMyStatistics(HttpServletRequest request) {
         return userRepoService.getMyStatistics(request.getSession());
     }
 
     @GetMapping(value = "/api/statistics/all")
     public @ResponseBody
-    ResponseEntity getAllStatistics(HttpServletRequest request) {
-        return userRepoService.getAllStatistics(request.getSession(), globalSettingsRepoService,
-                postVoteRepoService, postRepoService);
+    ResponseEntity<?> getAllStatistics(HttpServletRequest request) {
+        return userRepoService.getAllStatistics(request.getSession());
     }
 
     @GetMapping(value = "/api/settings")
     public @ResponseBody
-    ResponseEntity<String> getGlobalSettings(HttpServletRequest request) {
-        return globalSettingsRepoService.getGlobalSettings(request.getSession(), userRepoService);
+    ResponseEntity<?> getGlobalSettings(HttpServletRequest request) {
+        return globalSettingsRepoService.getGlobalSettings(request.getSession());
     }
 
     @PutMapping(value = "/api/settings", params = {"MULTIUSER_MODE", "POST_PREMODERATION", "STATISTICS_IS_PUBLIC"})
     //TODO Как получать параметры Global Settings и как их устанавливать??
     public @ResponseBody
-    ResponseEntity<String> setGlobalSettings(@RequestParam(value = "MULTIUSER_MODE") Boolean multiUserMode,
+    ResponseEntity<?> setGlobalSettings(@RequestParam(value = "MULTIUSER_MODE") Boolean multiUserMode,
                                              @RequestParam(value = "POST_PREMODERATION") Boolean postPremoderation,
                                              @RequestParam(value = "STATISTICS_IS_PUBLIC") Boolean statisticsIsPublic,
                                              HttpServletRequest request) {
         return globalSettingsRepoService.setGlobalSettings(multiUserMode, postPremoderation, statisticsIsPublic,
-                request.getSession(), userRepoService);
+                request.getSession());
     }
 }

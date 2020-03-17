@@ -1,7 +1,7 @@
-package main.model;
+package main.model.responses;
 
 // Синглтон
-public class GeneralData {
+public class GeneralData implements ResponseAPI {
 
     private String title = "DevPub"; //TODO Верно ли, что поля не статичные?
     private String subtitle = "Рассказы разработчиков";

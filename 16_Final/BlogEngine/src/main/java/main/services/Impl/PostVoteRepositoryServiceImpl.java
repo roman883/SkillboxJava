@@ -4,6 +4,8 @@ import main.model.entities.Post;
 import main.model.entities.PostVote;
 import main.model.entities.User;
 import main.model.repositories.PostVoteRepository;
+import main.model.responses.ResponseAPI;
+import main.model.responses.ResponseBoolean;
 import main.services.interfaces.PostRepositoryService;
 import main.services.interfaces.PostVoteRepositoryService;
 import main.services.interfaces.UserRepositoryService;
@@ -23,10 +25,13 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
 
     @Autowired
     private PostVoteRepository postVoteRepository;
+    @Autowired
+    private UserRepositoryService userRepositoryService;
+    @Autowired
+    private PostRepositoryService postRepositoryService;
 
     @Override
-    public ResponseEntity<String> likePost(int postId, HttpSession session, UserRepositoryService userRepositoryService,
-                                   PostRepositoryService postRepositoryService) {
+    public ResponseEntity<ResponseAPI> likePost(int postId, HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -51,21 +56,20 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         if (beforeLike == null) { // Не было лайков и диз
             PostVote newLike = postVoteRepository
                     .save(new PostVote(user, currentPost, Timestamp.valueOf(LocalDateTime.now()), (byte) 1));
-            return new ResponseEntity<>("{\"result\":" + true + "}", HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         if (beforeLike.getValue() == 1) { // Повторный лайк
-            return new ResponseEntity<>("{\"result\":" + false + "}", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == -1) { // был дизлайк, удаляем
             postVoteRepository.delete(beforeLike);
-            return new ResponseEntity<>("{\"result\":" + true + "}", HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
-        return new ResponseEntity<>("{\"result\":" + false + "}", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<String> dislikePost(int postId, HttpSession session, UserRepositoryService userRepositoryService,
-                                      PostRepositoryService postRepositoryService) {
+    public ResponseEntity<ResponseAPI> dislikePost(int postId, HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -90,16 +94,16 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         if (beforeLike == null) { // Не было лайков и диз
             PostVote newDislike = postVoteRepository
                     .save(new PostVote(user, currentPost, Timestamp.valueOf(LocalDateTime.now()), (byte) -1));
-            return new ResponseEntity<>("{\"result\":" + true + "}", HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         if (beforeLike.getValue() == -1) { // Повторный дизлайк
-            return new ResponseEntity<>("{\"result\":" + false + "}", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == 1) { // был лайк, удаляем
             postVoteRepository.delete(beforeLike);
-            return new ResponseEntity<>("{\"result\":" + true + "}", HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
-        return new ResponseEntity<>("{\"result\":" + false + "}", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override

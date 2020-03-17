@@ -1,6 +1,7 @@
 package main.services.interfaces;
 
 import main.model.entities.PostVote;
+import main.model.responses.ResponseAPI;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpSession;
@@ -8,11 +9,9 @@ import java.util.HashSet;
 
 public interface PostVoteRepositoryService {
 
-    ResponseEntity<String> likePost(int postId, HttpSession session, UserRepositoryService userRepositoryService,
-                            PostRepositoryService postRepositoryService);
+    ResponseEntity<ResponseAPI> likePost(int postId, HttpSession session);
 
-    ResponseEntity<String> dislikePost(int postId, HttpSession session, UserRepositoryService userRepositoryService,
-                               PostRepositoryService postRepositoryService);
+    ResponseEntity<ResponseAPI> dislikePost(int postId, HttpSession session);
 
     HashSet<PostVote> getAllPostVotes();
 }

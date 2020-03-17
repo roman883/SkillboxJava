@@ -19,7 +19,7 @@ public class Post implements Serializable {
 
     // @Size(max = 1)
     //@Column(name = "    ", columnDefinition="TINYINT(3) UNSIGNED default '40'")
-    @Column(name = "is_active", nullable = false, columnDefinition="TINYINT(1)")  // скрыта или активна публикация: 0 или 1
+    @Column(name = "is_active", nullable = false)  // скрыта или активна публикация: 0 или 1  //columnDefinition="TINYINT(1)"
     private boolean isActive;
 
     // http://tomee.apache.org/examples-trunk/jpa-enumerated/

@@ -1,8 +1,7 @@
 package main.services.interfaces;
 
-import main.model.DTOs.ResultLogoutDTO;
+import main.model.responses.ResponseAPI;
 import main.model.entities.User;
-import main.model.repositories.PostVoteRepository;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpSession;
@@ -13,28 +12,24 @@ public interface UserRepositoryService {
 
     ResponseEntity<User> getUser(int id);
 
-    ResponseEntity<?> login(String email, String password, HttpSession session);
+    ResponseEntity<ResponseAPI> login(String email, String password, HttpSession session);
 
-    ResponseEntity<String> checkAuth(HttpSession session);
+    ResponseEntity<ResponseAPI> checkAuth(HttpSession session);
 
-    ResponseEntity<String> restorePassword(String email);
+    ResponseEntity<ResponseAPI> restorePassword(String email);
 
-    ResponseEntity<String> changePassword(String code, String password, String captcha, String captcha_secret,
-                                          CaptchaRepositoryService captchaRepositoryService);
+    ResponseEntity<ResponseAPI> changePassword(String code, String password, String captcha, String captcha_secret);
 
-    ResponseEntity<?> register(String email, String name, String password, String captcha, String captcha_secret);
+    ResponseEntity<ResponseAPI> register(String email, String name, String password, String captcha, String captcha_secret);
 
-    ResponseEntity<String> editProfile(File photo, Byte removePhoto, String name, String email, String password,
+    ResponseEntity<ResponseAPI> editProfile(File photo, Byte removePhoto, String name, String email, String password,
                                        HttpSession session);
 
-    ResponseEntity<String> getMyStatistics(HttpSession session);
+    ResponseEntity<?> getMyStatistics(HttpSession session);
 
-    ResponseEntity getAllStatistics(HttpSession session,
-                                    GlobalSettingsRepositoryService globalSettingsRepositoryService,
-                                    PostVoteRepositoryService postVoteRepositoryService,
-                                    PostRepositoryService postRepositoryService);
+    ResponseEntity<?> getAllStatistics(HttpSession session);
 
-    ResponseEntity<ResultLogoutDTO> logout(HttpSession session);
+    ResponseEntity<ResponseAPI> logout(HttpSession session);
 
     Integer getUserIdBySession(HttpSession session);
 

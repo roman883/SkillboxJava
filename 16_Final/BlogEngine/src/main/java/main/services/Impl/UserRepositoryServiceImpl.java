@@ -1,7 +1,6 @@
 package main.services.Impl;
 
-import main.model.DTOs.ResultLogoutDTO;
-import main.model.DTOs.ResultSignUpDTO;
+import main.model.responses.*;
 import main.model.entities.*;
 import main.model.repositories.UserRepository;
 import main.services.interfaces.*;
@@ -21,8 +20,20 @@ import java.util.*;
 @Service
 public class UserRepositoryServiceImpl implements UserRepositoryService {
 
+    private static final char[] SYMBOLS_FOR_GENERATOR = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    private static final int KEY_SIZE = 45;
+
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CaptchaRepositoryService captchaRepositoryService;
+    @Autowired
+    private GlobalSettingsRepositoryService globalSettingsRepositoryService;
+    @Autowired
+    private PostVoteRepositoryService postVoteRepositoryService;
+    @Autowired
+    private PostRepositoryService postRepositoryService;
+
     private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя, по заданию не в БД
 
     @Override
@@ -34,101 +45,60 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<?> login(String email, String password, HttpSession session) {
+    public ResponseEntity<ResponseAPI> login(String email, String password, HttpSession session) {
+        User user = null;
         ArrayList<User> userList = getAllUsersList();
-        String resultString = "result";
-        for (User user : userList) {
-            if (user.getEmail().equals(email)) {
-                if (user.getHashedPassword().equals(Integer.toString(password.hashCode()))) { // пароль совпал по хэшу
+        for (User u : userList) {
+            if (u.getEmail().equals(email)) {
+                if (u.getHashedPassword().equals(Integer.toString(password.hashCode()))) { // пароль совпал по хэшу
                     // TODO сделать проверку наличия сессии в базе
-                    sessionIdToUserId.put(session.getId().toString(), user.getId()); // Запоминаем пользователя и сессию
-                    JSONObject json = new JSONObject();
-                    json.put(resultString, true);
-                    JSONObject userJson = new JSONObject();
-                    json.put("user", userJson);
-//                    int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
-                    int moderationCount = user.getPostsModerated().size();
-                    boolean hasSettings = false;
-                    if (user.isModerator()) {
-                        hasSettings = true;
-                    }
-                    userJson.put("id", user.getId()).put("name", user.getName()).put("photo", user.getPhoto()) //TODO если фото нет, так и оставить (null - пусто)?
-                            .put("email", user.getEmail()).put("moderation", user.isModerator())
-                            .put("moderationCount", moderationCount).put("settings", hasSettings);
-                    return new ResponseEntity<Object>(json.toString(), HttpStatus.OK);
+                    sessionIdToUserId.put(session.getId().toString(), u.getId()); // Запоминаем пользователя и сессию
+                    user = u;
+                    break;
                 } else {
-                    JSONObject json = new JSONObject();
-                    json.put(resultString, false);
-                    return new ResponseEntity<Object>(json.toString(), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
                 }
             }
         }
-        JSONObject json = new JSONObject();
-        json.put(resultString, false);
-        return new ResponseEntity<Object>(json.toString(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> checkAuth(HttpSession session) {
+    public ResponseEntity<ResponseAPI> checkAuth(HttpSession session) {
         if (!sessionIdToUserId.containsKey(session.getId().toString())) {
-            String jsonResult = "{\"result\":false}"; //TODO переделать на JSONObject?
-            return new ResponseEntity<>(jsonResult, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
         } else {
             int userId = sessionIdToUserId.get(session.getId().toString());
             User user = getUser(userId).getBody();
             if (user != null) {
-                JSONObject json = new JSONObject();
-                json.put("result", true);
-                JSONObject userJson = new JSONObject();
-                json.put("user", userJson);
-//                int moderationCount = postRepositoryService.getModerationCount(user.getId()); // Получаем кол-во постов, которые прошли модерацию по id
-                int moderationCount = user.getPostsModerated().size();
-                boolean hasSettings = false;
-                if (user.isModerator()) {
-                    hasSettings = true;
-                }
-                userJson.put("id", user.getId())
-                        .put("name", user.getName())
-                        .put("photo", user.getPhoto()) //TODO если фото нет, так и оставить (null - пусто)?
-                        .put("email", user.getEmail())
-                        .put("moderation", user.isModerator())
-                        .put("moderationCount", moderationCount)
-                        .put("settings", hasSettings);
-                return new ResponseEntity<>(json.toString(), HttpStatus.OK);
-            } else {
-                String badResult = "Ошибка! Пользователь найден в сессиях, однако отсутствует в БД!";
-                System.out.println(badResult);
-                return new ResponseEntity<>(badResult, HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+            } else {        // "Ошибка! Пользователь найден в сессиях, однако отсутствует в БД!";
+                return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
             }
         }
     }
 
     @Override
-    public ResponseEntity<String> restorePassword(String email) {
-        JSONObject json = new JSONObject();
+    public ResponseEntity<ResponseAPI> restorePassword(String email) {
         ArrayList<User> userList = getAllUsersList();
         for (User user : userList) {
             if (user.getEmail().equals(email)) { // пользователь найден в базе
-                // TODO генерация кода случайным образом не HASHcode, заменить ниже!
-                String hash = Integer.toString(Double.toString(
-                        Math.pow((Math.random() * Math.random()), 100 * (Math.random()))).hashCode());
+                String hash = generateRandomString();
                 user.setCode(hash); // запоминаем код в базе
+                userRepository.save(user);
                 String link = "/login/change-password/" + hash;
-                // TODO отправка ссылки на email пользователя!! И Занесение в БД к юзеру! А также в капчу
-                json.put("result", true);
-                return new ResponseEntity<>(json.toString(), HttpStatus.OK);
+                // TODO отправка ссылки на email пользователя!! И Занесение в БД к юзеру! А также в капчу  /login/change-password/HASH
+                return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
             }
         }
-        json.put("result", false);
-        return new ResponseEntity<>(json.toString(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<String> changePassword(String code, String password, String captcha, String captchaSecret,
-                                                 CaptchaRepositoryService captchaRepositoryService) {
-        JSONObject json = new JSONObject(); // TODO реализовать проверку длины пароля и наличия букв/цифр/символов в пароле во всех методах
+    public ResponseEntity<ResponseAPI> changePassword(String code, String password, String captcha, String captchaSecret) {
+        // TODO реализовать проверку длины пароля и наличия букв/цифр/символов в пароле во всех методах
         if (code == null || password == null || captcha == null || captchaSecret == null) {
-            return new ResponseEntity<>("Введены не все данные", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         ArrayList<User> userList = getAllUsersList();
         for (User user : userList) {
@@ -139,41 +109,31 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                         if (captchaCode.getCode().equals(captcha)) {
                             String newHashedPassword = Integer.toString(password.hashCode());
                             user.setHashedPassword(newHashedPassword);
-                            json.put("result", true);
-                            return new ResponseEntity<>(json.toString(), HttpStatus.OK);
+                            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
                         }
                     }
                 }
             }
         }
-        json.put("result", false);
-        JSONObject errorsJson = new JSONObject();
-        json.put("errors", errorsJson);
-        errorsJson.put("code", "Ссылка для восстановления пароля устарела.\n" +
-                "<a href=\"/auth/restore\">Запросить ссылку снова</a>")
-                .put("password", "Пароль короче 6-ти символов")
-                .put("captcha", "Код с картинки введён неверно");
-        return new ResponseEntity<>(json.toString(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseFailChangePass(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<?> register(String email, String name, String password, String captcha, String captcha_secret) {
+    public ResponseEntity<ResponseAPI> register(String email, String name, String password, String captcha, String captcha_secret) {
         if (email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captcha_secret.equals("")) { // TODO проверки сделать на длину пароля, формат Email
-            ResultSignUpDTO resultSignUpDTO = new ResultSignUpDTO();
-            return new ResponseEntity<ResultSignUpDTO>(resultSignUpDTO, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseFailSignUp(), HttpStatus.BAD_REQUEST);
         } else {    // если проверки прошли, создаем пользователя и возвращаем положительный результат
             Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());
             String hashedPassword = Integer.toString(password.hashCode());
             User user = new User(false, registrationDateTime, name, email, hashedPassword);
             userRepository.save(user); // И можно получить id
-            String jsonResult = "{\"result\":true}"; //TODO переделать на JSONObject?
-            return new ResponseEntity<>(jsonResult, HttpStatus.OK);  //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен??
+            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);  //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен??
         }
     }
 
     @Override
-    public ResponseEntity<String> editProfile(File photo, Byte removePhoto, String name, String email, String password,
-                                              HttpSession session) {
+    public ResponseEntity<ResponseAPI> editProfile(File photo, Byte removePhoto, String name, String email,
+                                                   String password, HttpSession session) {
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -194,15 +154,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             }
         }
         if (hasSameName || hasSameEmail) { // Такой пользователь уже есть в базе //TODO проверку размера фото, введенного когда капчи
-            JSONObject result = new JSONObject();
-            JSONObject errors = new JSONObject();
-            errors.put("email", "Этот e-mail уже зарегистрирован")
-                    .put("photo", "Фото слишком большое, нужно не более 5 Мб")
-                    .put("name", "Имя указано неверно")
-                    .put("password", "Пароль короче 6-ти символов")
-                    .put("captcha", "Код с картинки введён неверно");
-            result.put("result", false).put("errors", errors);
-            return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseFailEditProfile(), HttpStatus.OK);
         }
         if (photo != null) { // фото есть, тогда устанавливаем путь к загруженному фото пользователю
             // TODO как загрузить фото на сервер и получить путь? Заменить ниже
@@ -223,11 +175,11 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             //TODO удалить фото с сервера
             user.setPhoto(null);
         }
-        return new ResponseEntity<>("{\"result\": true}", HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> getMyStatistics(HttpSession session) {
+    public ResponseEntity<?> getMyStatistics(HttpSession session) {
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -262,17 +214,13 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         String firstPublicationDate;
         firstPublicationDate = firstPostTime == null ? "Еще не было"
                 : firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        JSONObject result = new JSONObject();
-        result.put("Постов", postsCount).put("Лайков", allLikesCount).put("Дизлайков", allDislikeCount)
-                .put("Просмотров", viewsCount).put("Первая публикация", firstPublicationDate);
-        return new ResponseEntity<String>(result.toString(), HttpStatus.OK);
+        ResponseStatistics responseStatistics = new ResponseStatistics(postsCount, allLikesCount, allDislikeCount,
+                viewsCount, firstPublicationDate);
+        return new ResponseEntity<>(responseStatistics.getMap(), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> getAllStatistics(HttpSession session,
-                                           GlobalSettingsRepositoryService globalSettingsRepositoryService,
-                                           PostVoteRepositoryService postVoteRepositoryService,
-                                           PostRepositoryService postRepositoryService) {
+    public ResponseEntity<?> getAllStatistics(HttpSession session) {
         HashSet<GlobalSettings> settingsSet = globalSettingsRepositoryService.getAllGlobalSettingsSet();
         boolean isStatisticsIsPublic = false;
         for (GlobalSettings s : settingsSet) {
@@ -313,22 +261,21 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         }
         String firstPublicationDate = firstPostTime == null ? "Еще не было" :
                 firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        JSONObject result = new JSONObject();
-        result.put("Постов", postsCount).put("Лайков", allLikesCount).put("Дизлайков", allDislikeCount)
-                .put("Просмотров", viewsCount).put("Первая публикация", firstPublicationDate);
-        return new ResponseEntity<String>(result.toString(), HttpStatus.OK);
+        ResponseStatistics responseStatistics = new ResponseStatistics(postsCount, allLikesCount, allDislikeCount,
+                viewsCount, firstPublicationDate);
+        return new ResponseEntity<>(responseStatistics.getMap(), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<ResultLogoutDTO> logout(HttpSession session) {
+    public ResponseEntity<ResponseAPI> logout(HttpSession session) {
         String sessionId = session.getId();
         if (!sessionIdToUserId.containsKey(sessionId)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResultLogoutDTO(true));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseBoolean(true));
         } // По условию всегда возвращает true
         else {
             sessionIdToUserId.remove(sessionId);
             session.invalidate();
-            return ResponseEntity.status(HttpStatus.OK).body(new ResultLogoutDTO(true));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseBoolean(true));
         }
     }
 
@@ -342,5 +289,13 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     @Override
     public Integer getUserIdBySession(HttpSession session) {
         return sessionIdToUserId.get(session.getId().toString());
+    }
+
+    private String generateRandomString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < KEY_SIZE; i++) {
+            builder.append(SYMBOLS_FOR_GENERATOR[(int) (Math.random() * (SYMBOLS_FOR_GENERATOR.length - 1))]);
+        }
+        return builder.toString();
     }
 }

@@ -2,9 +2,9 @@ package main.services.Impl;
 
 import main.model.entities.Tag;
 import main.model.repositories.TagRepository;
+import main.model.responses.ResponseAPI;
+import main.model.responses.ResponseTags;
 import main.services.interfaces.TagRepositoryService;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     private TagRepository tagRepository;
 
     @Override
-    public ResponseEntity<String> getTags(String query) {
+    public ResponseEntity<ResponseAPI> getTags(String query) {
         ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
@@ -39,15 +39,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
             Double weight = (queryTagsMap.get(key) / mostFrequentTag);
             queryTagsMap.put(key, weight); // Меняем количество на вес тэга
         }
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        for (String key : queryTagsMap.keySet()) {
-            JSONObject json = new JSONObject();
-            json.put("name", key).put("weight", queryTagsMap.get(key));
-            jsonArray.put(json);
-        }
-        jsonObject.put("tags", jsonArray);
-        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseTags(queryTagsMap), HttpStatus.OK);
     }
 
     @Override
@@ -72,7 +64,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     }
 
     @Override
-    public ResponseEntity<String> getTagsWithoutQuery() {
+    public ResponseEntity<ResponseAPI> getTagsWithoutQuery() {
         ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
@@ -86,14 +78,6 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
             Double weight = (queryTagsMap.get(key) / mostFrequentTag);
             queryTagsMap.put(key, weight); // Меняем количество на вес тэга
         }
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        for (String key : queryTagsMap.keySet()) {
-            JSONObject json = new JSONObject();
-            json.put("name", key).put("weight", queryTagsMap.get(key));
-            jsonArray.put(json);
-        }
-        jsonObject.put("tags", jsonArray);
-        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseTags(queryTagsMap), HttpStatus.OK);
     }
 }

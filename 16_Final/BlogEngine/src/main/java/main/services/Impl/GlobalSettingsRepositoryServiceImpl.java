@@ -3,6 +3,8 @@ package main.services.Impl;
 import main.model.entities.GlobalSettings;
 import main.model.entities.User;
 import main.model.repositories.GlobalSettingsRepository;
+import main.model.responses.ResponseAPI;
+import main.model.responses.ResponseSettings;
 import main.services.interfaces.GlobalSettingsRepositoryService;
 import main.services.interfaces.UserRepositoryService;
 import org.json.JSONObject;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.HashSet;
 
 @Service
@@ -19,9 +22,11 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
 
     @Autowired
     private GlobalSettingsRepository globalSettingsRepository;
+    @Autowired
+    private UserRepositoryService userRepositoryService;
 
     @Override
-    public ResponseEntity<String> getGlobalSettings(HttpSession session, UserRepositoryService userRepositoryService) {
+    public ResponseEntity<?> getGlobalSettings(HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -33,22 +38,14 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
         if (!user.isModerator()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
         }
-        HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
-        JSONObject result = new JSONObject();
-        for (GlobalSettings g : settings) {
-            boolean currentSetting = false;
-            if (g.getValue().toUpperCase().equals("YES")) {
-                currentSetting = true;
-            }
-            result.put(g.getName(), currentSetting);
-        }
-        return new ResponseEntity<String>(result.toString(), HttpStatus.OK);
+        ResponseSettings responseSettings = new ResponseSettings(getAllGlobalSettingsSet());
+        return new ResponseEntity<>(responseSettings.getMap(), HttpStatus.OK);
 
     }
 
     @Override
-    public ResponseEntity<String> setGlobalSettings(Boolean multiUserMode, Boolean postPremoderation, Boolean statisticsIsPublic,
-                                            HttpSession session, UserRepositoryService userRepositoryService) {
+    public ResponseEntity<?> setGlobalSettings(Boolean multiUserMode, Boolean postPremoderation, Boolean statisticsIsPublic,
+                                            HttpSession session) {
         if (multiUserMode == null || postPremoderation == null || statisticsIsPublic == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка в параметрах
         }
@@ -64,31 +61,37 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
         }
         HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
-        JSONObject result = new JSONObject();
+        HashSet<GlobalSettings> resultSet = new HashSet<>();
         for (GlobalSettings g : settings) {
             String settingName = g.getName().toUpperCase();
             switch (settingName) {
                 case "MULTIUSER_MODE": {
                     String value = booleanToYesOrNo(multiUserMode);
                     g.setValue(value);
-                    result.put("MULTIUSER_MODE", multiUserMode);
+                    globalSettingsRepository.save(g);
+                    resultSet.add(g);
+//                    result.put("MULTIUSER_MODE", multiUserMode);
                     break;
                 }
                 case "POST_PREMODERATION": {
                     String value = booleanToYesOrNo(postPremoderation);
                     g.setValue(value);
-                    result.put("POST_PREMODERATION", postPremoderation);
+                    globalSettingsRepository.save(g);
+                    resultSet.add(g);
+//                    result.put("POST_PREMODERATION", postPremoderation);
                     break;
                 }
                 case "STATISTICS_IS_PUBLIC": {
                     String value = booleanToYesOrNo(statisticsIsPublic);
                     g.setValue(value);
-                    result.put("STATISTICS_IS_PUBLIC", statisticsIsPublic);
+                    globalSettingsRepository.save(g);
+                    resultSet.add(g);
+//                    result.put("STATISTICS_IS_PUBLIC", statisticsIsPublic);
                     break;
                 }
             }
         }
-        return new ResponseEntity<String>(result.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseSettings(resultSet).getMap(), HttpStatus.OK);
     }
 
     @Override

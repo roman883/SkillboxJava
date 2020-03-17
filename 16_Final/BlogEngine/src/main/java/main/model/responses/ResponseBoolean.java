@@ -1,14 +1,14 @@
-package main.model.DTOs;
+package main.model.responses;
 
-public class ResultLogoutDTO {
+public class ResponseBoolean implements ResponseAPI {
 
     private boolean result;
 
-    public ResultLogoutDTO() {
+    public ResponseBoolean() {
         this.result = false;
     }
 
-    public ResultLogoutDTO(boolean result) {
+    public ResponseBoolean(boolean result) {
         this.result = result;
     }
 
