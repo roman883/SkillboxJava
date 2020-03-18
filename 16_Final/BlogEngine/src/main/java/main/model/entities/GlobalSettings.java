@@ -1,11 +1,12 @@
 package main.model.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "global_settings")
-public class GlobalSettings {
+public class GlobalSettings implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,6 +51,15 @@ public class GlobalSettings {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public GlobalSettings(String code, String name, String value) {
+        this.code = code;
+        this.name = name;
+        this.value = value;
+    }
+
+    public GlobalSettings() {
     }
 }
 

@@ -1,9 +1,9 @@
 package main.services.Impl;
 
+import main.api.response.ResponseApi;
+import main.api.response.ResponseTags;
 import main.model.entities.Tag;
 import main.model.repositories.TagRepository;
-import main.model.responses.ResponseAPI;
-import main.model.responses.ResponseTags;
 import main.services.interfaces.TagRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     private TagRepository tagRepository;
 
     @Override
-    public ResponseEntity<ResponseAPI> getTags(String query) {
+    public ResponseEntity<ResponseApi> getTags(String query) {
         ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
@@ -64,7 +64,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> getTagsWithoutQuery() {
+    public ResponseEntity<ResponseApi> getTagsWithoutQuery() {
         ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);

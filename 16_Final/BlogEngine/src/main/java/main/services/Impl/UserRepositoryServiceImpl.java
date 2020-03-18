@@ -1,10 +1,10 @@
 package main.services.Impl;
 
-import main.model.responses.*;
+import main.api.request.*;
+import main.api.response.*;
 import main.model.entities.*;
 import main.model.repositories.UserRepository;
 import main.services.interfaces.*;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +45,9 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> login(String email, String password, HttpSession session) {
+    public ResponseEntity<ResponseApi> login(LoginRequest loginRequest, HttpSession session) {
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
         User user = null;
         ArrayList<User> userList = getAllUsersList();
         for (User u : userList) {
@@ -60,11 +62,14 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 }
             }
         }
-        return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+        if (user != null) {
+            return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> checkAuth(HttpSession session) {
+    public ResponseEntity<ResponseApi> checkAuth(HttpSession session) {
         if (!sessionIdToUserId.containsKey(session.getId().toString())) {
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
         } else {
@@ -79,7 +84,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> restorePassword(String email) {
+    public ResponseEntity<ResponseApi> restorePassword(RestorePassRequest restorePassRequest) {
+        String email = restorePassRequest.getEmail();
         ArrayList<User> userList = getAllUsersList();
         for (User user : userList) {
             if (user.getEmail().equals(email)) { // пользователь найден в базе
@@ -95,7 +101,11 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> changePassword(String code, String password, String captcha, String captchaSecret) {
+    public ResponseEntity<ResponseApi> changePassword(ChangePasswordRequest changePasswordRequest) {
+        String code = changePasswordRequest.getCode();
+        String password = changePasswordRequest.getPassword();
+        String captcha = changePasswordRequest.getCaptcha();
+        String captchaSecret = changePasswordRequest.getCaptchaSecret();
         // TODO реализовать проверку длины пароля и наличия букв/цифр/символов в пароле во всех методах
         if (code == null || password == null || captcha == null || captchaSecret == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -119,8 +129,13 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> register(String email, String name, String password, String captcha, String captcha_secret) {
-        if (email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captcha_secret.equals("")) { // TODO проверки сделать на длину пароля, формат Email
+    public ResponseEntity<ResponseApi> register(RegisterRequest registerRequest) {
+        String email = registerRequest.getEmail();
+        String name = email.replaceAll("@.+", ""); //TODO кнопка регистрации неактивна в шаблоне/JS, а также при регистрации не задается имя
+        String password = registerRequest.getPassword();
+        String captcha = registerRequest.getCaptcha();
+        String captchaSecret = registerRequest.getCaptchaSecret();
+        if (email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captchaSecret.equals("")) { // TODO проверки сделать на длину пароля, формат Email
             return new ResponseEntity<>(new ResponseFailSignUp(), HttpStatus.BAD_REQUEST);
         } else {    // если проверки прошли, создаем пользователя и возвращаем положительный результат
             Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());
@@ -132,8 +147,12 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> editProfile(File photo, Byte removePhoto, String name, String email,
-                                                   String password, HttpSession session) {
+    public ResponseEntity<ResponseApi> editProfile(EditProfileRequest editProfileRequest, HttpSession session) {
+        File photo = editProfileRequest.getPhoto();
+        Byte removePhoto = editProfileRequest.getRemovePhoto();
+        String name = editProfileRequest.getName();
+        String email = editProfileRequest.getEmail();
+        String password = editProfileRequest.getPassword();
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -267,7 +286,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> logout(HttpSession session) {
+    public ResponseEntity<ResponseApi> logout(HttpSession session) {
         String sessionId = session.getId();
         if (!sessionIdToUserId.containsKey(sessionId)) {
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseBoolean(true));
