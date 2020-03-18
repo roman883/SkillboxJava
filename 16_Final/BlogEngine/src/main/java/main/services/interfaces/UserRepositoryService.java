@@ -1,6 +1,7 @@
 package main.services.interfaces;
 
-import main.model.responses.ResponseAPI;
+import main.api.request.*;
+import main.api.response.ResponseApi;
 import main.model.entities.User;
 import org.springframework.http.ResponseEntity;
 
@@ -12,24 +13,24 @@ public interface UserRepositoryService {
 
     ResponseEntity<User> getUser(int id);
 
-    ResponseEntity<ResponseAPI> login(String email, String password, HttpSession session);
+    ResponseEntity<ResponseApi> login(LoginRequest loginRequest, HttpSession session);
 
-    ResponseEntity<ResponseAPI> checkAuth(HttpSession session);
+    ResponseEntity<ResponseApi> checkAuth(HttpSession session);
 
-    ResponseEntity<ResponseAPI> restorePassword(String email);
+    ResponseEntity<ResponseApi> restorePassword(RestorePassRequest restorePassRequest);
 
-    ResponseEntity<ResponseAPI> changePassword(String code, String password, String captcha, String captcha_secret);
+    ResponseEntity<ResponseApi> changePassword(ChangePasswordRequest changePasswordRequest);
 
-    ResponseEntity<ResponseAPI> register(String email, String name, String password, String captcha, String captcha_secret);
+    ResponseEntity<ResponseApi> register(RegisterRequest registerRequest);
 
-    ResponseEntity<ResponseAPI> editProfile(File photo, Byte removePhoto, String name, String email, String password,
-                                       HttpSession session);
+    ResponseEntity<ResponseApi> editProfile(EditProfileRequest editProfileRequest,
+                                            HttpSession session);
 
     ResponseEntity<?> getMyStatistics(HttpSession session);
 
     ResponseEntity<?> getAllStatistics(HttpSession session);
 
-    ResponseEntity<ResponseAPI> logout(HttpSession session);
+    ResponseEntity<ResponseApi> logout(HttpSession session);
 
     Integer getUserIdBySession(HttpSession session);
 

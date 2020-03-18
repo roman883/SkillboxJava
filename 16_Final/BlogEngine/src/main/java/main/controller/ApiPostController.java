@@ -1,6 +1,7 @@
 package main.controller;
 
-import main.model.responses.ResponseAPI;
+import main.api.request.PostRequest;
+import main.api.response.ResponseApi;
 import main.services.Impl.*;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Date;
 import java.text.ParseException;
 
 @RestController
@@ -28,15 +28,15 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post", params = {"offset", "limit", "mode"}) // или /posts/? рекомендуется во множественном числе
     public @ResponseBody
-    ResponseEntity<ResponseAPI> get(@RequestParam(value = "offset") int offset,  // Может иметь defaultValue = "10"
-                       @RequestParam(value = "limit") int limit,
-                       @RequestParam(value = "mode") String mode) {
+    ResponseEntity<ResponseApi> get(@RequestParam(value = "offset") int offset,  // Может иметь defaultValue = "10"
+                                    @RequestParam(value = "limit") int limit,
+                                    @RequestParam(value = "mode") String mode) {
         return postRepoService.getPostsWithParams(offset, limit, mode);
     }
 
     @GetMapping(value = "/api/post/search", params = {"offset", "query", "limit"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> searchPosts(@RequestParam(value = "offset") int offset,
+    ResponseEntity<ResponseApi> searchPosts(@RequestParam(value = "offset") int offset,
                        @RequestParam(value = "query") String query,
                        @RequestParam(value = "limit") int limit) {
         return postRepoService.searchPosts(offset, query, limit);
@@ -44,13 +44,13 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post/{id}")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> get(@PathVariable int id) {
+    ResponseEntity<ResponseApi> get(@PathVariable int id) {
         return postRepoService.getPost(id);
     }
 
     @GetMapping(value = "/api/post/byDate", params = {"date", "offset", "limit"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> get(@RequestParam(value = "date") String date,
+    ResponseEntity<ResponseApi> get(@RequestParam(value = "date") String date,
                        @RequestParam(value = "offset") int offset,
                        @RequestParam(value = "limit") int limit) {
         return postRepoService.getPostsByDate(date, offset, limit);
@@ -58,7 +58,7 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post/byTag", params = {"tag", "offset", "limit"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> get(@RequestParam(value = "limit") int limit,
+    ResponseEntity<ResponseApi> get(@RequestParam(value = "limit") int limit,
                        @RequestParam(value = "tag") String tag,
                        @RequestParam(value = "offset") int offset) {
         return postRepoService.getPostsByTag(limit, tag, offset);
@@ -66,7 +66,7 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post/moderation", params = {"status", "offset", "limit"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> getPostsForModeration(@RequestParam(value = "status") String status,
+    ResponseEntity<ResponseApi> getPostsForModeration(@RequestParam(value = "status") String status,
                                          @RequestParam(value = "offset") int offset,
                                          @RequestParam(value = "limit") int limit,
                                          HttpServletRequest request) {
@@ -75,43 +75,35 @@ public class ApiPostController {
 
     @GetMapping(value = "/api/post/my", params = {"status", "offset", "limit"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> getMyPosts(@RequestParam(value = "status") String status,
+    ResponseEntity<ResponseApi> getMyPosts(@RequestParam(value = "status") String status,
                               @RequestParam(value = "offset") int offset,
                               @RequestParam(value = "limit") int limit,
                               HttpServletRequest request) {
         return postRepoService.getMyPosts(status, offset, limit, request.getSession());
     }
 
-    @PostMapping(value = "/api/post", params = {"time", "active", "title", "text", "tags"})
+    @PostMapping(value = "/api/post")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> post(@RequestParam(value = "time") String time,
-                        @RequestParam(value = "active") byte active,
-                        @RequestParam(value = "title") String title,
-                        @RequestParam(value = "text") String text,
-                        @RequestParam(value = "tags") String tags,
-                        HttpServletRequest request) throws ParseException {
-        return postRepoService.post(time, active, title, text, tags, request.getSession());
+    ResponseEntity<ResponseApi> post(@RequestBody PostRequest postRequest,
+                                     HttpServletRequest request) throws ParseException {
+        return postRepoService.post(postRequest, request.getSession());
     }
 
-    @PutMapping(value = "/api/post/{id}", params = {"time", "active", "title", "text", "tags"})
+    @PutMapping(value = "/api/post/{id}")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> editPost(@PathVariable int id,
-                            @RequestParam(value = "time") String time,
-                            @RequestParam(value = "active") byte active,
-                            @RequestParam(value = "title") String title,
-                            @RequestParam(value = "text") String text,
-                            @RequestParam(value = "tags") String tags,
+    ResponseEntity<ResponseApi> editPost(@PathVariable int id,
+                            @RequestBody PostRequest postRequest,
                             HttpServletRequest request) {
-        return postRepoService.editPost(id, time, active, title, text, tags, request.getSession());
+        return postRepoService.editPost(id, postRequest, request.getSession());
     }
 
     @PostMapping(value = "/api/post/like", params = {"post_id"})
-    public @ResponseBody ResponseEntity<ResponseAPI> likePost(@RequestParam(value = "post_id") int postId, HttpServletRequest request) {
+    public @ResponseBody ResponseEntity<ResponseApi> likePost(@RequestParam(value = "post_id") int postId, HttpServletRequest request) {
         return postVoteRepoService.likePost(postId, request.getSession());
     }
 
     @PostMapping(value = "/api/post/dislike", params = {"post_id"})
-    public @ResponseBody ResponseEntity<ResponseAPI> dislikePost(@RequestParam(value = "post_id") int postId,
+    public @ResponseBody ResponseEntity<ResponseApi> dislikePost(@RequestParam(value = "post_id") int postId,
                                                             HttpServletRequest request) {
         return postVoteRepoService.dislikePost(postId, request.getSession());
     }

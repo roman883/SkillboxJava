@@ -1,6 +1,10 @@
 package main.controller;
 
-import main.model.responses.ResponseAPI;
+import main.api.request.AddCommentRequest;
+import main.api.request.EditProfileRequest;
+import main.api.request.ModeratePostRequest;
+import main.api.request.SetGlobalSettingsRequest;
+import main.api.response.ResponseApi;
 import main.services.Impl.*;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,67 +45,66 @@ public class ApiGeneralController {
     }
 
     @GetMapping(value = "/api/init")
-    public @ResponseBody ResponseEntity<ResponseAPI> getData() {
+    public @ResponseBody
+    ResponseEntity<ResponseApi> getData() {
         return generalDataService.getData();
     }
 
-    @PostMapping(value = "/api/image", params = {"image"})
+    @PostMapping(value = "/api/image")
     public @ResponseBody
-    ResponseEntity<String> uploadImage(@RequestParam(value = "image") MultipartFile file,
+    ResponseEntity<String> uploadImage(@RequestParam MultipartFile image,
                                        HttpServletRequest request) {
+        System.out.println(request.toString() + "\n");
+        if (image == null) {
+            System.out.println("= = = => Нет файла");
+        }
         ResponseEntity<String> responseEntity = null;
         try {
-            responseEntity = postRepoService.uploadImage(file, request.getSession()); //TODO куда загружать фото? и как? ОГРАНИЧЕНИЕ РАЗМЕРА ФАЙЛА 1 МБ стандартно
+            System.out.println("==> грузим файл");
+            responseEntity = postRepoService.uploadImage(image, request.getSession()); //TODO куда загружать фото? ОГРАНИЧЕНИЕ РАЗМЕРА ФАЙЛА 1 МБ стандартно
         } catch (IOException e) {
             e.printStackTrace();
         }
         return responseEntity;
     }
 
-    @PostMapping(value = "/api/comment", params = {"parent_id", "post_id", "text"})
+    @PostMapping(value = "/api/comment")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> addComment(@RequestParam(value = "parent_id") Integer parentId,
-                                 @RequestParam(value = "post_id") Integer postId,
-                                 @RequestParam(value = "text") String text,
-                                 HttpServletRequest request) {
-        return commentRepoService.addComment(parentId, postId, text, request.getSession());
+    ResponseEntity<ResponseApi> addComment(@RequestBody AddCommentRequest addCommentRequest,
+                                           HttpServletRequest request) {
+        return commentRepoService.addComment(addCommentRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/tag", params = {"query"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> getTags(@RequestParam(value = "query") String query) {
+    ResponseEntity<ResponseApi> getTags(@RequestParam(value = "query") String query) {
         return tagRepoService.getTags(query);
     }
 
     @GetMapping(value = "/api/tag")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> getTagsWithoutQuery() {
+    ResponseEntity<ResponseApi> getTagsWithoutQuery() {
         return tagRepoService.getTagsWithoutQuery();
     }
 
-    @PostMapping(value = "/api/moderation", params = {"post_id", "decision"}) // Точно ли ничего не надо возвращать??
+    @PostMapping(value = "/api/moderation") // Точно ли ничего не надо возвращать??
     public @ResponseBody
-    ResponseEntity<ResponseAPI> moderatePost(@RequestParam(value = "post_id") int postId,
-                                        @RequestParam(value = "decision") String decision,
-                                        HttpServletRequest request) {
-        return postRepoService.moderatePost(postId, decision, request.getSession());
+    ResponseEntity<ResponseApi> moderatePost(@RequestBody ModeratePostRequest moderatePostRequest,
+                                             HttpServletRequest request) {
+        return postRepoService.moderatePost(moderatePostRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/calendar", params = {"year"}) // или years и много лет должно быть???
     public @ResponseBody
-    ResponseEntity<ResponseAPI> countPostByYear(@RequestParam(value = "year") Integer year) {
+    ResponseEntity<ResponseApi> countPostByYear(@RequestParam(value = "year") Integer year) {
         return postRepoService.countPostsByYear(year);
     }
 
     @PostMapping(value = "/api/profile/my", params = {"photo", "removePhoto", "name", "email", "password"})
     public @ResponseBody
-    ResponseEntity<ResponseAPI> editProfile(@RequestParam(value = "photo") File photo,
-                                       @RequestParam(value = "removePhoto") Byte removePhoto,
-                                       @RequestParam(value = "name") String name,
-                                       @RequestParam(value = "email") String email,
-                                       @RequestParam(value = "password") String password,
-                                       HttpServletRequest request) {
-        return userRepoService.editProfile(photo, removePhoto, name, email, password, request.getSession());
+    ResponseEntity<ResponseApi> editProfile(@RequestBody EditProfileRequest editProfileRequest,
+                                            HttpServletRequest request) {
+        return userRepoService.editProfile(editProfileRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/statistics/my")
@@ -122,14 +125,12 @@ public class ApiGeneralController {
         return globalSettingsRepoService.getGlobalSettings(request.getSession());
     }
 
-    @PutMapping(value = "/api/settings", params = {"MULTIUSER_MODE", "POST_PREMODERATION", "STATISTICS_IS_PUBLIC"})
+    @PutMapping(value = "/api/settings")
     //TODO Как получать параметры Global Settings и как их устанавливать??
     public @ResponseBody
-    ResponseEntity<?> setGlobalSettings(@RequestParam(value = "MULTIUSER_MODE") Boolean multiUserMode,
-                                             @RequestParam(value = "POST_PREMODERATION") Boolean postPremoderation,
-                                             @RequestParam(value = "STATISTICS_IS_PUBLIC") Boolean statisticsIsPublic,
-                                             HttpServletRequest request) {
-        return globalSettingsRepoService.setGlobalSettings(multiUserMode, postPremoderation, statisticsIsPublic,
+    ResponseEntity<?> setGlobalSettings(@RequestBody SetGlobalSettingsRequest setGlobalSettingsRequest,
+                                        HttpServletRequest request) {
+        return globalSettingsRepoService.setGlobalSettings(setGlobalSettingsRequest,
                 request.getSession());
     }
 }

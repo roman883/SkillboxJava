@@ -1,9 +1,9 @@
 package main.services.interfaces;
 
-import main.model.responses.ResponseAPI;
+import main.api.response.ResponseApi;
 import org.springframework.http.ResponseEntity;
 
 public interface GeneralDataService {
 
-    ResponseEntity<ResponseAPI> getData();
+    ResponseEntity<ResponseApi> getData();
 }

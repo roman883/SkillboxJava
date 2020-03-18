@@ -2,10 +2,10 @@ package main.services.Impl;
 
 import com.github.cage.Cage;
 import com.github.cage.GCage;
+import main.api.response.ResponseApi;
 import main.model.entities.CaptchaCode;
 import main.model.repositories.CaptchaRepository;
-import main.model.responses.ResponseAPI;
-import main.model.responses.ResponseCaptcha;
+import main.api.response.ResponseCaptcha;
 import main.services.interfaces.CaptchaRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,13 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
     private static final Cage cage = new GCage();
     private final static long OLD_CAPTCHA_DELETE_TIME_IN_MIN = 60; // TODO задавать через конфиг
     private static final char[] SYMBOLS_FOR_GENERATOR = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-    private static final int KEY_SIZE = 22;
+    private static final int RANDOM_SECRET_KEY_SIZE = 22;
+    private static final int CAPTCHA_PICTURE_SIZE_LIMIT = 5;
     @Autowired
     private CaptchaRepository captchaRepository;
 
     @Override
-    public ResponseEntity<ResponseAPI> generateCaptcha() {
+    public ResponseEntity<ResponseApi> generateCaptcha() {
         ArrayList<CaptchaCode> captchas = getAllCaptchas(); // Сначала удаляем все устаревшие капчи
         for (CaptchaCode captcha : captchas) {
             LocalDateTime captchaCreatedTime = captcha.getTime().toLocalDateTime();
@@ -39,8 +40,11 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
         }
         String secretCode = generateRandomString();
         String token = cage.getTokenGenerator().next();
+        if (token.length() > CAPTCHA_PICTURE_SIZE_LIMIT) { // Ограничиваем размер картинки капчи символами
+            token = token.substring(0, CAPTCHA_PICTURE_SIZE_LIMIT);
+        }
         byte[] encodedBytes = Base64.getEncoder().encode(cage.draw(token));
-        String captchaImageBase64String = new String(encodedBytes, StandardCharsets.UTF_8);
+        String captchaImageBase64String = "data:image/png;base64, " + new String(encodedBytes, StandardCharsets.UTF_8);
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         CaptchaCode newCaptcha = captchaRepository.save(new CaptchaCode(timestamp, token, secretCode));
         return new ResponseEntity<>(new ResponseCaptcha(secretCode, captchaImageBase64String), HttpStatus.OK);
@@ -54,7 +58,7 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
 
     private String generateRandomString() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < KEY_SIZE; i++) {
+        for (int i = 0; i < RANDOM_SECRET_KEY_SIZE; i++) {
             builder.append(SYMBOLS_FOR_GENERATOR[(int) (Math.random() * (SYMBOLS_FOR_GENERATOR.length - 1))]);
         }
         return builder.toString();

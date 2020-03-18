@@ -1,11 +1,11 @@
 package main.services.Impl;
 
+import main.api.response.ResponseApi;
 import main.model.entities.Post;
 import main.model.entities.PostVote;
 import main.model.entities.User;
 import main.model.repositories.PostVoteRepository;
-import main.model.responses.ResponseAPI;
-import main.model.responses.ResponseBoolean;
+import main.api.response.*;
 import main.services.interfaces.PostRepositoryService;
 import main.services.interfaces.PostVoteRepositoryService;
 import main.services.interfaces.UserRepositoryService;
@@ -31,7 +31,7 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
     private PostRepositoryService postRepositoryService;
 
     @Override
-    public ResponseEntity<ResponseAPI> likePost(int postId, HttpSession session) {
+    public ResponseEntity<ResponseApi> likePost(int postId, HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -69,7 +69,7 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> dislikePost(int postId, HttpSession session) {
+    public ResponseEntity<ResponseApi> dislikePost(int postId, HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

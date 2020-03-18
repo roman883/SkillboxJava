@@ -1,6 +1,10 @@
 package main.controller;
 
-import main.model.responses.ResponseAPI;
+import main.api.request.ChangePasswordRequest;
+import main.api.request.RegisterRequest;
+import main.api.request.LoginRequest;
+import main.api.request.RestorePassRequest;
+import main.api.response.ResponseApi;
 import main.services.interfaces.CaptchaRepositoryService;
 import main.services.Impl.CaptchaRepositoryServiceImpl;
 import main.services.Impl.UserRepositoryServiceImpl;
@@ -27,54 +31,51 @@ public class ApiAuthController {
     }
 
     @GetMapping(value = "/api/auth/logout") // TODO вынести общую часть /api/auth/ в @RequestMapping класса
-    public @ResponseBody
-    ResponseEntity<ResponseAPI> logout(HttpServletRequest request) {
+    public @ResponseBody  //TODO remove all annotations '@ResponseBody': @RestController is a composed annotation that
+        // is itself meta-annotated with @Controller and @ResponseBody to indicate a controller whose every method
+        // inherits the type-level @ResponseBody annotation and, therefore, writes directly to the response body versus
+        // view resolution and rendering with an HTML template.
+    ResponseEntity<ResponseApi> logout(HttpServletRequest request) {
         return userRepoService.logout(request.getSession());
     }
 
     // Методы
-    @PostMapping(value = "/api/auth/register", params = {"e_mail", "name", "password", "captcha", "captcha_secret"})
+    @PostMapping(value = "/api/auth/register") //params = {"e_mail", "name", "password", "captcha", "captcha_secret"}
     public @ResponseBody
-    ResponseEntity<ResponseAPI> register(@RequestParam(value = "e_mail") String email,
-                               @RequestParam(value = "name") String name,
-                               @RequestParam(value = "password") String password,
-                               @RequestParam(value = "captcha") String captcha,
-                               @RequestParam(value = "captcha_secret") String captchaSecret
-    ) {
-        return userRepoService.register(email, name, password, captcha, captchaSecret);
+    ResponseEntity<ResponseApi> register(@RequestBody RegisterRequest registerRequest) {
+        return userRepoService.register(registerRequest);
     }
 
-    @PostMapping(value = "/api/auth/login", params = {"e_mail", "password"})
+    @PostMapping(value = "/api/auth/login") // params = {"e_mail", "password"}
     public @ResponseBody
-    ResponseEntity<ResponseAPI> login(@RequestParam(value = "e_mail") String email,
-                            @RequestParam(value = "password") String password, HttpServletRequest request) {
-        return userRepoService.login(email, password, request.getSession());
+    ResponseEntity<ResponseApi> login(@RequestBody LoginRequest loginRequest
+//            @RequestParam(value = "e_mail") String email,
+//                            @RequestParam(value = "password") String password
+            , HttpServletRequest request) {
+        return userRepoService.login(loginRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/auth/check")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> checkAuth(HttpServletRequest request) {
+    ResponseEntity<ResponseApi> checkAuth(HttpServletRequest request) {
         return userRepoService.checkAuth(request.getSession());
     }
 
-    @PostMapping(value = "/api/auth/restore", params = {"email"})
+    @PostMapping(value = "/api/auth/restore")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> restorePassword(@RequestParam(value = "email") String email) {
-        return userRepoService.restorePassword(email);
+    ResponseEntity<ResponseApi> restorePassword(@RequestBody RestorePassRequest restorePassRequest) {
+        return userRepoService.restorePassword(restorePassRequest);
     }
 
-    @PostMapping(value = "/api/auth/password", params = {"code", "password", "captcha", "captcha_secret"})
+    @PostMapping(value = "/api/auth/password")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> changePassword(@RequestParam(value = "code") String code,
-                                          @RequestParam(value = "password") String password,
-                                          @RequestParam(value = "captcha") String captcha,
-                                          @RequestParam(value = "captcha_secret") String captchaSecret) {
-        return userRepoService.changePassword(code, password, captcha, captchaSecret);
+    ResponseEntity<ResponseApi> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        return userRepoService.changePassword(changePasswordRequest);
     }
 
     @GetMapping(value = "/api/auth/captcha")
     public @ResponseBody
-    ResponseEntity<ResponseAPI> generateCaptcha() {
+    ResponseEntity<ResponseApi> generateCaptcha() {
         return captchaRepoService.generateCaptcha();
     }
 }

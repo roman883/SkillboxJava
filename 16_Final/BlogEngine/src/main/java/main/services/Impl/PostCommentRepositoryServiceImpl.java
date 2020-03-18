@@ -1,16 +1,16 @@
 package main.services.Impl;
 
+import main.api.request.AddCommentRequest;
+import main.api.response.ResponseApi;
 import main.model.entities.Post;
 import main.model.entities.PostComment;
 import main.model.entities.User;
 import main.model.repositories.PostCommentRepository;
-import main.model.responses.ResponseAPI;
-import main.model.responses.ResponseFailComment;
-import main.model.responses.ResponseSuccessComment;
+import main.api.response.ResponseFailComment;
+import main.api.response.*;
 import main.services.interfaces.PostCommentRepositoryService;
 import main.services.interfaces.PostRepositoryService;
 import main.services.interfaces.UserRepositoryService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,10 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
     }
 
     @Override
-    public ResponseEntity<ResponseAPI> addComment(Integer parentId, Integer postId, String text, HttpSession session) {
+    public ResponseEntity<ResponseApi> addComment(AddCommentRequest addCommentRequest, HttpSession session) {
+        Integer parentId = addCommentRequest.getParentId();
+        Integer postId = addCommentRequest.getPostId();
+        String text = addCommentRequest.getText();
         Integer userId = userRepoService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ошибка, не авторизован
