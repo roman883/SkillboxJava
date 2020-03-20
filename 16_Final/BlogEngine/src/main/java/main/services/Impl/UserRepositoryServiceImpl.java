@@ -8,10 +8,15 @@ import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +27,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     private static final char[] SYMBOLS_FOR_GENERATOR = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
     private static final int KEY_SIZE = 45;
+    private static final int PASSWORD_LENGTH = 8;
+    private static final String ROOT_PATH_TO_UPLOAD_AVATARS = "images";
 
     @Autowired
     private UserRepository userRepository;
@@ -33,6 +40,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     private PostVoteRepositoryService postVoteRepositoryService;
     @Autowired
     private PostRepositoryService postRepositoryService;
+    @Autowired
+    private JavaMailSender emailSender;
 
     private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя, по заданию не в БД
 
@@ -53,7 +62,6 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         for (User u : userList) {
             if (u.getEmail().equals(email)) {
                 if (u.getHashedPassword().equals(Integer.toString(password.hashCode()))) { // пароль совпал по хэшу
-                    // TODO сделать проверку наличия сессии в базе
                     sessionIdToUserId.put(session.getId().toString(), u.getId()); // Запоминаем пользователя и сессию
                     user = u;
                     break;
@@ -86,14 +94,21 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     @Override
     public ResponseEntity<ResponseApi> restorePassword(RestorePassRequest restorePassRequest) {
         String email = restorePassRequest.getEmail();
+        if (!isEmailValid(email)) {
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+        }
         ArrayList<User> userList = getAllUsersList();
         for (User user : userList) {
             if (user.getEmail().equals(email)) { // пользователь найден в базе
                 String hash = generateRandomString();
                 user.setCode(hash); // запоминаем код в базе
                 userRepository.save(user);
-                String link = "/login/change-password/" + hash;
-                // TODO отправка ссылки на email пользователя!! И Занесение в БД к юзеру! А также в капчу  /login/change-password/HASH
+                String restorePasswordLink = "/login/change-password/" + hash;
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(email);
+                message.setSubject("Ссылка для восстановление пароля");
+                message.setText(restorePasswordLink);
+                this.emailSender.send(message);
                 return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
             }
         }
@@ -106,8 +121,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         String password = changePasswordRequest.getPassword();
         String captcha = changePasswordRequest.getCaptcha();
         String captchaSecret = changePasswordRequest.getCaptchaSecret();
-        // TODO реализовать проверку длины пароля и наличия букв/цифр/символов в пароле во всех методах
-        if (code == null || password == null || captcha == null || captchaSecret == null) {
+        if (code == null || !isPasswordValid(password) || captcha == null || captchaSecret == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         ArrayList<User> userList = getAllUsersList();
@@ -131,11 +145,13 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     @Override
     public ResponseEntity<ResponseApi> register(RegisterRequest registerRequest) {
         String email = registerRequest.getEmail();
-        String name = email.replaceAll("@.+", ""); //TODO кнопка регистрации неактивна в шаблоне/JS, а также при регистрации не задается имя
+        String name = email.replaceAll("@.+", "");
         String password = registerRequest.getPassword();
         String captcha = registerRequest.getCaptcha();
         String captchaSecret = registerRequest.getCaptchaSecret();
-        if (email.equals("") || name.equals("") || password.equals("") || captcha.equals("") || captchaSecret.equals("")) { // TODO проверки сделать на длину пароля, формат Email
+        Boolean isCaptchaCodValid = isCaptchaValid(captcha, captchaSecret);
+        if (!isEmailValid(email) || name.isBlank() || !isPasswordValid(password) || captcha.equals("") || captchaSecret.equals("")
+        || isCaptchaCodValid == null || !isCaptchaCodValid) {
             return new ResponseEntity<>(new ResponseFailSignUp(), HttpStatus.BAD_REQUEST);
         } else {    // если проверки прошли, создаем пользователя и возвращаем положительный результат
             Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());
@@ -148,7 +164,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     @Override
     public ResponseEntity<ResponseApi> editProfile(EditProfileRequest editProfileRequest, HttpSession session) {
-        File photo = editProfileRequest.getPhoto();
+        File photo = editProfileRequest.getPhoto(); // TODO каким образом файл приходит??
         Byte removePhoto = editProfileRequest.getRemovePhoto();
         String name = editProfileRequest.getName();
         String email = editProfileRequest.getEmail();
@@ -172,28 +188,53 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 hasSameName = true;
             }
         }
-        if (hasSameName || hasSameEmail) { // Такой пользователь уже есть в базе //TODO проверку размера фото, введенного когда капчи
-            return new ResponseEntity<>(new ResponseFailEditProfile(), HttpStatus.OK);
+        try {
+            if (hasSameName || hasSameEmail || (photo != null && Files.size(photo.toPath()) > 5_000_000)) {
+                return new ResponseEntity<>(new ResponseFailEditProfile(), HttpStatus.OK);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        if (photo != null) { // фото есть, тогда устанавливаем путь к загруженному фото пользователю
-            // TODO как загрузить фото на сервер и получить путь? Заменить ниже
-            String photoUrl = "dsds";
-            user.setPhoto(photoUrl);
+        if (removePhoto != null && removePhoto == 1) {
+            String currentPhoto = user.getPhoto();
+            if (currentPhoto != null) {
+                try {
+                    Files.deleteIfExists(Path.of(currentPhoto));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                user.setPhoto(null);
+            }
         }
+        String photoUrl = null;
+        File newFile = null;
+        if (photo != null) {
+            do {
+                try {
+                    photoUrl = createDirectoriesAndGetFullPath();
+
+                    if (!Files.exists(Path.of(photoUrl))) {
+                        Files.createFile(Path.of(photoUrl));
+                        newFile = new File(photoUrl);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } while (newFile == null);
+            copyFile(photo, newFile);
+        }
+        user.setPhoto(photoUrl);
         if (!name.isBlank()) {
             user.setName(name);
         }
-        if (!email.isBlank()) { // TODO проверка соответствия EMAIL виду mail@mail.ru
+        if (!email.isBlank() && isEmailValid(email)) {
             user.setEmail(email);
         }
-        if (!password.isBlank()) { // Проверить длину и т.п. пароля
+        if (!password.isBlank() && isPasswordValid(password)) {
             String newHashedPassword = Integer.toString(password.hashCode());
             user.setHashedPassword(newHashedPassword);
         }
-        if (removePhoto == 1) {
-            //TODO удалить фото с сервера
-            user.setPhoto(null);
-        }
+        userRepository.save(user);
         return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
@@ -316,5 +357,46 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             builder.append(SYMBOLS_FOR_GENERATOR[(int) (Math.random() * (SYMBOLS_FOR_GENERATOR.length - 1))]);
         }
         return builder.toString();
+    }
+
+    private boolean isPasswordValid(String passwordToCheck) {
+        return (passwordToCheck != null && passwordToCheck.length() >= PASSWORD_LENGTH
+                && (passwordToCheck.matches("\\w+\\W+") || passwordToCheck.matches("\\W+\\w+"))
+                && !passwordToCheck.contains(" ") && (passwordToCheck.contains("0") || passwordToCheck.contains("1")
+                || passwordToCheck.contains("2") || passwordToCheck.contains("3") || passwordToCheck.contains("4")
+                || passwordToCheck.contains("5") || passwordToCheck.contains("6") || passwordToCheck.contains("7")
+                || passwordToCheck.contains("8") || passwordToCheck.contains("9")));
+    }
+
+    private boolean isEmailValid(String emailToCheck) {
+        return (emailToCheck != null && emailToCheck.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}"));
+    }
+
+    private void copyFile(File source, File dest) {
+        try {
+            byte[] bytes = Files.readAllBytes(source.toPath());
+            Files.write(dest.toPath(), bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String createDirectoriesAndGetFullPath() throws IOException {
+        String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
+        StringBuilder builder = new StringBuilder(ROOT_PATH_TO_UPLOAD_AVATARS).append("/upload/").append("avatars");
+        Files.createDirectories(Path.of(builder.toString()));
+        return builder.append("/").append(randomHash).append(".jpg").toString(); // имя файла задаем хэшем
+    }
+
+    private Boolean isCaptchaValid(String captcha, String captchaSecret) {
+        CaptchaCode captchaCode;
+        Optional<CaptchaCode> optionalCaptchaCode = captchaRepositoryService.getAllCaptchas().stream()
+                .filter(c -> c.getSecretCode().equals(captchaSecret)).findFirst();
+        if (optionalCaptchaCode.isEmpty()) {
+            return null;
+        } else {
+            captchaCode = optionalCaptchaCode.get();
+        }
+        return captchaCode.getCode().equals(captcha);
     }
 }

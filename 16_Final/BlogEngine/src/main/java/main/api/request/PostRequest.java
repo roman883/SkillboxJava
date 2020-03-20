@@ -1,14 +1,16 @@
 package main.api.request;
 
+import java.util.List;
+
 public class PostRequest implements RequestApi {
 
     private String time;
     private Byte active;
     private String title;
     private String text;
-    private String[] tags;
+    private List<String> tags;
 
-    public PostRequest(String time, byte active, String title, String text, String[] tags) {
+    public PostRequest(String time, byte active, String title, String text, List<String> tags) {
         this.time = time;
         this.active = active;
         this.title = title;
@@ -51,11 +53,11 @@ public class PostRequest implements RequestApi {
         this.text = text;
     }
 
-    public String[] getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String[] tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 }

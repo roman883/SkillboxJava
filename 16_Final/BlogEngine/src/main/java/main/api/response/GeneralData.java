@@ -3,7 +3,7 @@ package main.api.response;
 // Синглтон
 public class GeneralData implements ResponseApi {
 
-    private String title = "DevPub"; //TODO Верно ли, что поля не статичные?
+    private String title = "DevPub";
     private String subtitle = "Рассказы разработчиков";
     private String phone = "+7 903 666-44-55";
     private String email = "mail@mail.ru";

@@ -30,7 +30,7 @@ public class ResponseSettings implements ResponseApi {
 
     public ResponseSettings(Set<GlobalSettings> settings) {
         for (GlobalSettings g : settings) {
-            String settingName = g.getName().toUpperCase();
+            String settingName = g.getCode().toUpperCase();
             switch (settingName) {
                 case "MULTIUSER_MODE": {
                     MULTIUSER_MODE = yesOrNoToBoolean(g.getValue());

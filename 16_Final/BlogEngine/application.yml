@@ -1,6 +1,6 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver # com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/blogdb?serverTimezone=UTC
     useJDBCCompliantTimeZoneShift: true
     username: root
@@ -8,8 +8,19 @@ spring:
   jpa:
     show_sql: true # в логах видны sql запросы, false в режиме норм работы (show-sql)
     hibernate:
-      ddl-auto: validate # update работает только так, валидэйт не проходит
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+  mail: # Параметры не подгружаются в JavaMailConfiguration.java нужно указать вручную в классе
+    host: smtp.gmail.com
+    port: 587
+    username: someMailHere
+    password: SomeSecretCodeForMail #somepassword(application password generated for your google account)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+          enable: true

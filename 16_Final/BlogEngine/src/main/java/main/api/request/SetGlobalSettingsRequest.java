@@ -2,14 +2,11 @@ package main.api.request;
 
 public class SetGlobalSettingsRequest implements RequestApi {
 
-    private Boolean MULTIUSER_MODE;
-    private Boolean POST_PREMODERATION;
-    private Boolean STATISTICS_IS_PUBLIC;
+    private boolean MULTIUSER_MODE;
+    private boolean POST_PREMODERATION;
+    private boolean STATISTICS_IS_PUBLIC;
 
     public SetGlobalSettingsRequest() {
-        MULTIUSER_MODE = false;
-        POST_PREMODERATION = false;
-        STATISTICS_IS_PUBLIC = false;
     }
 
     public SetGlobalSettingsRequest(Boolean MULTIUSER_MODE, Boolean POST_PREMODERATION, Boolean STATISTICS_IS_PUBLIC) {

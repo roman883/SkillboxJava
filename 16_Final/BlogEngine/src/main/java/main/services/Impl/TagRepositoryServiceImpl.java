@@ -23,7 +23,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
         ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
         tagRepository.findAll().forEach(allTags::add);
-        if (query.equals("")) {
+        if (query == null || query.equals("") || query.isBlank()) {
             return getTagsWithoutQuery();
         } else {
             for (Tag tag : allTags) {
@@ -73,11 +73,12 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
             double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);
             queryTagsMap.put(tagName, tempTagCount + 1.0);
         }
+        if (!allTags.isEmpty()) {
         Double mostFrequentTag = Collections.max(queryTagsMap.values());
         for (String key : queryTagsMap.keySet()) {
             Double weight = (queryTagsMap.get(key) / mostFrequentTag);
             queryTagsMap.put(key, weight); // Меняем количество на вес тэга
-        }
+        } }
         return new ResponseEntity<>(new ResponseTags(queryTagsMap), HttpStatus.OK);
     }
 }

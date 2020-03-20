@@ -17,7 +17,7 @@ public class PostVote implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL) // TODO Разобраться с каскадами, удаляется все, при удалении лайков/дизлайков
     @JoinColumn(name = "post_id")
     private Post post;
 

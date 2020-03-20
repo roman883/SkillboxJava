@@ -1,5 +1,6 @@
 package main.services.Impl;
 
+import main.api.request.PostVoteRequest;
 import main.api.response.ResponseApi;
 import main.model.entities.Post;
 import main.model.entities.PostVote;
@@ -31,7 +32,8 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
     private PostRepositoryService postRepositoryService;
 
     @Override
-    public ResponseEntity<ResponseApi> likePost(int postId, HttpSession session) {
+    public ResponseEntity<ResponseApi> likePost(PostVoteRequest postVoteRequest, HttpSession session) {
+        int postId = postVoteRequest.getPostId();
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -46,8 +48,8 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         if (currentPost == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка
         }
-        Set<PostVote> userVotes = user.getPostVotes();
-        for (PostVote p : userVotes) {
+        Set<PostVote> currentUserVotes = user.getPostVotes();
+        for (PostVote p : currentUserVotes) {
             if (p.getPost().getId() == postId) {
                 beforeLike = p;
                 break;
@@ -62,14 +64,15 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == -1) { // был дизлайк, удаляем
-            postVoteRepository.delete(beforeLike);
+            postVoteRepository.delete(beforeLike); //TODO Тут схлопываются каскадом посты!
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<ResponseApi> dislikePost(int postId, HttpSession session) {
+    public ResponseEntity<ResponseApi> dislikePost(PostVoteRequest postVoteRequest, HttpSession session) {
+        int postId = postVoteRequest.getPostId();
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -100,7 +103,7 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == 1) { // был лайк, удаляем
-            postVoteRepository.delete(beforeLike);
+            postVoteRepository.delete(beforeLike); //TODO Тут схлопываются каскадом посты!
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
