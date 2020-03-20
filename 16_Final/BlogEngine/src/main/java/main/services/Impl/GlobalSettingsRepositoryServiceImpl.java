@@ -44,8 +44,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
     }
 
     @Override
-    public ResponseEntity<?> setGlobalSettings(SetGlobalSettingsRequest setGlobalSettingsRequest, //TODO пока не работает,
-    // не создается объект Request с параметрами (их может быть 1-2 или 3, ожидаю 3)
+    public ResponseEntity<?> setGlobalSettings(SetGlobalSettingsRequest setGlobalSettingsRequest, //TODO пока не работает, не создается объект Request с параметрами (их может быть 1-2 или 3, ожидаю 3) получаю только false
                                                HttpSession session) {
         Boolean multiUserMode = setGlobalSettingsRequest.getMULTIUSER_MODE();
         Boolean postPremoderation = setGlobalSettingsRequest.getPOST_PREMODERATION();
@@ -81,7 +80,6 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                     g.setValue(value);
                     globalSettingsRepository.save(g);
                     resultMap.put("POST_PREMODERATION", postPremoderation);
-//                    result.put("POST_PREMODERATION", postPremoderation);
                     break;
                 }
                 case "STATISTICS_IS_PUBLIC": {
@@ -89,7 +87,6 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                     g.setValue(value);
                     globalSettingsRepository.save(g);
                     resultMap.put("STATISTICS_IS_PUBLIC", statisticsIsPublic);
-//                    result.put("STATISTICS_IS_PUBLIC", statisticsIsPublic);
                     break;
                 }
             }
@@ -117,7 +114,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             boolean hasPostPremoderation = false;
             boolean hasStatisticsIsPublic = false;
             for (GlobalSettings g : gsSet) {
-                String globalSettingsCode = g.getCode();
+                String globalSettingsCode = g.getCode().toUpperCase();
                 switch (globalSettingsCode) {
                     case ("MULTIUSER_MODE"):
                         hasMultiuserMode = true;

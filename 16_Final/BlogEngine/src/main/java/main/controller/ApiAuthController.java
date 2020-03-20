@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @ComponentScan("service")
+@RequestMapping(value = "/api/auth/")
 public class ApiAuthController {
 
     private UserRepositoryService userRepoService;
@@ -30,7 +31,7 @@ public class ApiAuthController {
         this.captchaRepoService = captchaRepoServiceImpl;
     }
 
-    @GetMapping(value = "/api/auth/logout") // TODO вынести общую часть /api/auth/ в @RequestMapping класса
+    @GetMapping(value = "logout") // TODO вынести общую часть /api/auth/ в @RequestMapping класса
     public @ResponseBody  //TODO remove all annotations '@ResponseBody': @RestController is a composed annotation that
         // is itself meta-annotated with @Controller and @ResponseBody to indicate a controller whose every method
         // inherits the type-level @ResponseBody annotation and, therefore, writes directly to the response body versus
@@ -40,13 +41,13 @@ public class ApiAuthController {
     }
 
     // Методы
-    @PostMapping(value = "/api/auth/register") //params = {"e_mail", "name", "password", "captcha", "captcha_secret"}
+    @PostMapping(value = "register") //params = {"e_mail", "name", "password", "captcha", "captcha_secret"}
     public @ResponseBody
     ResponseEntity<ResponseApi> register(@RequestBody RegisterRequest registerRequest) {
         return userRepoService.register(registerRequest);
     }
 
-    @PostMapping(value = "/api/auth/login") // params = {"e_mail", "password"}
+    @PostMapping(value = "login") // params = {"e_mail", "password"}
     public @ResponseBody
     ResponseEntity<ResponseApi> login(@RequestBody LoginRequest loginRequest
 //            @RequestParam(value = "e_mail") String email,
@@ -55,25 +56,25 @@ public class ApiAuthController {
         return userRepoService.login(loginRequest, request.getSession());
     }
 
-    @GetMapping(value = "/api/auth/check")
+    @GetMapping(value = "check")
     public @ResponseBody
     ResponseEntity<ResponseApi> checkAuth(HttpServletRequest request) {
         return userRepoService.checkAuth(request.getSession());
     }
 
-    @PostMapping(value = "/api/auth/restore")
+    @PostMapping(value = "restore")
     public @ResponseBody
     ResponseEntity<ResponseApi> restorePassword(@RequestBody RestorePassRequest restorePassRequest) {
         return userRepoService.restorePassword(restorePassRequest);
     }
 
-    @PostMapping(value = "/api/auth/password")
+    @PostMapping(value = "password")
     public @ResponseBody
     ResponseEntity<ResponseApi> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         return userRepoService.changePassword(changePasswordRequest);
     }
 
-    @GetMapping(value = "/api/auth/captcha")
+    @GetMapping(value = "captcha")
     public @ResponseBody
     ResponseEntity<ResponseApi> generateCaptcha() {
         return captchaRepoService.generateCaptcha();

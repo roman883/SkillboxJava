@@ -10,6 +10,7 @@ import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,13 +55,8 @@ public class ApiGeneralController {
     public @ResponseBody
     ResponseEntity<String> uploadImage(@RequestParam MultipartFile image,
                                        HttpServletRequest request) {
-        System.out.println(request.toString() + "\n");
-        if (image == null) {
-            System.out.println("= = = => Нет файла");
-        }
         ResponseEntity<String> responseEntity = null;
         try {
-            System.out.println("==> грузим файл");
             responseEntity = postRepoService.uploadImage(image, request.getSession()); //TODO куда загружать фото? ОГРАНИЧЕНИЕ РАЗМЕРА ФАЙЛА 1 МБ стандартно
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,7 +96,7 @@ public class ApiGeneralController {
         return postRepoService.countPostsByYear(year);
     }
 
-    @PostMapping(value = "/api/profile/my", params = {"photo", "removePhoto", "name", "email", "password"})
+    @PostMapping(value = "/api/profile/my") // params = {"photo", "removePhoto", "name", "email", "password"}
     public @ResponseBody
     ResponseEntity<ResponseApi> editProfile(@RequestBody EditProfileRequest editProfileRequest,
                                             HttpServletRequest request) {

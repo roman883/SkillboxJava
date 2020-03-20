@@ -40,9 +40,11 @@ public interface PostRepositoryService {
 
     ResponseEntity<ResponseApi> countPostsByYear(Integer year);
 
-    int getModerationCount(int moderatorUserId);
+//    int getModerationCount(int moderatorUserId);
 
     ArrayList<Post> getAllPosts();
 
     Post getPostById(int postId);
+
+    ResponseEntity<ResponseApi> getRecentPosts();
 }
