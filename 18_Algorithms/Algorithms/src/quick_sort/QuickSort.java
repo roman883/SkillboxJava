@@ -1,5 +1,7 @@
 package quick_sort;
 
+import java.util.Arrays;
+
 public class QuickSort
 {
     public static void sort(int[] array)
@@ -22,9 +24,18 @@ public class QuickSort
 
     private static int partition(int[] array, int from, int to)
     {
-        //TODO: moving values around pivot,
-        // return new pivot index
-        return 0;
+        int pivot = from;
+        for (int i = from; i <= to; i++) {
+            if (array[i] < array[pivot]) {
+                int tempInt = array[i];
+                for (int j = i; j > pivot; j--) {
+                    array[j] = array[j-1];
+                }
+                array[pivot] = tempInt;
+                pivot += 1;
+            }
+        }
+        return pivot;
     }
 
 }
