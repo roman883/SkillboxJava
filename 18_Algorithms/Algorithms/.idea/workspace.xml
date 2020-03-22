@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="" />
+    <list default="true" id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/junit_junit_4_12.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Algorithms.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Algorithms.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/array_max_value/ArrayMaxValue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/array_max_value/ArrayMaxValue.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/binary_search/BinarySearch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/binary_search/BinarySearch.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/merge_sort/MergeSort.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/merge_sort/MergeSort.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/quick_sort/QuickSort.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_sort/QuickSort.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabin_karp/RabinKarpExtended.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabin_karp/RabinKarpExtended.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -113,6 +122,10 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="415" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1584883021346" />
+    <state x="525" y="74" key="CommitChangelistDialog2" timestamp="1584918128705">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="525" y="74" key="CommitChangelistDialog2/2.0.1918.1040@2.0.1918.1040" timestamp="1584918128705" />
     <state x="598" y="261" key="FileChooserDialogImpl" timestamp="1584858659812">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
