@@ -13,17 +13,23 @@ public class RabinKarpExtended {
     private int[] intArray;
 
     public RabinKarpExtended(String text) {
+        if (text == null || text.equals("")) {
+            throw new IllegalArgumentException("Передан пустой текстовый фрагмент или null.");
+        }
         this.text = text;
     }
 
     public List<Integer> search(String query) {
         ArrayList<Integer> indices = new ArrayList<>();
+        if (query == null || query.equals("")) {
+            throw new IllegalArgumentException("Передан пустой поисковый запрос или null.");
+        }
         createAlphabet();         // создаем алфавит (используемые символы) и проверяем его размер
         if (!isAlphabetSmallEnough()) return null;
         createIndex(query.length());  // Индексируем текст на основании длины строки поиска (кусками по query-длине и сдвиг на 1 поз)
         int queryInt;// Индексируем строку поиска (переводим символы в числа и составляем конкатенированную строку => int
         StringBuilder queryIntString = new StringBuilder();
-        char[] queryArray = query.toUpperCase().toCharArray();
+        char[] queryArray = query.toCharArray(); // Добавить toUpperCase() для поиска игнорируя Case
         for (int i = 0; i < queryArray.length; i++) {
             for (int j = 0; j < symbols.size(); j++) {
                 if (queryArray[i] == symbols.get(j)) {
@@ -31,9 +37,13 @@ public class RabinKarpExtended {
                 }
             }
         }
+        if (queryIntString.length() < 1) {
+            System.out.println("В тексте нет данной подстроки"); // Можно убрать дублирование вывода
+            return null;
+        }
         queryInt = Integer.parseInt(queryIntString.toString());
         if (!number2position.containsKey(queryInt)) { // Ищем
-            System.out.println("В тексте нет данной подстроки");
+            System.out.println("В тексте нет данной подстроки"); // Можно убрать дублирование вывода
             return null;
         }
         int startIndex = number2position.get(queryInt);
