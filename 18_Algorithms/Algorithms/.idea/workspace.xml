@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="" />
+    <list default="true" id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/JavaMailConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/JavaMailConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/GeneralData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseGeneralData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseMyPosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseMyPosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePost.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePost.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePostsForModeration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePostsForModeration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiAuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiAuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiGeneralController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiGeneralController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiPostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiPostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/CaptchaRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/CaptchaRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/GeneralDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/GeneralDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostCommentRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostCommentRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/UserRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/UserRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Algorithms/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Algorithms/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Algorithms/rabin_karp/RabinKarpExtended.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Algorithms/rabin_karp/RabinKarpExtended.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabin_karp/RabinKarpExtended.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabin_karp/RabinKarpExtended.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,6 +42,11 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../.." value="dev" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="ProjectId" id="1ZQaHNKcTMluHcKHDXQFLVyKJ7y" />
@@ -126,34 +152,34 @@
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="415" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1584883021346" />
-    <state x="525" y="74" key="CommitChangelistDialog2" timestamp="1584918181762">
+    <state x="159" y="25" width="1412" height="1011" key="CommitChangelistDialog2" timestamp="1584959136039">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
-    <state x="525" y="74" key="CommitChangelistDialog2/2.0.1918.1040@2.0.1918.1040" timestamp="1584918181762" />
+    <state x="159" y="25" width="1412" height="1011" key="CommitChangelistDialog2/2.0.1918.1040@2.0.1918.1040" timestamp="1584959136039" />
     <state x="598" y="261" key="FileChooserDialogImpl" timestamp="1584858659812">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state x="598" y="261" key="FileChooserDialogImpl/2.0.1918.1040@2.0.1918.1040" timestamp="1584858659812" />
-    <state width="1875" height="348" key="GridCell.Tab.0.bottom" timestamp="1584883113509">
+    <state width="1875" height="327" key="GridCell.Tab.0.bottom" timestamp="1584958735968">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="206" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
-    <state width="1875" height="348" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
-    <state width="1875" height="348" key="GridCell.Tab.0.center" timestamp="1584883113508">
+    <state width="1875" height="327" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1584958735968" />
+    <state width="1875" height="327" key="GridCell.Tab.0.center" timestamp="1584958735967">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="206" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
-    <state width="1875" height="348" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113508" />
-    <state width="1875" height="348" key="GridCell.Tab.0.left" timestamp="1584883113508">
+    <state width="1875" height="327" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1584958735967" />
+    <state width="1875" height="327" key="GridCell.Tab.0.left" timestamp="1584958735967">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="206" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
-    <state width="1875" height="348" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113508" />
-    <state width="1875" height="348" key="GridCell.Tab.0.right" timestamp="1584883113509">
+    <state width="1875" height="327" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1584958735967" />
+    <state width="1875" height="327" key="GridCell.Tab.0.right" timestamp="1584958735968">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>
     <state width="1877" height="206" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
-    <state width="1875" height="348" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
+    <state width="1875" height="327" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1584958735968" />
     <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1584883113509">
       <screen x="2" y="0" width="1918" height="1040" />
     </state>

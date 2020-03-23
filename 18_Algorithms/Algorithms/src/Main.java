@@ -89,12 +89,27 @@ public class Main {
 //        String query = "birthday";
         String text = "CGTTACGTATGCGCTAGCTAGTCGATGATGACGACGACGACGTA";
         String query = "GATG";
-        RabinKarpExtended rabinKarpExtended = new RabinKarpExtended(text);
-        List<Integer> indices = rabinKarpExtended.search(query);
-        if (indices != null) {
-            System.out.println(Arrays.toString(indices.toArray()));
-        } else {
-            System.out.println("Указанная подстрока отсутствует или невозможно найти из-за ограничения алфавита в поиске");
+        String emptyQuery = "";
+        try {
+            System.out.println("Поиск подстроки по Рабину-Карпу. \nНа вход передается пустой запрос: ");
+            searchTextAndPrint(new RabinKarpExtended(text), emptyQuery);
+        } catch (IllegalArgumentException ex) {
+            System.out.println(ex.getMessage());
         }
+        try {
+            System.out.println("==== Поиск подстроки " + query);
+            searchTextAndPrint(new RabinKarpExtended(text), query);
+        } catch (IllegalArgumentException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    private static void searchTextAndPrint(RabinKarpExtended rabinKarpExtended, String query) {
+            List<Integer> indices = rabinKarpExtended.search(query);
+            if (indices != null) {
+                System.out.println(Arrays.toString(indices.toArray()));
+            } else {
+                System.out.println("Указанная подстрока отсутствует или невозможно найти из-за ограничения алфавита в поиске");
+            }
     }
 }

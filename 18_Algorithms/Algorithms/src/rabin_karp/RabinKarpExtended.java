@@ -13,11 +13,17 @@ public class RabinKarpExtended {
     private int[] intArray;
 
     public RabinKarpExtended(String text) {
+        if (text == null || text.equals("")) {
+            throw new IllegalArgumentException("Передан пустой текстовый фрагмент или null.");
+        }
         this.text = text;
     }
 
     public List<Integer> search(String query) {
         ArrayList<Integer> indices = new ArrayList<>();
+        if (query == null || query.equals("")) {
+            throw new IllegalArgumentException("Передан пустой поисковый запрос или null.");
+        }
         createAlphabet();         // создаем алфавит (используемые символы) и проверяем его размер
         if (!isAlphabetSmallEnough()) return null;
         createIndex(query.length());  // Индексируем текст на основании длины строки поиска (кусками по query-длине и сдвиг на 1 поз)
