@@ -13,11 +13,11 @@ public class PostVote implements Serializable {
     @Column(nullable = false)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.ALL) // TODO Разобраться с каскадами, удаляется все, при удалении лайков/дизлайков
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

@@ -1,28 +1,32 @@
 package main.api.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import main.model.entities.GlobalSettings;
+import main.services.interfaces.GlobalSettingsRepositoryService;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class ResponseSettings implements ResponseApi {
 
-    private Boolean MULTIUSER_MODE;
-    private Boolean POST_PREMODERATION;
-    private Boolean STATISTICS_IS_PUBLIC;
+    @JsonProperty(GlobalSettingsRepositoryService.MULTIUSER_MODE)
+    private Boolean multiuserMode;
+    @JsonProperty(GlobalSettingsRepositoryService.POST_PREMODERATION)
+    private Boolean postPremoderation;
+    @JsonProperty(GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC)
+    private Boolean statisticsIsPublic;
 
     public ResponseSettings(Map<String, Boolean> settings) {
         for (String key : settings.keySet()) {
             switch (key) {
-                case ("MULTIUSER_MODE"):
-                    MULTIUSER_MODE = settings.get("MULTIUSER_MODE");
+                case (GlobalSettingsRepositoryService.MULTIUSER_MODE):
+                    multiuserMode = settings.get(GlobalSettingsRepositoryService.MULTIUSER_MODE);
                     break;
-                case ("POST_PREMODERATION"):
-                    POST_PREMODERATION = settings.get("POST_PREMODERATION");
+                case (GlobalSettingsRepositoryService.POST_PREMODERATION):
+                    postPremoderation = settings.get(GlobalSettingsRepositoryService.POST_PREMODERATION);
                     break;
-                case ("STATISTICS_IS_PUBLIC"):
-                    STATISTICS_IS_PUBLIC = settings.get("STATISTICS_IS_PUBLIC");
+                case (GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC):
+                    statisticsIsPublic = settings.get(GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC);
                     break;
             }
         }
@@ -33,43 +37,43 @@ public class ResponseSettings implements ResponseApi {
             String settingName = g.getCode().toUpperCase();
             switch (settingName) {
                 case "MULTIUSER_MODE": {
-                    MULTIUSER_MODE = yesOrNoToBoolean(g.getValue());
+                    multiuserMode = yesOrNoToBoolean(g.getValue());
                     break;
                 }
                 case "POST_PREMODERATION": {
-                    POST_PREMODERATION = yesOrNoToBoolean(g.getValue());
+                    postPremoderation = yesOrNoToBoolean(g.getValue());
                     break;
                 }
                 case "STATISTICS_IS_PUBLIC": {
-                    STATISTICS_IS_PUBLIC = yesOrNoToBoolean(g.getValue());
+                    statisticsIsPublic = yesOrNoToBoolean(g.getValue());
                     break;
                 }
             }
         }
     }
 
-    public Boolean getMULTIUSER_MODE() {
-        return MULTIUSER_MODE;
+    public Boolean getMultiuserMode() {
+        return multiuserMode;
     }
 
-    public void setMULTIUSER_MODE(Boolean MULTIUSER_MODE) {
-        this.MULTIUSER_MODE = MULTIUSER_MODE;
+    public void setMultiuserMode(Boolean multiuserMode) {
+        this.multiuserMode = multiuserMode;
     }
 
-    public Boolean getPOST_PREMODERATION() {
-        return POST_PREMODERATION;
+    public Boolean getPostPremoderation() {
+        return postPremoderation;
     }
 
-    public void setPOST_PREMODERATION(Boolean POST_PREMODERATION) {
-        this.POST_PREMODERATION = POST_PREMODERATION;
+    public void setPostPremoderation(Boolean postPremoderation) {
+        this.postPremoderation = postPremoderation;
     }
 
-    public Boolean getSTATISTICS_IS_PUBLIC() {
-        return STATISTICS_IS_PUBLIC;
+    public Boolean getStatisticsIsPublic() {
+        return statisticsIsPublic;
     }
 
-    public void setSTATISTICS_IS_PUBLIC(Boolean STATISTICS_IS_PUBLIC) {
-        this.STATISTICS_IS_PUBLIC = STATISTICS_IS_PUBLIC;
+    public void setStatisticsIsPublic(Boolean statisticsIsPublic) {
+        this.statisticsIsPublic = statisticsIsPublic;
     }
 
     private String booleanToYesOrNo(boolean bool) {

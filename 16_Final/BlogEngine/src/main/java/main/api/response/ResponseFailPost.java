@@ -1,13 +1,25 @@
 package main.api.response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ResponseFailPost implements ResponseApi {
 
     private boolean result;
-    private FailPostErrors errors;
+//    private FailPostErrors errors;
+    private Map<String, String> errors;
 
-    public ResponseFailPost() {
+    public ResponseFailPost(boolean isTextValid, boolean isTitleValid) {
         result = false;
-        errors = new FailPostErrors();
+        errors = new HashMap<>();
+//        errors = new FailPostErrors();
+        if (!isTextValid) {
+            errors.put("text", "Текст публикации слишком короткий");
+        }
+        if (!isTitleValid) {
+            errors.put("title", "Заголовок не установлен");
+        }
+
     }
 
     public boolean isResult() {
@@ -18,13 +30,21 @@ public class ResponseFailPost implements ResponseApi {
         this.result = result;
     }
 
-    public FailPostErrors getErrors() {
+    public Map<String, String> getErrors() {
         return errors;
     }
 
-    public void setErrors(FailPostErrors errors) {
+    public void setErrors(Map<String, String> errors) {
         this.errors = errors;
     }
+
+    //    public FailPostErrors getErrors() {
+//        return errors;
+//    }
+//
+//    public void setErrors(FailPostErrors errors) {
+//        this.errors = errors;
+//    }
 
     static class FailPostErrors {
         private String title;

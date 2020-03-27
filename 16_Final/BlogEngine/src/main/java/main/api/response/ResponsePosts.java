@@ -1,6 +1,8 @@
 package main.api.response;
 
 import main.model.entities.Post;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Transient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,11 +15,11 @@ public class ResponsePosts implements ResponseApi {
     private int count;
     private List<ResponsePostsApi> posts;
 
-    public ResponsePosts(int count, ArrayList<Post> postsToShow) {
+    public ResponsePosts(int count, ArrayList<Post> postsToShow, int announceLength) {
         this.count = count;
         posts = new ArrayList<>();
         for (Post p : postsToShow) {
-            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p);
+            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p, announceLength);
             posts.add(responsePostsApi);
         }
     }
@@ -44,18 +46,19 @@ public class ResponsePosts implements ResponseApi {
         private String time;
         private PostAuthorUser user;
         private String title;
-        private String announce; //TODO Как-то конвертировать в HTML? Не String? какой-то текст анонса - откуда брать?
+        private String announce;
         private int likeCount;
         private int dislikeCount;
         private int commentCount;
         private int viewCount;
 
-        public ResponsePostsApi(Post post) {
+        public ResponsePostsApi(Post post, int announceLength) {
             this.id = post.getId();
             this.time = getTimeString(post.getTime().toLocalDateTime());
             this.user = new PostAuthorUser(post);
             this.title = post.getTitle();
-            this.announce = "Текст анонса поста без HTML-тэгов";
+            announce = post.getText().length() < announceLength ? post.getText()
+                    : post.getText().substring(0, announceLength) + "...";
             this.likeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == 1).count();
             this.dislikeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == -1).count();
             this.commentCount = post.getPostComments().size();

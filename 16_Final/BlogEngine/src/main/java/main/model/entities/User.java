@@ -51,13 +51,13 @@ public class User implements Serializable {
     }
 
     // Доп поля - связи
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<Post>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostVote> postVotes = new HashSet<PostVote>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostComment> postComments = new HashSet<PostComment>();
 
     @OneToMany(mappedBy = "moderatorId", cascade = CascadeType.ALL)

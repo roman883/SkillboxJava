@@ -1,20 +1,33 @@
 package main;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Properties;
 
 @Configuration
 public class JavaMailConfiguration {
 
-    private static final String EMAIL_ADDRESS_FROM = "SOME_EMAIL@GMAIL.COM";
-    private static final String GMAIL_SECRET_MAIL_APPLICATION_KEY = "HERE_YOUR_SECRET_KEY_FOR_GMAIL";
+    @Value("${spring.mail.username}") // или username + "@gmail.com"
+    private String emailAddressFrom;
+    @Value("${spring.mail.password}")
+    private String gmailSecretMailApplicationKey;
+    @Value("${spring.mail.host}")
+    private String host;
+    @Value("${spring.mail.port}")
+    private int port;
+    @Value("${spring.mail.properties.mail.smtp.auth}")
+    private String mailSmtpAuth;
+    @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+    private String mailSterttlsEnable;
+    @Value("${spring.mail.properties.mail.debug}")
+    private String mailDebug;
+    @Value("${spring.mail.properties.mail.transport.protocol}")
+    private String transportProtocol;
+
 
 //    @Bean
 //    public SimpleMailMessage templateSimpleMessage() {
@@ -23,19 +36,19 @@ public class JavaMailConfiguration {
 //        return message;
 //    }
 
-    @Bean //TODO настройки задаются здесь или все же в application.yml?
+    @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-        mailSender.setUsername(EMAIL_ADDRESS_FROM);
-        mailSender.setPassword(GMAIL_SECRET_MAIL_APPLICATION_KEY);
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(emailAddressFrom);
+        mailSender.setPassword(gmailSecretMailApplicationKey);
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.transport.protocol", transportProtocol);
+        props.put("mail.smtp.auth", mailSmtpAuth);
+        props.put("mail.smtp.starttls.enable", mailSterttlsEnable);
+        props.put("mail.debug", mailDebug);
         return mailSender;
     }
 }

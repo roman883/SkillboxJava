@@ -1,5 +1,7 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class PostRequest implements RequestApi {

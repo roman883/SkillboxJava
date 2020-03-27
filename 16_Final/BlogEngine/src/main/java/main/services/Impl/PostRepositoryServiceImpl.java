@@ -4,17 +4,26 @@ import main.api.request.ModeratePostRequest;
 import main.api.request.PostRequest;
 import main.api.response.*;
 import main.model.ModerationStatus;
-import main.model.entities.*;
+import main.model.entities.Post;
+import main.model.entities.Tag;
+import main.model.entities.TagToPost;
+import main.model.entities.User;
 import main.model.repositories.PostRepository;
-import main.services.interfaces.*;
+import main.services.interfaces.PostRepositoryService;
+import main.services.interfaces.TagRepositoryService;
+import main.services.interfaces.TagToPostRepositoryService;
+import main.services.interfaces.UserRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Transient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Date;
@@ -27,11 +36,28 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PostRepositoryServiceImpl implements PostRepositoryService {
-    private static final String ROOT_PATH_TO_UPLOAD = "images";
+    @Value("${post.image.root_folder}")
+    private String imagesRootFolder;
+    @Value("${post.body.min_length}")
+    private int postBodyMinLength;
+    @Value("${post.body.max_length}")
+    private int postBodyMaxLength;
+    @Value("${post.title.min_length}")
+    private int postTitleMinLength;
+    @Value("${post.title.max_length}")
+    private int postTitleMaxLength;
+    @Value("${post.image.upload_folder}")
+    private String imagesUploadFolder;
+    @Value("${post.image.format}")
+    private String imagesFormat;
+    @Value("${post.default_limit_per_page}")
+    private int defaultPostsLimitPerPage;
+    @Transient // TODO или убрать?
+    @Value("${post.announce.max_length}")
+    private int announceLength;
 
     @Autowired
     private PostRepository postRepository;
@@ -52,7 +78,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 || !post.getTime().toLocalDateTime().isBefore(LocalDateTime.now())) {  // Не все данные отображаются, проверить время
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        ResponseApi responseApi = new ResponsePost(post);
+        ResponseApi responseApi = new ResponsePost(post, announceLength);
         post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);
         return new ResponseEntity<ResponseApi>(responseApi, HttpStatus.OK);
@@ -66,7 +92,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
 
     @Override
     public ResponseEntity<ResponseApi> getRecentPosts() {
-        return getPostsWithParams(0, 10, "recent");
+        return getPostsWithParams(0, defaultPostsLimitPerPage, "recent");
     }
 
     public ResponseEntity<ResponseApi> getPostsWithParams(int offset, int limit, String mode) {
@@ -74,47 +100,23 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 (!mode.equals("recent") && !mode.equals("popular") && !mode.equals("best") && !mode.equals("early"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        List<Post> allPosts = getAllPosts();
-        int count = allPosts.size();
-        switch (mode.toLowerCase()) { // Сортировка
+        List<Post> postsToShow = new ArrayList<>();
+        int count = postRepository.countAllPosts();
+        switch (mode.toLowerCase()) {
             case ("recent"):
-                Comparator<Post> compareByTimeNewFirst = new Comparator<Post>() {
-                    public int compare(Post o1, Post o2) {
-                        return o2.getTime().compareTo(o1.getTime());
-                    }
-                };
-                allPosts.sort(compareByTimeNewFirst);
+                postsToShow = postRepository.getRecentPosts(offset, limit);
                 break;
             case ("popular"):
-                Comparator<Post> compareByCommentsCount = (o1, o2) -> o2.getPostComments().size() - o1.getPostComments().size();
-                allPosts.sort(compareByCommentsCount);
+                postsToShow = postRepository.getPopularPosts(offset, limit);
                 break;
             case ("best"):
-                Comparator<Post> compareByLikesCount = (o1, o2) -> {
-                    int o1likesCount = (int) o1.getPostVotes().stream().filter(like -> like.getValue() == 1).count();
-                    int o2LikesCount = (int) o2.getPostVotes().stream().filter(like -> like.getValue() == 1).count();
-                    return o2LikesCount - o1likesCount;
-                };
-                allPosts.sort(compareByLikesCount);
+                postsToShow = postRepository.getBestPosts(offset, limit);
                 break;
             case ("early"):
-                Comparator<Post> compareByTimeOldFirst = Comparator.comparing(Post::getTime);
-                allPosts.sort(compareByTimeOldFirst);
+                postsToShow = postRepository.getEarlyPosts(offset, limit);
                 break;
         }
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        for (int i = 0; i < limit; i++) {
-            int index = offset + i;
-            if (index == count) {
-                break;
-            }
-            Post currentPost = allPosts.get(index);
-            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())) {
-                postsToShow.add(currentPost);
-            }
-        }
-        ResponseApi responseApi = new ResponsePosts(count, postsToShow);
+        ResponseApi responseApi = new ResponsePosts(count, (ArrayList<Post>) postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
@@ -122,26 +124,8 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (offset < 0 || limit < 1) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        ArrayList<Post> allPosts = getAllPosts();
-        int count = allPosts.size();
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        if (query.equals("")) {
-            postsToShow = allPosts;
-        } else {
-            for (int i = 0; i < limit; i++) {
-                int index = offset + i;
-                if (index == count) {
-                    break;
-                }
-                Post currentPost = allPosts.get(index);
-                if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                        && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
-                        && currentPost.getText().contains(query)) {
-                    postsToShow.add(currentPost);
-                }
-            }
-        }
-        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), postsToShow);
+        List<Post> postsToShow = postRepository.searchPosts(offset, limit, query);
+        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
@@ -156,54 +140,37 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (offset < 0 || limit < 1 || date == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        ArrayList<Post> allPosts = getAllPosts();
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        for (int i = 0; i < limit; i++) {
-            int index = offset + i;
-            if (index == allPosts.size()) {
-                break;
-            }
-            Post currentPost = allPosts.get(index);
-            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
-                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date)) {
-                postsToShow.add(currentPost);
-            }
-        }
-        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), postsToShow);
+        List<Post> postsToShow = postRepository.getPostsByDate(dateString, limit, offset);
+//        for (int i = 0; i < limit; i++) {
+//            int index = offset + i;
+//            if (index == allPosts.size()) {
+//                break;
+//            }
+//            Post currentPost = allPosts.get(index);
+//            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
+//                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
+//                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date)) {
+//                postsToShow.add(currentPost);
+//            }
+//        }
+        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
     public ResponseEntity<ResponseApi> getPostsByTag(int limit, String tag, int offset) {
-        if (offset < 0 || limit < 1 || tag.equals("")) {
+        if (offset < 0 || limit < 1 || tag == null || tag.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Set<Tag> allTags = tagRepositoryService.getAllTags();
-        ArrayList<Post> allPostsByTag = new ArrayList<>();
-        allTags.stream().filter(t -> t.getName().contains(tag))
-                .forEach(m -> m.getTagsToPostsSet()
-                        .forEach(k -> allPostsByTag.add(k.getPost())));
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        for (int i = 0; i < limit; i++) {
-            int index = offset + i;
-            if (index == allPostsByTag.size()) {
-                break;
-            }
-            Post currentPost = allPostsByTag.get(index);
-            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
-                    && !postsToShow.contains(currentPost)) {
-                postsToShow.add(currentPost);
-            }
-        }
-        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), postsToShow);
+        List<Post> postsToShow = postRepository.getPostsByTag(tag, limit, offset);
+        ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
     public ResponseEntity<ResponseApi> getPostsForModeration(String status, int offset, int limit,
                                                              HttpSession session) {
         if (offset < 0 || limit < 1 ||
-                (!status.equals("new") && !status.equals("declined") && !status.equals("accepted"))) {
+                (!status.equalsIgnoreCase("new") && !status.equalsIgnoreCase("declined")
+                        && !status.equalsIgnoreCase("accepted"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
@@ -218,44 +185,45 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
         }
         // Пост при создании не имеет moderator_id, показываем всем модераторам все новые посты
-        ArrayList<Post> queriedPosts = new ArrayList<>();
+        ArrayList<Post> postsToShow = new ArrayList<>();
         switch (status) {
             case ("new"):
-                queriedPosts = getAllPosts().stream()
-                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.NEW))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getPostsForModeration(limit, offset);
                 break;
             case ("declined"):
-                queriedPosts = getAllPosts().stream()
-                        .filter(u -> u.getModeratorId().equals(userId))
-                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.DECLINED))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getPostsModeratedByMe("DECLINED", limit, offset, user.getId());
                 break;
             case ("accepted"):
-                queriedPosts = getAllPosts().stream()
-                        .filter(u -> u.getModeratorId().equals(userId))
-                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getPostsModeratedByMe("ACCEPTED", limit, offset, user.getId());
                 break;
         }
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        for (int i = 0; i < limit; i++) {
-            int index = offset + i;
-            if (index == queriedPosts.size()) {
-                break;
-            }
-            Post currentPost = queriedPosts.get(index);
-            if (currentPost.isActive()) {
-                postsToShow.add(currentPost);
-            }
-        }
-        ResponseApi responseApi = new ResponsePostsForModeration(postsToShow.size(), postsToShow);
+//        switch (status) {
+//            case ("new"):
+//                queriedPosts = getAllPosts().stream()
+//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.NEW))
+//                        .collect(Collectors.toCollection(ArrayList::new));
+//                break;
+//            case ("declined"):
+//                queriedPosts = getAllPosts().stream()
+//                        .filter(u -> u.getModeratorId().equals(userId))
+//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.DECLINED))
+//                        .collect(Collectors.toCollection(ArrayList::new));
+//                break;
+//            case ("accepted"):
+//                queriedPosts = getAllPosts().stream()
+//                        .filter(u -> u.getModeratorId().equals(userId))
+//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
+//                        .collect(Collectors.toCollection(ArrayList::new));
+//                break;
+//        }
+        ResponseApi responseApi = new ResponsePostsForModeration(postsToShow.size(), postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
     public ResponseEntity<ResponseApi> getMyPosts(String status, int offset, int limit, HttpSession session) {
         if (offset < 0 || limit < 1 || (!status.equals("inactive")
-                && !status.equals("pending") && !status.equals("declined") && !status.equals("published"))) {
+                && !status.equalsIgnoreCase("pending") && !status.equalsIgnoreCase("declined")
+                && !status.equalsIgnoreCase("published"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
@@ -266,38 +234,22 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
         }
-        Set<Post> allMyPosts = user.getPosts();
-        ArrayList<Post> queriedPosts = new ArrayList<>();
+        ArrayList<Post> postsToShow = new ArrayList<>();
         switch (status) {
             case ("inactive"):
-                queriedPosts = allMyPosts.stream().filter(p -> !p.isActive())
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getMyNotActivePosts(user.getId(), limit, offset);
                 break;
             case ("pending"):
-                queriedPosts = allMyPosts.stream()
-                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.NEW))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getMyActivePosts("NEW", limit, offset, user.getId());
                 break;
             case ("declined"):
-                queriedPosts = allMyPosts.stream()
-                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.DECLINED))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getMyActivePosts("DECLINED", limit, offset, user.getId());
                 break;
             case ("published"):
-                queriedPosts = allMyPosts.stream()
-                        .filter(p -> p.isActive() && p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                postsToShow = (ArrayList<Post>) postRepository.getMyActivePosts("ACCEPTED", limit, offset, user.getId());
                 break;
         }
-        ArrayList<Post> postsToShow = new ArrayList<>();
-        for (int i = 0; i < limit; i++) {
-            int index = offset + i;
-            if (index == queriedPosts.size()) {
-                break;
-            }
-            postsToShow.add(queriedPosts.get(index));
-        }
-        ResponseApi responseApi = new ResponseMyPosts(postsToShow.size(), postsToShow);
+        ResponseApi responseApi = new ResponseMyPosts(postsToShow.size(), postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
@@ -306,18 +258,20 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         byte active = postRequest.getActive();
         String title = postRequest.getTitle();
         String text = postRequest.getText();
-        List<String> tagsSplit = postRequest.getTags();
+        List<String> postTags = postRequest.getTags();
         LocalDateTime time = null;
         try {
             time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(timeString).toInstant(), ZoneId.systemDefault());
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        if (title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500 || time == null) {
-            return new ResponseEntity<>(new ResponseFailPost(), HttpStatus.BAD_REQUEST);
+        if (time == null || time.isBefore(LocalDateTime.now())) { // "на frontend нужно исправлять автоматически на текущее время" делать это отсюда?
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        if (time.isBefore(LocalDateTime.now())) {
-            return new ResponseEntity<>(new ResponseFailPost(), HttpStatus.BAD_REQUEST);
+        boolean isTextValidFlag = isTextValid(text);
+        boolean isTitleValidFlag = isTitleValid(title);
+        if (!isTextValidFlag || !isTitleValidFlag) {
+            return new ResponseEntity<>(new ResponseFailPost(isTextValidFlag, isTitleValidFlag), HttpStatus.BAD_REQUEST);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
@@ -333,7 +287,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         }
         Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
         Post currentPost = postRepository.save(new Post(isActive, ModerationStatus.NEW, user, timestamp, title, text));
-        for (String currentTagName : tagsSplit) {
+        for (String currentTagName : postTags) {
             if (!currentTagName.isBlank()) {
                 Tag currentTag = tagRepositoryService.addTag(new Tag(currentTagName));
                 tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
@@ -343,20 +297,15 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     }
 
     public ResponseEntity<String> uploadImage(MultipartFile image, HttpSession session) throws IOException {
-        if (image == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+        if (image == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         Integer userId = userRepositoryService.getUserIdBySession(session);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         User user = userRepositoryService.getUser(userId).getBody();
-        if (user == null) {
+        if (user == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
-        }
-        if (!Files.exists(Path.of(ROOT_PATH_TO_UPLOAD))) {
+        if (!Files.exists(Path.of(imagesRootFolder))) {
             try {
-                Files.createDirectory(Path.of(ROOT_PATH_TO_UPLOAD));
+                Files.createDirectory(Path.of(imagesRootFolder));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -379,34 +328,29 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         byte active = postRequest.getActive();
         String title = postRequest.getTitle();
         String text = postRequest.getText();
-        List<String> tagsSplit = postRequest.getTags();
-        LocalDateTime time = null;
+        List<String> tags = postRequest.getTags();
+        LocalDateTime time = null; // TODO можно вынести парсинг даты в отдельный метод
         try {
-            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeString).toInstant(), ZoneId.systemDefault());
+            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    .parse(timeString).toInstant(), ZoneId.systemDefault());
         } catch (ParseException e) {
             e.printStackTrace();
         }
         Post currentPost = getPostById(id);
-        if (currentPost == null || title.equals("") || text.equals("") || title.length() < 10 || text.length() < 500) {
-            return new ResponseEntity<>(new ResponseFailPost(), HttpStatus.BAD_REQUEST);
-        }
-        if (time == null || time.isBefore(LocalDateTime.now())) {
-            time = LocalDateTime.now();
+        if (currentPost == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Пост не существует
+        if (time == null || time.isBefore(LocalDateTime.now())) time = LocalDateTime.now();
+        boolean isTextValidFlag = isTextValid(text);
+        boolean isTitleValidFlag = isTitleValid(title);
+        if (!isTextValidFlag || !isTitleValidFlag) {
+            return new ResponseEntity<>(new ResponseFailPost(isTextValidFlag, isTitleValidFlag), HttpStatus.BAD_REQUEST);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         User user = userRepositoryService.getUser(userId).getBody();
-        if (user == null) {
+        if (user == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
-        }
-        boolean isActive = false;
-        if (active == 1) {
-            isActive = true;
-        }
         Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
-        currentPost.setActive(isActive);
+        currentPost.setActive(active == 1);
         currentPost.setTime(timestamp);
         currentPost.setTitle(title);
         currentPost.setText(text);
@@ -415,11 +359,11 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         currentPost.getTagsToPostsSet().forEach(tag2post -> {
             tagRepositoryService.deleteTag(tag2post.getTag());
             tagToPostRepositoryService.deleteTagToPost(tag2post);
-        }); // Нужно ли отдельно удалять все теги?
-        for (String currentTagName : tagsSplit) {         // удалили все теги и тег-ту-посты, добавляем новые
+        });
+        for (String currentTagName : tags) {
             if (!currentTagName.isBlank()) {
                 Tag currentTag = tagRepositoryService.addTag(new Tag(currentTagName));
-                tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
+                tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost));
             }
         }
         return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
@@ -430,23 +374,18 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         String decision = moderatePostRequest.getDecision();
         decision = decision.toUpperCase().trim();
         if (!decision.equals("DECLINE") && !decision.equals("ACCEPT")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Результат модерации не распознан
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         // Если пользователь залогинен
         Integer userId = userRepositoryService.getUserIdBySession(session);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         User user = userRepositoryService.getUser(userId).getBody();
-        if (user == null) {
+        if (user == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Пользователь не найден, хотя сессия есть
-        }
-        if (!user.isModerator()) {  // Не модератор
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        if (!user.isModerator()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         Post post = getPostById(postId);
         if (post == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Пост не найден
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         post.setModeratorId(userId);
         if (decision.equals("DECLINE")) {
@@ -459,58 +398,23 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     }
 
     public ResponseEntity<ResponseApi> countPostsByYear(Integer year) {
-        ArrayList<Post> allPosts = getAllPosts();
+        List<Post> postsByYear = year == null
+                ? postRepository.getPostsByYear(LocalDateTime.now().getYear())
+                : postRepository.getPostsByYear(year);
         HashMap<Date, Integer> postsCountByDate = new HashMap<>();
-        TreeSet<Integer> allYears = new TreeSet<>();
-        int queriedYear;
-        if (year == null) {
-            queriedYear = LocalDateTime.now().getYear();
-        } else {
-            queriedYear = year;
+        for (Post p : postsByYear) {
+            Date postDate = Date.valueOf(p.getTime().toLocalDateTime().toLocalDate());
+            Integer postCount = postsCountByDate.getOrDefault(postDate, 0);
+            postsCountByDate.put(postDate, postCount + 1);
         }
-        for (Post p : allPosts) {
-            Integer postYear = p.getTime().toLocalDateTime().getYear();
-            allYears.add(postYear);
-            if (postYear.equals(queriedYear)) {
-                Date postDate = Date.valueOf(p.getTime().toLocalDateTime().toLocalDate());
-                Integer postCount = postsCountByDate.getOrDefault(postDate, 0);
-                postsCountByDate.put(postDate, postCount + 1);
-            }
-        }
+        List<Integer> allYears = postRepository.countYearsWithAnyPosts();
         return new ResponseEntity<ResponseApi>(new ResponsePostsCalendar(postsCountByDate, allYears), HttpStatus.OK);
     }
 
-//    @Override
-//    public int getModerationCount(int moderatorUserId) { // TODO удалить, храним данные по модерируемым постам в сете в объекте User
-//        AtomicInteger count = new AtomicInteger();
-//        postRepository.findAll().forEach(p -> {
-//            if (p.getModeratorId() == moderatorUserId) {
-//                count.addAndGet(1);
-//            }
-//        });
-//        return count.intValue();
-//    }
-
     @Override
     public ArrayList<Post> getAllPosts() {
-        ArrayList<Post> posts = new ArrayList<>();
-        postRepository.findAll().forEach(posts::add);
-        return posts;
+        return new ArrayList<>(postRepository.findAll());
     }
-
-//    private JSONObject createResultJsonObjectByPost(Post p) {
-//        String timeString = getTimeString(p.getTime().toLocalDateTime());
-//        JSONObject postObject = new JSONObject();
-//        postObject.put("id", p.getId()).put("time", timeString);
-//        JSONObject userObject = new JSONObject();
-//        userObject.put("id", p.getUser().getId()).put("name", p.getUser().getName());
-//        postObject.put("user", userObject).put("title", p.getTitle())
-//                .put("announce", "Текст анонса поста без HTML-тэгов") //TODO откуда брать???
-//                .put("likeCount", p.getPostVotes().stream().filter(l -> l.getValue() == 1).count())
-//                .put("dislikeCount", p.getPostVotes().stream().filter(l -> l.getValue() == -1).count())
-//                .put("commentCount", p.getPostComments().size()).put("viewCount", p.getViewCount());
-//        return postObject;
-//    }
 
     private String getTimeString(LocalDateTime objectCreatedTime) {
         StringBuilder timeString = new StringBuilder();
@@ -550,9 +454,22 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         String secondFolder = randomHash.substring(
                 firstFolder.length(), (firstFolder.length() + randomHash.length() / 3));
         String thirdFolder = randomHash.substring((firstFolder.length() + secondFolder.length()));
-        StringBuilder builder = new StringBuilder(ROOT_PATH_TO_UPLOAD).append("/upload/").append(firstFolder)
-                .append("/").append(secondFolder).append("/").append(thirdFolder);
+        StringBuilder builder = new StringBuilder(imagesRootFolder)
+                .append("/").append(imagesUploadFolder)
+                .append("/").append(firstFolder)
+                .append("/").append(secondFolder)
+                .append("/").append(thirdFolder);
         Files.createDirectories(Path.of(builder.toString()));
-        return builder.append("/").append(randomHash).append(".jpg").toString(); // имя файла задаем тем же хэшем
+        return builder.append("/").append(randomHash).append(".").append(imagesFormat).toString(); // имя файла задаем тем же хэшем
+    }
+
+    private boolean isTextValid(String text) {
+        return text != null && !text.equals("") && text.length() <= postBodyMaxLength
+                && text.length() >= postBodyMinLength;
+    }
+
+    private boolean isTitleValid(String title) {
+        return title != null && !title.equals("") && title.length() <= postTitleMaxLength
+                && title.length() >= postTitleMinLength;
     }
 }

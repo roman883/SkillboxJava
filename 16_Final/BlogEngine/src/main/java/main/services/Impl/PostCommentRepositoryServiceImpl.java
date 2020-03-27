@@ -2,16 +2,17 @@ package main.services.Impl;
 
 import main.api.request.AddCommentRequest;
 import main.api.response.ResponseApi;
+import main.api.response.ResponseFailComment;
+import main.api.response.ResponseSuccessComment;
 import main.model.entities.Post;
 import main.model.entities.PostComment;
 import main.model.entities.User;
 import main.model.repositories.PostCommentRepository;
-import main.api.response.ResponseFailComment;
-import main.api.response.*;
 import main.services.interfaces.PostCommentRepositoryService;
 import main.services.interfaces.PostRepositoryService;
 import main.services.interfaces.UserRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,17 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
 public class PostCommentRepositoryServiceImpl implements PostCommentRepositoryService {
 
-    private static final int DEFAULT_COMMENT_LENGTH = 200;
+    @Value("${post_comment.min_length}")
+    private int minCommentLength;
+    @Value("${post_comment.max_length}")
+    private int maxCommentLength;
 
     @Autowired
     private PostCommentRepository postCommentRepository;
@@ -36,20 +41,18 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
 
     @Override
     public ArrayList<PostComment> getAllComments() {
-        ArrayList<PostComment> resultList = new ArrayList<>();
-        postCommentRepository.findAll().forEach(resultList::add);
-        return resultList;
+        return new ArrayList<>(postCommentRepository.findAll());
     }
 
     @Override
     public ResponseEntity<ResponseApi> addComment(AddCommentRequest addCommentRequest, HttpSession session) {
         Integer parentId = addCommentRequest.getParentId();
         Integer postId = addCommentRequest.getPostId();
-        if (parentId == null && postId == null) { // не найдены id
+        if (parentId == null && postId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         String text = addCommentRequest.getText();
-        if (text.equals("") || text.length() < DEFAULT_COMMENT_LENGTH) {
+        if (!isTextValid(text)) {
             return new ResponseEntity<>(new ResponseFailComment(), HttpStatus.OK);
         } // Если все ок, создаем комментарий и возвращаем id
         Integer userId = userRepoService.getUserIdBySession(session);
@@ -65,10 +68,10 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             parentPost = postRepositoryService.getPostById(postId);
         }
         if (parentComment == null && parentPost == null) { // не найдены ни пост, ни коммент с таким id на которые добавляем коммент
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // TODO Задавать ли непрописанные в API ошибки?
         }
         User user = userRepoService.getUser(userId).getBody();
-        Timestamp time = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp time = Timestamp.from(LocalDateTime.now().toInstant(ZoneOffset.UTC));
         PostComment newComment = postCommentRepository.save(new PostComment(parentComment, user, parentPost, time, text));
         return new ResponseEntity<>(new ResponseSuccessComment(newComment), HttpStatus.OK);
     }
@@ -77,5 +80,9 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
     public PostComment getPostCommentById(int id) {
         Optional<PostComment> optionalComment = postCommentRepository.findById(id);
         return optionalComment.isPresent() ? optionalComment.get() : null;
+    }
+
+    private boolean isTextValid(String text) {
+        return text != null && !text.equals("") && text.length() <= maxCommentLength && text.length() >= minCommentLength;
     }
 }

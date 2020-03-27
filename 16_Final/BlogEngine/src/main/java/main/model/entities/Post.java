@@ -30,7 +30,7 @@ public class Post implements Serializable {
     @Column(name = "moderator_id", nullable = true)
     private Integer moderatorId = null;                 // ID пользователя-модератора, принявшего решение, или NULL
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;     // автор поста
 

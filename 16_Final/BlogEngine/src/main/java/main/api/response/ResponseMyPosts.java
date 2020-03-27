@@ -13,12 +13,14 @@ public class ResponseMyPosts implements ResponseApi {
     private int count;
     private List<ResponsePostsApi> posts;
 
-    public ResponseMyPosts(int count, ArrayList<Post> postsToShow) {
+    public ResponseMyPosts(int count, ArrayList<Post> postsToShow, int announceLength) {
         this.count = count;
         posts = new ArrayList<>();
         for (Post p : postsToShow) {
-            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p);
+            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p, announceLength);
             posts.add(responsePostsApi);
+//            PostAuthorApi postAuthorApi = new PostAuthorApi(p.getUser().getId(), p.getUser().getEmail());
+//            posts.add(postAuthorApi);
         }
     }
 
@@ -43,17 +45,19 @@ public class ResponseMyPosts implements ResponseApi {
         private int id;
         private String time;
         private String title;
-        private String announce; //TODO Как-то конвертировать в HTML? Не String? какой-то текст анонса - откуда брать?
+        private String announce;
         private int likeCount;
         private int dislikeCount;
         private int commentCount;
         private int viewCount;
 
-        public ResponsePostsApi(Post post) {
+        public ResponsePostsApi(Post post, int announceLength) {
             this.id = post.getId();
             this.time = getTimeString(post.getTime().toLocalDateTime());
             this.title = post.getTitle();
-            this.announce = "Текст анонса поста без HTML-тэгов";
+            String temp = post.getText().replaceAll("<.?>", "");
+            announce = temp.length() < announceLength ? temp
+                    : temp.substring(0, announceLength) + "...";
             this.likeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == 1).count();
             this.dislikeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == -1).count();
             this.commentCount = post.getPostComments().size();
@@ -137,4 +141,31 @@ public class ResponseMyPosts implements ResponseApi {
             return timeString.toString();
         }
     }
+
+//    static class PostAuthorApi {
+//
+//        private String name;
+//        private int id;
+//
+//        public PostAuthorApi(int id, String name) {
+//            this.id = id;
+//            this.name = name;
+//        }
+//
+//        public int getId() {
+//            return id;
+//        }
+//
+//        public void setId(int id) {
+//            this.id = id;
+//        }
+//
+//        public String getName() {
+//            return name;
+//        }
+//
+//        public void setName(String name) {
+//            this.name = name;
+//        }
+//    }
 }

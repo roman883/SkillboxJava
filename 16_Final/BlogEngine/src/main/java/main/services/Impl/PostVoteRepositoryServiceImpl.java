@@ -2,11 +2,11 @@ package main.services.Impl;
 
 import main.api.request.PostVoteRequest;
 import main.api.response.ResponseApi;
+import main.api.response.ResponseBoolean;
 import main.model.entities.Post;
 import main.model.entities.PostVote;
 import main.model.entities.User;
 import main.model.repositories.PostVoteRepository;
-import main.api.response.*;
 import main.services.interfaces.PostRepositoryService;
 import main.services.interfaces.PostVoteRepositoryService;
 import main.services.interfaces.UserRepositoryService;
@@ -64,7 +64,7 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == -1) { // был дизлайк, удаляем
-            postVoteRepository.delete(beforeLike); //TODO Тут схлопываются каскадом посты!
+            postVoteRepository.deleteById(beforeLike.getId()); // TODO НЕ УДАЛЯЮТСЯ ИЗ БАЗЫ ЛАЙКИ/ДИЗЛАЙКИ
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
@@ -103,7 +103,7 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == 1) { // был лайк, удаляем
-            postVoteRepository.delete(beforeLike); //TODO Тут схлопываются каскадом посты!
+            postVoteRepository.deleteById(beforeLike.getId()); // TODO НЕ УДАЛЯЮТСЯ ИЗ БАЗЫ ЛАЙКИ/ДИЗЛАЙКИ. ВЕРНУТЬ КАСКАДЫ, но OrphanRemoval = false? Чтобы посты и юзеры не удалялись после удаления все лайков
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);

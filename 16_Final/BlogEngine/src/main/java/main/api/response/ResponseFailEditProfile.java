@@ -8,14 +8,15 @@ public class ResponseFailEditProfile implements ResponseApi {
     private boolean result;
     private Map<String, String> errors;
 
-    public ResponseFailEditProfile() {
+    public ResponseFailEditProfile(boolean isEmailValid, boolean isPhotoValid, boolean isNameValid,
+                                   boolean sPassValid, boolean isCaptchaCodeValid) {
         result = false;
         errors = new HashMap<>();
-        errors.put("email", "Этот e-mail уже зарегистрирован");
-        errors.put("photo", "Фото слишком большое, нужно не более 5 Мб");
-        errors.put("name", "Имя указано неверно");
-        errors.put("password", "Пароль короче 6-ти символов");
-        errors.put("captcha", "Код с картинки введён неверно");
+        if (!isEmailValid) errors.put("email", "Этот e-mail уже зарегистрирован");
+        if (!isPhotoValid) errors.put("photo", "Фото слишком большое, нужно не более 5 Мб");
+        if (!isNameValid) errors.put("name", "Имя указано неверно");
+        if (!sPassValid) errors.put("password", "Пароль короче 6-ти символов");
+        if (!isCaptchaCodeValid) errors.put("captcha", "Код с картинки введён неверно");
     }
 
     public boolean isResult() {

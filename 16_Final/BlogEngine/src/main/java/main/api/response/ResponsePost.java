@@ -16,7 +16,8 @@ public class ResponsePost implements ResponseApi {
     private String time;
     private PostAuthorApi user;
     private String title;
-    private String announce; //TODO Как-то конвертировать в HTML? Не String?
+    private String text;
+    private String announce;
     private int likeCount;
     private int dislikeCount;
     private int commentCount;
@@ -24,12 +25,15 @@ public class ResponsePost implements ResponseApi {
     private List<PostCommentApi> comments;
     private List<String> tags;
 
-    public ResponsePost(Post post) {
+    public ResponsePost(Post post, int announceLength) {
         id = post.getId();
         time = getTimeString(post.getTime().toLocalDateTime());
         user = new PostAuthorApi(post.getUser().getId(), post.getUser().getName());
         title = post.getTitle();
-        announce = post.getText().length() < 200 ? post.getText(): post.getText().substring(0, 200) + "..."; //TODO аннонс - 200 символов из текста поста
+        text = post.getText();
+        String temp = post.getText().replaceAll("<.?>", "");
+        announce = temp.length() < announceLength ? temp
+                : temp.substring(0, announceLength) + "...";
         likeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == 1).count();
         dislikeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == -1).count();
         commentCount = post.getPostComments().size();
@@ -72,12 +76,13 @@ public class ResponsePost implements ResponseApi {
     // Конструктор, геттеры и сеттеры. Не используются (пока)
 
 
-    public ResponsePost(int id, String time, PostAuthorApi user, String title, String announce, int likeCount,
+    public ResponsePost(int id, String time, PostAuthorApi user, String title, String text, String announce, int likeCount,
                         int dislikeCount, int commentCount, int viewCount, List<PostCommentApi> comments, List<String> tags) {
         this.id = id;
         this.time = time;
         this.user = user;
         this.title = title;
+        this.text = text;
         this.announce = announce;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
@@ -173,6 +178,14 @@ public class ResponsePost implements ResponseApi {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     static class PostAuthorApi {
