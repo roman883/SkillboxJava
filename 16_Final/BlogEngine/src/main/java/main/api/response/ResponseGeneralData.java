@@ -1,29 +1,26 @@
 package main.api.response;
 
-// Синглтон
-public class GeneralData implements ResponseApi {
+public class ResponseGeneralData implements ResponseApi {
 
-    private String title = "DevPub";
-    private String subtitle = "Рассказы разработчиков";
-    private String phone = "+7 903 666-44-55";
-    private String email = "mail@mail.ru";
-    private String copyright = "Дмитрий Сергеев";
-    private String copyrightFrom = "2005";
+    // TODO почему если тут получать значения @Value() из application.yml они null?
+    private String title;
+    private String subtitle;
+    private String phone;
+    private String email;
+    private String copyright;
+    private String copyrightFrom;
 
-    private static volatile GeneralData instance; // Volatile для многопоточности
-
-    private GeneralData() {
+    public ResponseGeneralData(String title, String subtitle, String phone, String email,
+                               String copyright, String copyrightFrom) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.phone = phone;
+        this.email = email;
+        this.copyright = copyright;
+        this.copyrightFrom = copyrightFrom;
     }
 
-    public static GeneralData getInstance() { // создание только при обращении
-        if (instance == null) {
-            synchronized (GeneralData.class) {
-                if (instance == null) { // если объект не создан, то создаем
-                    instance = new GeneralData();
-                }
-            }
-        }
-        return instance;
+    public ResponseGeneralData() {
     }
 
     public String getTitle() {

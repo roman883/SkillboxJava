@@ -1,17 +1,16 @@
 package main.api.request;
 
-import java.io.File;
-
 public class EditProfileRequest implements RequestApi {
 
-    private File photo;
     private Byte removePhoto;
     private String name;
     private String email;
     private String password;
+    private String captcha;
+    private String captcha_secret;
 
-    public EditProfileRequest(File photo, Byte removePhoto, String name, String email, String password) {
-        this.photo = photo;
+    public EditProfileRequest(Byte removePhoto, String name, String email, String password,
+                              String captcha, String captcha_secret) {
         this.removePhoto = removePhoto;
         this.name = name;
         this.email = email;
@@ -19,14 +18,6 @@ public class EditProfileRequest implements RequestApi {
     }
 
     public EditProfileRequest() {
-    }
-
-    public File getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(File photo) {
-        this.photo = photo;
     }
 
     public Byte getRemovePhoto() {
@@ -59,5 +50,21 @@ public class EditProfileRequest implements RequestApi {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
+    }
+
+    public String getCaptchaSecret() {
+        return captcha_secret;
+    }
+
+    public void setCaptcha_secret(String captcha_secret) {
+        this.captcha_secret = captcha_secret;
     }
 }

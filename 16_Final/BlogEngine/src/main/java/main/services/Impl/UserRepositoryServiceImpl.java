@@ -3,22 +3,28 @@ package main.services.Impl;
 import main.api.request.*;
 import main.api.response.*;
 import main.model.entities.*;
+import main.model.repositories.CaptchaRepository;
+import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -26,9 +32,31 @@ import java.util.*;
 public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     private static final char[] SYMBOLS_FOR_GENERATOR = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-    private static final int KEY_SIZE = 45;
-    private static final int PASSWORD_LENGTH = 8;
-    private static final String ROOT_PATH_TO_UPLOAD_AVATARS = "images";
+
+    @Value("${user.password.restore_key_length}")
+    private int keySize;
+    @Value("${user.image.root_folder}")
+    private String rootPathToUploadAvatars;
+    @Value("${user.password.validation_regex}")
+    private String passwordValidationRegex;
+    @Value("${user.email.validation_regex}")
+    private String emailValidationRegex;
+    @Value("${user.image.upload_folder}")
+    private String uploadFolder;
+    @Value("${user.image.avatars_folder}")
+    private String avatarsFolder;
+    @Value("${user.image.format}")
+    private String imageFormat;
+    @Value("${user.image.max_size}")
+    private int maxPhotoSizeInBytes;
+    @Value("${user.image.upload_timeout_ms}")
+    private int timeoutToUploadPhotoMS;
+    @Value("${user.timeout_edit_profile}")
+    private int timeoutToFinishEditProfileMS;
+    @Value("${user.password.restore_pass_message_string}")
+    private String restorePassMessageString;
+    @Value("${user.password.restore_message_subject}")
+    private String restoreMessageSubject;
 
     @Autowired
     private UserRepository userRepository;
@@ -42,8 +70,14 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     private PostRepositoryService postRepositoryService;
     @Autowired
     private JavaMailSender emailSender;
+    @Autowired
+    private CaptchaRepository captchaRepository;
+    @Autowired
+    private PostRepository postRepository;
 
     private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя, по заданию не в БД
+    private String tempUploadLink = null;
+    private boolean isEditFinished = true;
 
     @Override
     public ResponseEntity<User> getUser(int id) {
@@ -54,26 +88,20 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     }
 
     @Override
+    //TODO ? добавить print "В случае неудачной авторизации (на frontend должно отображаться сообщение: “Логин и/или пароль введен(ы) неверно”" ?
     public ResponseEntity<ResponseApi> login(LoginRequest loginRequest, HttpSession session) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
-        User user = null;
-        ArrayList<User> userList = getAllUsersList();
-        for (User u : userList) {
-            if (u.getEmail().equals(email)) {
-                if (u.getHashedPassword().equals(Integer.toString(password.hashCode()))) { // пароль совпал по хэшу
-                    sessionIdToUserId.put(session.getId().toString(), u.getId()); // Запоминаем пользователя и сессию
-                    user = u;
-                    break;
-                } else {
-                    return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
-                }
-            }
+        User user = userRepository.getUserByEmail(email);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
-        if (user != null) {
+        if (user.getHashedPassword().equals(Integer.toString(password.hashCode()))) { // пароль совпал по хэшу
+            sessionIdToUserId.put(session.getId().toString(), user.getId()); // Запоминаем пользователя и сессию
             return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -97,22 +125,20 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         if (!isEmailValid(email)) {
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
-        ArrayList<User> userList = getAllUsersList();
-        for (User user : userList) {
-            if (user.getEmail().equals(email)) { // пользователь найден в базе
-                String hash = generateRandomString();
-                user.setCode(hash); // запоминаем код в базе
-                userRepository.save(user);
-                String restorePasswordLink = "/login/change-password/" + hash;
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(email);
-                message.setSubject("Ссылка для восстановление пароля");
-                message.setText(restorePasswordLink);
-                this.emailSender.send(message);
-                return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
-            }
+        User user = userRepository.getUserByEmail(email);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+        String hash = generateRandomString();
+        user.setCode(hash); // запоминаем код в базе
+        userRepository.save(user);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject(restoreMessageSubject);
+        message.setText(restorePassMessageString + hash);
+        this.emailSender.send(message);
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
+        //TODO у юзера удалять код восстановления
     }
 
     @Override
@@ -121,81 +147,95 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         String password = changePasswordRequest.getPassword();
         String captcha = changePasswordRequest.getCaptcha();
         String captchaSecret = changePasswordRequest.getCaptchaSecret();
-        if (code == null || !isPasswordValid(password) || captcha == null || captchaSecret == null) {
+        if (code == null || password == null || captcha == null || captchaSecret == null ||
+                code.isBlank() || password.isBlank() || captcha.isBlank() || captchaSecret.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        ArrayList<User> userList = getAllUsersList();
-        for (User user : userList) {
-            if (user.getCode().equals(code)) { // пользователь найден в базе по коду
-                ArrayList<CaptchaCode> captchaCodes = captchaRepositoryService.getAllCaptchas();
-                for (CaptchaCode captchaCode : captchaCodes) {
-                    if (captchaCode.getSecretCode().equals(captchaSecret)) { // Нашли по секретному коду и проверяем введенные данные капчи
-                        if (captchaCode.getCode().equals(captcha)) {
-                            String newHashedPassword = Integer.toString(password.hashCode());
-                            user.setHashedPassword(newHashedPassword);
-                            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
-                        }
-                    }
-                }
-            }
+        User user = userRepository.getUserByCode(code);
+        boolean isCodeValid = (user != null);
+        boolean isPassValid = isPasswordValid(password);
+        boolean isCaptchaCodeValid = isCaptchaValid(captcha, captchaSecret);
+        if (!isCodeValid || !isPassValid || !isCaptchaCodeValid) {
+            return new ResponseEntity<>(new ResponseFailChangePass(isCodeValid, isPassValid, isCaptchaCodeValid), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseFailChangePass(), HttpStatus.BAD_REQUEST);
+        String newHashedPassword = Integer.toString(password.hashCode());
+        user.setHashedPassword(newHashedPassword);
+        userRepository.save(user);
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<ResponseApi> register(RegisterRequest registerRequest) {
         String email = registerRequest.getEmail();
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
         String name = email.replaceAll("@.+", "");
         String password = registerRequest.getPassword();
         String captcha = registerRequest.getCaptcha();
         String captchaSecret = registerRequest.getCaptchaSecret();
-        Boolean isCaptchaCodValid = isCaptchaValid(captcha, captchaSecret);
-        if (!isEmailValid(email) || name.isBlank() || !isPasswordValid(password) || captcha.equals("") || captchaSecret.equals("")
-        || isCaptchaCodValid == null || !isCaptchaCodValid) {
-            return new ResponseEntity<>(new ResponseFailSignUp(), HttpStatus.BAD_REQUEST);
-        } else {    // если проверки прошли, создаем пользователя и возвращаем положительный результат
-            Timestamp registrationDateTime = Timestamp.valueOf(LocalDateTime.now());
-            String hashedPassword = Integer.toString(password.hashCode());
-            User user = new User(false, registrationDateTime, name, email, hashedPassword);
-            userRepository.save(user); // И можно получить id
-            return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);  //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен??
+        if (name.isBlank() || password == null || captcha == null || captchaSecret == null
+                || password.isBlank() || captcha.isBlank() || captchaSecret.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+        // Проверка уникальности имени и email
+        boolean isNameValid = (userRepository.getUserByName(name) == null);
+        boolean isEmailValid = (userRepository.getUserByEmail(email.toLowerCase()) == null && isEmailValid(email));
+        boolean isCaptchaCodeValid = isCaptchaValid(captcha, captchaSecret);
+        boolean isPassValid = isPasswordValid(password);
+        if (!isNameValid || !isPassValid || !isCaptchaCodeValid || !isEmailValid) {
+            return new ResponseEntity<>(new ResponseFailSignUp(isNameValid, isPassValid,
+                    isCaptchaCodeValid, isEmailValid), HttpStatus.BAD_REQUEST);
+        }
+        // Все проверки прошли, регистрация
+        Timestamp registrationDateTime = Timestamp.from(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        String hashedPassword = Integer.toString(password.hashCode());
+        User user = new User(false, registrationDateTime, name, email, hashedPassword);
+        userRepository.save(user); // И можно получить id
+        return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);  //TODO Может быть добавить сессию зарегинного юзера в sessionToUserId, чтобы пользователь сразу был залогинен?? А также удалять капчу?
     }
+
 
     @Override
     public ResponseEntity<ResponseApi> editProfile(EditProfileRequest editProfileRequest, HttpSession session) {
-        File photo = editProfileRequest.getPhoto(); // TODO каким образом файл приходит??
+//        File photo = editProfileRequest.getPhoto(); // TODO каким образом файл приходит??
+        isEditFinished = false;
         Byte removePhoto = editProfileRequest.getRemovePhoto();
-        String name = editProfileRequest.getName();
         String email = editProfileRequest.getEmail();
+        String name = editProfileRequest.getName();
         String password = editProfileRequest.getPassword();
+        String captcha = editProfileRequest.getCaptcha();
+        String captchaSecret = editProfileRequest.getCaptchaSecret();
+        // проверка авторизации
         Integer userId = getUserIdBySession(session);
         if (userId == null) {
+            isEditFinished = true;
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         User user = getUser(userId).getBody();
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+            isEditFinished = true;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } // Ошибка, пользователь не найден, а сессия есть
+        boolean isNameValid = true;
+        boolean isEmailValid = true;
+        boolean isCaptchaCodeValid = isCaptchaValid(captcha, captchaSecret);
+        boolean isPassValid = true;
+        boolean isPhotoValid = true;
+        if (password != null && !password.isBlank()) {
+            isPassValid = isPasswordValid(password);
+            String hashedPassword = Integer.toString(password.hashCode());
+            if (isPassValid) user.setHashedPassword(hashedPassword);
         }
-        ArrayList<User> allUsers = getAllUsersList();
-        boolean hasSameName = false;
-        boolean hasSameEmail = false;
-        for (User u : allUsers) {
-            if (u.getEmail().toLowerCase().equals(email.toLowerCase())) {
-                hasSameEmail = true;
-            }
-            if (u.getName().toUpperCase().equals(name.toUpperCase())) {
-                hasSameName = true;
-            }
+        if (name != null && !name.isBlank()) {
+            isNameValid = (userRepository.getUserByName(name) == null);
+            if (isNameValid) user.setName(name);
         }
-        try {
-            if (hasSameName || hasSameEmail || (photo != null && Files.size(photo.toPath()) > 5_000_000)) {
-                return new ResponseEntity<>(new ResponseFailEditProfile(), HttpStatus.OK);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (email != null && !email.isBlank()) {
+            isEmailValid = (userRepository.getUserByEmail(email.toLowerCase()) == null && isEmailValid(email));
+            if (isEmailValid) user.setEmail(email);
         }
-        if (removePhoto != null && removePhoto == 1) {
+        if (removePhoto != null && removePhoto == 1) { // Удаляем фото юзера
             String currentPhoto = user.getPhoto();
             if (currentPhoto != null) {
                 try {
@@ -206,35 +246,33 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 user.setPhoto(null);
             }
         }
-        String photoUrl = null;
-        File newFile = null;
-        if (photo != null) {
-            do {
-                try {
-                    photoUrl = createDirectoriesAndGetFullPath();
-
-                    if (!Files.exists(Path.of(photoUrl))) {
-                        Files.createFile(Path.of(photoUrl));
-                        newFile = new File(photoUrl);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+        // Загрузка нового фото
+        int count = 0;  // TODO ПЕРЕДЕЛАТЬ! Статическая переменная будет работать как надо только для одного потока (юзера)!
+        while (tempUploadLink == null && count++ < timeoutToUploadPhotoMS) { // ждем появления ссылки на фото
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            if (tempUploadLink != null) {
+                if (Files.size(Path.of(tempUploadLink)) < maxPhotoSizeInBytes) {
+                    user.setPhoto(tempUploadLink);
+                } else {
+                    isPhotoValid = false;
                 }
-            } while (newFile == null);
-            copyFile(photo, newFile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        user.setPhoto(photoUrl);
-        if (!name.isBlank()) {
-            user.setName(name);
-        }
-        if (!email.isBlank() && isEmailValid(email)) {
-            user.setEmail(email);
-        }
-        if (!password.isBlank() && isPasswordValid(password)) {
-            String newHashedPassword = Integer.toString(password.hashCode());
-            user.setHashedPassword(newHashedPassword);
+        if (!isNameValid || !isPassValid || !isCaptchaCodeValid || !isEmailValid || !isPhotoValid) {
+            isEditFinished = true;
+            return new ResponseEntity<>(new ResponseFailEditProfile(isEmailValid, isPhotoValid, isNameValid,
+                    isPassValid, isCaptchaCodeValid), HttpStatus.BAD_REQUEST);
         }
         userRepository.save(user);
+        isEditFinished = true;
         return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
@@ -284,7 +322,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         HashSet<GlobalSettings> settingsSet = globalSettingsRepositoryService.getAllGlobalSettingsSet();
         boolean isStatisticsIsPublic = false;
         for (GlobalSettings s : settingsSet) {
-            if (s.getName().toUpperCase().equals("STATISTICS_IS_PUBLIC")) {
+            if (s.getName().toUpperCase().equals(GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC)) {
                 if (s.getValue().toUpperCase().equals("YES")) {
                     isStatisticsIsPublic = true;
                 } else if (s.getValue().toUpperCase().equals("NO")) {
@@ -296,31 +334,12 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         if (!isStatisticsIsPublic && userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        ArrayList<Post> allPosts = postRepositoryService.getAllPosts();
-        int postsCount = allPosts.size();
-        int allLikesCount = 0;
-        int allDislikeCount = 0;
-        int viewsCount = 0;
-        LocalDateTime firstPostTime = null;
-        for (Post p : allPosts) {
-            LocalDateTime currentPostTime = p.getTime().toLocalDateTime();
-            if (firstPostTime == null) {
-                firstPostTime = currentPostTime;
-            } else if (firstPostTime.isAfter(currentPostTime)) {
-                firstPostTime = currentPostTime;
-            }
-            viewsCount += p.getViewCount();
-        }
-        HashSet<PostVote> postVotes = postVoteRepositoryService.getAllPostVotes();
-        for (PostVote like : postVotes) {
-            if (like.getValue() == 1) {
-                allLikesCount += 1;
-            } else if (like.getValue() == -1) {
-                allDislikeCount += 1;
-            }
-        }
-        String firstPublicationDate = firstPostTime == null ? "Еще не было" :
-                firstPostTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        int postsCount = postRepository.countAllPosts();
+        int allLikesCount = postRepository.countAllLikes();
+        int allDislikeCount = postRepository.countAllDislikes();
+        int viewsCount = postRepository.countAllViews();
+        String firstPublicationDate = postsCount < 1 ? "Еще не было публикаций" : postRepository
+                .getFirstPublicationDate().toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         ResponseStatistics responseStatistics = new ResponseStatistics(postsCount, allLikesCount, allDislikeCount,
                 viewsCount, firstPublicationDate);
         return new ResponseEntity<>(responseStatistics.getMap(), HttpStatus.OK);
@@ -341,9 +360,65 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     @Override
     public ArrayList<User> getAllUsersList() {
-        ArrayList<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        return users;
+        return new ArrayList<>(userRepository.findAll());
+    }
+
+    @Override
+    public ResponseEntity<?> uploadImage(MultipartFile image, HttpSession session) throws IOException {
+        if (image == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        if (image.getSize() > maxPhotoSizeInBytes) {
+            return new ResponseEntity<>(new ResponseFailEditProfile(true, false,
+                    true, true, true), HttpStatus.OK);
+        }
+        Integer userId = getUserIdBySession(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        User user = getUser(userId).getBody();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+        }
+        if (!Files.exists(Path.of(rootPathToUploadAvatars))) {
+            try {
+                Files.createDirectory(Path.of(rootPathToUploadAvatars));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String fileDestPath;
+        File newFile = null;
+        do {
+            fileDestPath = createDirectoriesAndGetFullPath();
+            if (!Files.exists(Path.of(fileDestPath))) {
+                Files.createFile(Path.of(fileDestPath));
+                newFile = new File(fileDestPath);
+            }
+        } while (newFile == null);
+        copyFile(image, newFile);
+        // изображение загружено, готовим ссылку для профиля пользователя
+        tempUploadLink = fileDestPath;
+        // ждем когда пользователь нажмет кнопку редактировать профиль, если не нажимает, то удаляем фото и обнуляем ссылку
+        int count = 0;
+        while (!isEditFinished && count < timeoutToFinishEditProfileMS) {
+            try {
+                Thread.sleep(1);
+                count++;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (isEditFinished) {
+            tempUploadLink = null;
+            isEditFinished = false;
+            return new ResponseEntity<>(fileDestPath, HttpStatus.OK);
+        } else {
+            Files.deleteIfExists(Paths.get(fileDestPath));
+            tempUploadLink = null;
+            isEditFinished = false;
+        }
+        return new ResponseEntity<>(fileDestPath, HttpStatus.OK);
     }
 
     @Override
@@ -353,50 +428,46 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
 
     private String generateRandomString() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < KEY_SIZE; i++) {
+        for (int i = 0; i < keySize; i++) {
             builder.append(SYMBOLS_FOR_GENERATOR[(int) (Math.random() * (SYMBOLS_FOR_GENERATOR.length - 1))]);
         }
         return builder.toString();
     }
 
     private boolean isPasswordValid(String passwordToCheck) {
-        return (passwordToCheck != null && passwordToCheck.length() >= PASSWORD_LENGTH
-                && (passwordToCheck.matches("\\w+\\W+") || passwordToCheck.matches("\\W+\\w+"))
-                && !passwordToCheck.contains(" ") && (passwordToCheck.contains("0") || passwordToCheck.contains("1")
-                || passwordToCheck.contains("2") || passwordToCheck.contains("3") || passwordToCheck.contains("4")
-                || passwordToCheck.contains("5") || passwordToCheck.contains("6") || passwordToCheck.contains("7")
-                || passwordToCheck.contains("8") || passwordToCheck.contains("9")));
+        return (passwordToCheck != null && passwordToCheck.matches(passwordValidationRegex));
     }
 
     private boolean isEmailValid(String emailToCheck) {
-        return (emailToCheck != null && emailToCheck.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}"));
+        return (emailToCheck != null && emailToCheck.matches(emailValidationRegex));
     }
 
-    private void copyFile(File source, File dest) {
+    private void copyFile(MultipartFile source, File dest) {
         try {
-            byte[] bytes = Files.readAllBytes(source.toPath());
+            byte[] bytes = source.getBytes();
             Files.write(dest.toPath(), bytes);
         } catch (IOException e) {
             e.printStackTrace();
         }
+//            (File source, File dest) {
+//        try {
+//            byte[] bytes = Files.readAllBytes(source.toPath());
+//            Files.write(dest.toPath(), bytes);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private String createDirectoriesAndGetFullPath() throws IOException {
         String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
-        StringBuilder builder = new StringBuilder(ROOT_PATH_TO_UPLOAD_AVATARS).append("/upload/").append("avatars");
+        StringBuilder builder = new StringBuilder(rootPathToUploadAvatars).append("/").append(uploadFolder)
+                .append("/").append(avatarsFolder);
         Files.createDirectories(Path.of(builder.toString()));
-        return builder.append("/").append(randomHash).append(".jpg").toString(); // имя файла задаем хэшем
+        return builder.append("/").append(randomHash).append(".").append(imageFormat).toString(); // имя файла задаем хэшем
     }
 
     private Boolean isCaptchaValid(String captcha, String captchaSecret) {
-        CaptchaCode captchaCode;
-        Optional<CaptchaCode> optionalCaptchaCode = captchaRepositoryService.getAllCaptchas().stream()
-                .filter(c -> c.getSecretCode().equals(captchaSecret)).findFirst();
-        if (optionalCaptchaCode.isEmpty()) {
-            return null;
-        } else {
-            captchaCode = optionalCaptchaCode.get();
-        }
-        return captchaCode.getCode().equals(captcha);
+        CaptchaCode captchaCode = captchaRepository.getCaptchaBySecretCode(captchaSecret);
+        return captchaCode != null && captchaCode.getCode().equals(captcha);
     }
 }

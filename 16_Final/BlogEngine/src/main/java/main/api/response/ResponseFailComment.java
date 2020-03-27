@@ -31,7 +31,7 @@ public class ResponseFailComment implements ResponseApi{
         private String text;
 
         private ErrorsFailComment() {
-            text = "Текст комментария не задан или слишком короткий";
+            text = "Текст комментария не задан, слишком короткий или превышает максимальный размер";
         }
 
         public String getText() {

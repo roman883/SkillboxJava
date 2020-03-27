@@ -1,41 +1,47 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import main.services.interfaces.GlobalSettingsRepositoryService;
+
 public class SetGlobalSettingsRequest implements RequestApi {
 
-    private boolean MULTIUSER_MODE;
-    private boolean POST_PREMODERATION;
-    private boolean STATISTICS_IS_PUBLIC;
+    @JsonProperty(GlobalSettingsRepositoryService.MULTIUSER_MODE)
+    private Boolean multiuserMode = null;
+    @JsonProperty(GlobalSettingsRepositoryService.POST_PREMODERATION)
+    private Boolean postPremoderation = null;
+    @JsonProperty(GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC)
+    private Boolean statisticsIsPublic = null;
 
     public SetGlobalSettingsRequest() {
     }
 
-    public SetGlobalSettingsRequest(Boolean MULTIUSER_MODE, Boolean POST_PREMODERATION, Boolean STATISTICS_IS_PUBLIC) {
-        this.MULTIUSER_MODE = MULTIUSER_MODE;
-        this.POST_PREMODERATION = POST_PREMODERATION;
-        this.STATISTICS_IS_PUBLIC = STATISTICS_IS_PUBLIC;
+    public SetGlobalSettingsRequest(Boolean multiuserMode, Boolean postPremoderation, Boolean statisticsIsPublic) {
+        this.multiuserMode = multiuserMode;
+        this.postPremoderation = postPremoderation;
+        this.statisticsIsPublic = statisticsIsPublic;
     }
 
-    public Boolean getMULTIUSER_MODE() {
-        return MULTIUSER_MODE;
+    public Boolean getMultiuserMode() {
+        return multiuserMode;
     }
 
-    public void setMULTIUSER_MODE(Boolean MULTIUSER_MODE) {
-        this.MULTIUSER_MODE = MULTIUSER_MODE;
+    public void setMultiuserMode(Boolean multiuserMode) {
+        this.multiuserMode = multiuserMode;
     }
 
-    public Boolean getPOST_PREMODERATION() {
-        return POST_PREMODERATION;
+    public Boolean getPostPremoderation() {
+        return postPremoderation;
     }
 
-    public void setPOST_PREMODERATION(Boolean POST_PREMODERATION) {
-        this.POST_PREMODERATION = POST_PREMODERATION;
+    public void setPostPremoderation(Boolean postPremoderation) {
+        this.postPremoderation = postPremoderation;
     }
 
-    public Boolean getSTATISTICS_IS_PUBLIC() {
-        return STATISTICS_IS_PUBLIC;
+    public Boolean getStatisticsIsPublic() {
+        return statisticsIsPublic;
     }
 
-    public void setSTATISTICS_IS_PUBLIC(Boolean STATISTICS_IS_PUBLIC) {
-        this.STATISTICS_IS_PUBLIC = STATISTICS_IS_PUBLIC;
+    public void setStatisticsIsPublic(Boolean statisticsIsPublic) {
+        this.statisticsIsPublic = statisticsIsPublic;
     }
 }

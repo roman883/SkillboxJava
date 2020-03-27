@@ -18,11 +18,11 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
     @Autowired
     private TagRepository tagRepository;
 
+    // TODO Получать все теги и их вес из базы данных? формат (Тег : Вес) Теги "весят" немного, можно и из БД все выгружать
     @Override
     public ResponseEntity<ResponseApi> getTags(String query) {
-        ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
-        tagRepository.findAll().forEach(allTags::add);
+        ArrayList<Tag> allTags = new ArrayList<>(tagRepository.findAll());
         if (query == null || query.equals("") || query.isBlank()) {
             return getTagsWithoutQuery();
         } else {
@@ -44,9 +44,7 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
 
     @Override
     public Set<Tag> getAllTags() {
-        HashSet<Tag> tags = new HashSet<>();
-        tagRepository.findAll().forEach(tags::add);
-        return tags;
+        return new HashSet<>(tagRepository.findAll());
     }
 
     @Override
@@ -65,9 +63,8 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
 
     @Override
     public ResponseEntity<ResponseApi> getTagsWithoutQuery() {
-        ArrayList<Tag> allTags = new ArrayList<>();
         HashMap<String, Double> queryTagsMap = new HashMap<>();
-        tagRepository.findAll().forEach(allTags::add);
+        ArrayList<Tag> allTags = new ArrayList<>(tagRepository.findAll());
         for (Tag tag : allTags) {
             String tagName = tag.getName();
             double tempTagCount = queryTagsMap.getOrDefault(tagName, 0.0);

@@ -1,10 +1,10 @@
 package main.services.Impl;
 
 import main.api.request.SetGlobalSettingsRequest;
+import main.api.response.ResponseSettings;
 import main.model.entities.GlobalSettings;
 import main.model.entities.User;
 import main.model.repositories.GlobalSettingsRepository;
-import main.api.response.*;
 import main.services.interfaces.GlobalSettingsRepositoryService;
 import main.services.interfaces.UserRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,49 +44,56 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
     }
 
     @Override
-    public ResponseEntity<?> setGlobalSettings(SetGlobalSettingsRequest setGlobalSettingsRequest, //TODO пока не работает, не создается объект Request с параметрами (их может быть 1-2 или 3, ожидаю 3) получаю только false
+    public ResponseEntity<?> setGlobalSettings(SetGlobalSettingsRequest setGlobalSettingsRequest,
                                                HttpSession session) {
-        Boolean multiUserMode = setGlobalSettingsRequest.getMULTIUSER_MODE();
-        Boolean postPremoderation = setGlobalSettingsRequest.getPOST_PREMODERATION();
-        Boolean statisticsIsPublic = setGlobalSettingsRequest.getSTATISTICS_IS_PUBLIC();
-        if (multiUserMode == null || postPremoderation == null || statisticsIsPublic == null) {
+        Boolean multiUserModeSetting = setGlobalSettingsRequest.getMultiuserMode();
+        Boolean postPremoderationSetting = setGlobalSettingsRequest.getPostPremoderation();
+        Boolean statisticsIsPublicSetting = setGlobalSettingsRequest.getStatisticsIsPublic();
+        // Проверка: задани ли какие-то параметры
+        if (multiUserModeSetting == null && postPremoderationSetting == null && statisticsIsPublicSetting == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка в параметрах
         }
+        // Проверка: есть ли пользователь и права на внесение изменений в настройки
         Integer userId = userRepositoryService.getUserIdBySession(session);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         User user = userRepositoryService.getUser(userId).getBody();
-        if (user == null) {
+        if (user == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
-        }
-        if (!user.isModerator()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
-        }
+        if (!user.isModerator()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        // Устанавливаем новые настройки и получаем результат
         HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
         Map<String, Boolean> resultMap = new HashMap<>();
         for (GlobalSettings g : settings) {
             String settingCode = g.getCode().toUpperCase();
             switch (settingCode) {
-                case "MULTIUSER_MODE": {
-                    String value = booleanToYesOrNo(multiUserMode);
-                    g.setValue(value);
-                    globalSettingsRepository.save(g);
-                    resultMap.put("MULTIUSER_MODE", multiUserMode);
+                case MULTIUSER_MODE: {
+                    if (multiUserModeSetting != null) {
+                        g.setValue(convertBooleanToYesOrNo(multiUserModeSetting));
+                        globalSettingsRepository.save(g);
+                        resultMap.put(MULTIUSER_MODE, multiUserModeSetting);
+                    } else {
+                        resultMap.put(MULTIUSER_MODE, yesOrNoToBoolean(g.getValue()));
+                    }
                     break;
                 }
-                case "POST_PREMODERATION": {
-                    String value = booleanToYesOrNo(postPremoderation);
-                    g.setValue(value);
-                    globalSettingsRepository.save(g);
-                    resultMap.put("POST_PREMODERATION", postPremoderation);
+                case POST_PREMODERATION: {
+                    if (postPremoderationSetting != null) {
+                        g.setValue(convertBooleanToYesOrNo(postPremoderationSetting));
+                        globalSettingsRepository.save(g);
+                        resultMap.put(POST_PREMODERATION, postPremoderationSetting);
+                    } else {
+                        resultMap.put(POST_PREMODERATION, yesOrNoToBoolean(g.getValue()));
+                    }
                     break;
                 }
-                case "STATISTICS_IS_PUBLIC": {
-                    String value = booleanToYesOrNo(statisticsIsPublic);
-                    g.setValue(value);
-                    globalSettingsRepository.save(g);
-                    resultMap.put("STATISTICS_IS_PUBLIC", statisticsIsPublic);
+                case STATISTICS_IS_PUBLIC: {
+                    if (statisticsIsPublicSetting != null) {
+                        g.setValue(convertBooleanToYesOrNo(statisticsIsPublicSetting));
+                        globalSettingsRepository.save(g);
+                        resultMap.put(STATISTICS_IS_PUBLIC, statisticsIsPublicSetting);
+                    } else {
+                        resultMap.put(STATISTICS_IS_PUBLIC, yesOrNoToBoolean(g.getValue()));
+                    }
                     break;
                 }
             }
@@ -96,16 +103,15 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
 
     @Override
     public HashSet<GlobalSettings> getAllGlobalSettingsSet() {
-        HashSet<GlobalSettings> gsSet = new HashSet<>();
-        globalSettingsRepository.findAll().forEach(gsSet::add);
-        // Если нет каких-то настроек, устанавливаем значения по умолчанию false
+        HashSet<GlobalSettings> gsSet = new HashSet<>(globalSettingsRepository.findAll());
+        // Если нет каких-то или всех настроек, устанавливаем значения по умолчанию false
         if (gsSet.isEmpty()) {
             GlobalSettings globalSettingsMultiUser =
-                    new GlobalSettings("MULTIUSER_MODE", "Многопользовательский режим", "NO");
+                    new GlobalSettings(MULTIUSER_MODE, MULTIUSER_MODE_NAME, "NO");
             GlobalSettings globalSettingsPreModeration =
-                    new GlobalSettings("POST_PREMODERATION", "Премодерация постов", "NO");
+                    new GlobalSettings(POST_PREMODERATION, POST_PREMODERATION_NAME, "NO");
             GlobalSettings globalSettingsStatisticsIsPublic =
-                    new GlobalSettings("STATISTICS_IS_PUBLIC", "Показывать всем статистику блога", "NO");
+                    new GlobalSettings(STATISTICS_IS_PUBLIC, STATISTICS_IS_PUBLIC_NAME, "NO");
             gsSet.add(globalSettingsRepository.save(globalSettingsMultiUser));
             gsSet.add(globalSettingsRepository.save(globalSettingsPreModeration));
             gsSet.add(globalSettingsRepository.save(globalSettingsStatisticsIsPublic));
@@ -116,47 +122,47 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             for (GlobalSettings g : gsSet) {
                 String globalSettingsCode = g.getCode().toUpperCase();
                 switch (globalSettingsCode) {
-                    case ("MULTIUSER_MODE"):
+                    case (MULTIUSER_MODE):
                         hasMultiuserMode = true;
                         break;
-                    case ("POST_PREMODERATION"):
+                    case (POST_PREMODERATION):
                         hasPostPremoderation = true;
                         break;
-                    case ("STATISTICS_IS_PUBLIC"):
+                    case (STATISTICS_IS_PUBLIC):
                         hasStatisticsIsPublic = true;
                         break;
                 }
             }
             if (!hasMultiuserMode) {
                 GlobalSettings globalSettings =
-                        new GlobalSettings("MULTIUSER_MODE", "Многопользовательский режим", "NO");
+                        new GlobalSettings(MULTIUSER_MODE, MULTIUSER_MODE_NAME, "NO");
                 gsSet.add(globalSettingsRepository.save(globalSettings));
             }
             if (!hasPostPremoderation) {
                 GlobalSettings globalSettings =
-                        new GlobalSettings("POST_PREMODERATION", "Премодерация постов", "NO");
+                        new GlobalSettings(POST_PREMODERATION, POST_PREMODERATION_NAME, "NO");
                 gsSet.add(globalSettingsRepository.save(globalSettings));
             }
             if (!hasStatisticsIsPublic) {
                 GlobalSettings globalSettings =
-                        new GlobalSettings("STATISTICS_IS_PUBLIC", "Показывать всем статистику блога", "NO");
+                        new GlobalSettings(STATISTICS_IS_PUBLIC, STATISTICS_IS_PUBLIC_NAME, "NO");
                 gsSet.add(globalSettingsRepository.save(globalSettings));
             }
         }
         return gsSet;
     }
 
-//    private Boolean yesOrNoToBoolean(String yesOrNo) {
-//        if (yesOrNo.toUpperCase().equals("YES")) {
-//            return true;
-//        } else if (yesOrNo.toUpperCase().equals("NO")) {
-//            return false;
-//        } else return null;
-//    }
-
-    private String booleanToYesOrNo(boolean bool) {
+    private String convertBooleanToYesOrNo(boolean bool) {
         if (bool) {
             return "YES";
         } else return "NO";
+    }
+
+    private Boolean yesOrNoToBoolean(String yesOrNo) {
+        if (yesOrNo.toUpperCase().equals("YES")) {
+            return true;
+        } else if (yesOrNo.toUpperCase().equals("NO")) {
+            return false;
+        } else return null;
     }
 }

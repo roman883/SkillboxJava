@@ -22,39 +22,30 @@ import java.io.IOException;
 @ComponentScan("service")
 public class ApiGeneralController {
 
-    private final PostRepositoryService postRepoService;
-    private final UserRepositoryService userRepoService;
-    private final GlobalSettingsRepositoryService globalSettingsRepoService;
-    private final TagRepositoryService tagRepoService;
-    private final GeneralDataService generalDataService;
-    private final PostCommentRepositoryService commentRepoService;
-
     @Autowired
-    public ApiGeneralController(PostRepositoryServiceImpl postRepoServiceImpl,
-                                UserRepositoryServiceImpl userRepoServiceImpl,
-                                GlobalSettingsRepositoryServiceImpl globalSettingsRepoServiceImpl,
-                                TagRepositoryServiceImpl tagRepoServiceImpl,
-                                GeneralDataServiceImpl generalDataServiceImpl,
-                                PostCommentRepositoryServiceImpl postCommentRepoServiceImpl
-    ) {
-        this.postRepoService = postRepoServiceImpl;
-        this.userRepoService = userRepoServiceImpl;
-        this.globalSettingsRepoService = globalSettingsRepoServiceImpl;
-        this.tagRepoService = tagRepoServiceImpl;
-        this.generalDataService = generalDataServiceImpl;
-        this.commentRepoService = postCommentRepoServiceImpl;
+    private PostRepositoryService postRepoService;
+    @Autowired
+    private UserRepositoryService userRepoService;
+    @Autowired
+    private GlobalSettingsRepositoryService globalSettingsRepoService;
+    @Autowired
+    private TagRepositoryService tagRepoService;
+    @Autowired
+    private GeneralDataService generalDataService;
+    @Autowired
+    private PostCommentRepositoryService commentRepoService;
+
+    public ApiGeneralController() {
     }
 
     @GetMapping(value = "/api/init")
-    public @ResponseBody
-    ResponseEntity<ResponseApi> getData() {
+    public ResponseEntity<ResponseApi> getData() {
         return generalDataService.getData();
     }
 
     @PostMapping(value = "/api/image")
-    public @ResponseBody
-    ResponseEntity<String> uploadImage(@RequestParam MultipartFile image,
-                                       HttpServletRequest request) {
+    public ResponseEntity<String> uploadImage(@RequestParam MultipartFile image,
+                                              HttpServletRequest request) {
         ResponseEntity<String> responseEntity = null;
         try {
             responseEntity = postRepoService.uploadImage(image, request.getSession()); //TODO куда загружать фото? ОГРАНИЧЕНИЕ РАЗМЕРА ФАЙЛА 1 МБ стандартно
@@ -65,67 +56,64 @@ public class ApiGeneralController {
     }
 
     @PostMapping(value = "/api/comment")
-    public @ResponseBody
-    ResponseEntity<ResponseApi> addComment(@RequestBody AddCommentRequest addCommentRequest,
-                                           HttpServletRequest request) {
+    public ResponseEntity<ResponseApi> addComment(@RequestBody AddCommentRequest addCommentRequest,
+                                                  HttpServletRequest request) {
         return commentRepoService.addComment(addCommentRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/tag", params = {"query"})
-    public @ResponseBody
-    ResponseEntity<ResponseApi> getTags(@RequestParam(value = "query") String query) {
+    public ResponseEntity<ResponseApi> getTags(@RequestParam(value = "query") String query) {
         return tagRepoService.getTags(query);
     }
 
     @GetMapping(value = "/api/tag")
-    public @ResponseBody
-    ResponseEntity<ResponseApi> getTagsWithoutQuery() {
+    public ResponseEntity<ResponseApi> getTagsWithoutQuery() {
         return tagRepoService.getTagsWithoutQuery();
     }
 
-    @PostMapping(value = "/api/moderation") // Точно ли ничего не надо возвращать??
-    public @ResponseBody
-    ResponseEntity<ResponseApi> moderatePost(@RequestBody ModeratePostRequest moderatePostRequest,
-                                             HttpServletRequest request) {
+    @PostMapping(value = "/api/moderation")
+    public ResponseEntity<ResponseApi> moderatePost(@RequestBody ModeratePostRequest moderatePostRequest,
+                                                    HttpServletRequest request) {
         return postRepoService.moderatePost(moderatePostRequest, request.getSession());
     }
 
-    @GetMapping(value = "/api/calendar", params = {"year"}) // или years и много лет должно быть???
-    public @ResponseBody
-    ResponseEntity<ResponseApi> countPostByYear(@RequestParam(value = "year") Integer year) {
+    @GetMapping(value = "/api/calendar", params = {"year"})
+    public ResponseEntity<ResponseApi> countPostByYear(@RequestParam(value = "year") Integer year) {
         return postRepoService.countPostsByYear(year);
     }
 
-    @PostMapping(value = "/api/profile/my") // params = {"photo", "removePhoto", "name", "email", "password"}
-    public @ResponseBody
-    ResponseEntity<ResponseApi> editProfile(@RequestBody EditProfileRequest editProfileRequest,
-                                            HttpServletRequest request) {
+    @PostMapping(value = "/api/profile/my")
+    public ResponseEntity<ResponseApi> editProfile(@RequestBody EditProfileRequest editProfileRequest,
+                                                   HttpServletRequest request, @RequestParam("photo") MultipartFile image) {
+        if (image != null) {
+            try {
+                userRepoService.uploadImage(image, request.getSession());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return userRepoService.editProfile(editProfileRequest, request.getSession());
     }
 
     @GetMapping(value = "/api/statistics/my")
-    public @ResponseBody
-    ResponseEntity<?> getMyStatistics(HttpServletRequest request) {
+    public ResponseEntity<?> getMyStatistics(HttpServletRequest request) {
         return userRepoService.getMyStatistics(request.getSession());
     }
 
     @GetMapping(value = "/api/statistics/all")
-    public @ResponseBody
-    ResponseEntity<?> getAllStatistics(HttpServletRequest request) {
+    public ResponseEntity<?> getAllStatistics(HttpServletRequest request) {
         return userRepoService.getAllStatistics(request.getSession());
     }
 
     @GetMapping(value = "/api/settings")
-    public @ResponseBody
-    ResponseEntity<?> getGlobalSettings(HttpServletRequest request) {
+    public ResponseEntity<?> getGlobalSettings(HttpServletRequest request) {
         return globalSettingsRepoService.getGlobalSettings(request.getSession());
     }
 
     @PutMapping(value = "/api/settings")
-    //TODO Как получать параметры Global Settings и как их устанавливать??
-    public @ResponseBody
-    ResponseEntity<?> setGlobalSettings(@RequestBody SetGlobalSettingsRequest setGlobalSettingsRequest,
-                                        HttpServletRequest request) {
+    //TODO как их устанавливать??
+    public ResponseEntity<?> setGlobalSettings(@RequestBody SetGlobalSettingsRequest setGlobalSettingsRequest,
+                                               HttpServletRequest request) {
         return globalSettingsRepoService.setGlobalSettings(setGlobalSettingsRequest,
                 request.getSession());
     }

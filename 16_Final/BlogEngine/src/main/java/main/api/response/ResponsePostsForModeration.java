@@ -1,6 +1,8 @@
 package main.api.response;
 
 import main.model.entities.Post;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Transient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,11 +15,11 @@ public class ResponsePostsForModeration implements ResponseApi {
     private int count;
     private List<ResponsePostsApi> posts;
 
-    public ResponsePostsForModeration(int count, ArrayList<Post> postsToShow) {
+    public ResponsePostsForModeration(int count, ArrayList<Post> postsToShow, int announceLength) {
         this.count = count;
         posts = new ArrayList<>();
         for (Post p : postsToShow) {
-            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p);
+            ResponsePostsApi responsePostsApi = new ResponsePostsApi(p, announceLength);
             posts.add(responsePostsApi);
         }
     }
@@ -44,14 +46,15 @@ public class ResponsePostsForModeration implements ResponseApi {
         private String time;
         private PostAuthorUser user;
         private String title;
-        private String announce; //TODO Как-то конвертировать в HTML? Не String? какой-то текст анонса - откуда брать?
+        private String announce;
 
-        public ResponsePostsApi(Post post) {
+        public ResponsePostsApi(Post post, int announceLength) {
             this.id = post.getId();
             this.time = getTimeString(post.getTime().toLocalDateTime());
             this.user = new PostAuthorUser(post);
             this.title = post.getTitle();
-            this.announce = "Текст анонса поста без HTML-тэгов";
+            announce = post.getText().length() < announceLength ? post.getText() // TODO Убрать html теги?
+                    : post.getText().substring(0, announceLength) + "...";
         }
 
         public int getId() {

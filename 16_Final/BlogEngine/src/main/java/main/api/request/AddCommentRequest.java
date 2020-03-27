@@ -3,6 +3,7 @@ package main.api.request;
 public class AddCommentRequest implements RequestApi {
 
     private Integer parent_id;
+    //@JsonProperty("post_id") //TODO Заменить везде на Java формат
     private Integer post_id;
     private String text;
 

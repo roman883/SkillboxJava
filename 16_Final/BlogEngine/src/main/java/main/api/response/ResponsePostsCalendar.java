@@ -8,9 +8,8 @@ public class ResponsePostsCalendar implements ResponseApi {
     private List<Integer> years;
     private HashMap<String, Integer> posts;
 
-    public ResponsePostsCalendar(HashMap<Date, Integer> postsCountByDate, TreeSet<Integer> allYears) {
-        years = new LinkedList<>();
-        years.addAll(allYears);
+    public ResponsePostsCalendar(HashMap<Date, Integer> postsCountByDate, List<Integer> allYears) {
+        years = new LinkedList<>(allYears);
         years.sort(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
