@@ -1,5 +1,6 @@
 package main.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import main.api.request.ChangePasswordRequest;
 import main.api.request.RegisterRequest;
 import main.api.request.LoginRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @RestController
 @ComponentScan("service")
 @RequestMapping(value = "/api/auth/")
@@ -27,18 +29,29 @@ public class ApiAuthController {
     public ApiAuthController() {
     }
 
-    @GetMapping(value = "logout") // TODO вынести общую часть /api/auth/ в @RequestMapping класса
+    @GetMapping(value = "logout")
     public ResponseEntity<ResponseApi> logout(HttpServletRequest request) {
+        log.info("Получен GET запрос на /api/auth/logout : ID сессии" + request.getSession().getId());
         return userRepoService.logout(request.getSession());
     }
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseApi> register(@RequestBody RegisterRequest registerRequest) {
+        log.info("Получен POST запрос на /api/auth/register со следующими параметрами - {" +
+                "Email: " + registerRequest.getEmail() + ", " +
+//                "Password: " + registerRequest.getPassword() + ", " + // Пароль не сохраняем в лог
+                "Captcha: " + registerRequest.getCaptcha() + ", " +
+                "CaptchaSecret: " + registerRequest.getCaptchaSecret() + ", " +
+                "}");
         return userRepoService.register(registerRequest);
     }
 
     @PostMapping(value = "login")
     public ResponseEntity<ResponseApi> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        log.info("Получен POST запрос на /api/auth/login со следующими параметрами - {" +
+                "Email: " + loginRequest.getEmail() + ", " +
+//                "Password: " + loginRequest.getPassword() + ", " + // Пароль не сохраняем в лог
+                "}");
         return userRepoService.login(loginRequest, request.getSession());
     }
 

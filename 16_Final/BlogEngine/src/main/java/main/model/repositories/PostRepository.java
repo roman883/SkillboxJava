@@ -19,14 +19,23 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "ORDER BY p.time DESC LIMIT ?2 OFFSET ?1", nativeQuery = true)
     List<Post> getRecentPosts(int offset, int limit);
 
+//    @Query(value = "SELECT p.* FROM posts AS p " +       // Популярные посты не по количеству просмотров, а по комментам
+//            "JOIN (SELECT post_id, SUM(value) AS sum_values " +
+//            "FROM post_votes GROUP BY post_id) AS sum_votes " +
+//            "ON p.id=sum_votes.post_id " +
+//            "WHERE p.is_active = 1 " +
+//            "AND p.moderation_status = 'ACCEPTED' " +
+//            "AND p.time < NOW() " +
+//            "ORDER BY sum_values DESC " +
+//            "LIMIT ?2 OFFSET ?1", nativeQuery = true)
     @Query(value = "SELECT p.* FROM posts AS p " +
-            "JOIN (SELECT post_id, SUM(value) AS sum_values " +
-            "FROM post_votes GROUP BY post_id) AS sum_votes " +
-            "ON p.id=sum_votes.post_id " +
+            "JOIN (SELECT post_id, COUNT(post_id) AS post_counts " +
+            "FROM post_comments GROUP BY post_id) AS posts_w_counts " +
+            "ON p.id=posts_w_counts.post_id " +
             "WHERE p.is_active = 1 " +
             "AND p.moderation_status = 'ACCEPTED' " +
             "AND p.time < NOW() " +
-            "ORDER BY sum_values DESC " +
+            "ORDER BY post_counts DESC " +
             "LIMIT ?2 OFFSET ?1", nativeQuery = true)
     List<Post> getBestPosts(int offset, int limit);
 
@@ -47,7 +56,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "SELECT count(id) AS count FROM posts", nativeQuery = true)
     int countAllPosts();
 
-    @Query(value = "SELECT * FROM posts p " +
+    @Query(value = "SELECT DISTINCT * FROM posts p " +
             "WHERE (p.text LIKE %?3% OR p.title LIKE %?3%) " +
             "AND p.is_active = 1 " +
             "AND p.moderation_status = 'ACCEPTED' " +
@@ -63,7 +72,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "ORDER BY p.time DESC LIMIT ? OFFSET ?", nativeQuery = true)
     List<Post> getPostsByDate(String date, int limit, int offset);
 
-    @Query(value = "SELECT p.* " +
+    @Query(value = "SELECT DISTINCT p.* " +
             "FROM posts AS p " +
             "INNER JOIN tag2post t2 ON p.id = t2.post_id " +
             "INNER JOIN tags t ON t.id  = t2.tag_id " +

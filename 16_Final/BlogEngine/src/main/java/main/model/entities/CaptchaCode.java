@@ -3,6 +3,7 @@ package main.model.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "captcha_codes")
@@ -13,7 +14,7 @@ public class CaptchaCode implements Serializable {
     private int id;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
-    private Timestamp time;
+    private LocalDateTime time;
 
     @Column(nullable = false, columnDefinition = "TINYTEXT")
     private String code;
@@ -21,7 +22,7 @@ public class CaptchaCode implements Serializable {
     @Column(name = "secret_code", nullable = false, columnDefinition = "TINYTEXT")
     private String secretCode;
 
-    public CaptchaCode(Timestamp time, String code, String secretCode) {
+    public CaptchaCode(LocalDateTime time, String code, String secretCode) {
         this.time = time;
         this.code = code;
         this.secretCode = secretCode;
@@ -37,11 +38,11 @@ public class CaptchaCode implements Serializable {
         this.id = id;
     }
 
-    public Timestamp getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

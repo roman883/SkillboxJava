@@ -36,15 +36,15 @@ public class ResponseSettings implements ResponseApi {
         for (GlobalSettings g : settings) {
             String settingName = g.getCode().toUpperCase();
             switch (settingName) {
-                case "MULTIUSER_MODE": {
+                case GlobalSettingsRepositoryService.MULTIUSER_MODE: {
                     multiuserMode = yesOrNoToBoolean(g.getValue());
                     break;
                 }
-                case "POST_PREMODERATION": {
+                case GlobalSettingsRepositoryService.POST_PREMODERATION: {
                     postPremoderation = yesOrNoToBoolean(g.getValue());
                     break;
                 }
-                case "STATISTICS_IS_PUBLIC": {
+                case GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC: {
                     statisticsIsPublic = yesOrNoToBoolean(g.getValue());
                     break;
                 }

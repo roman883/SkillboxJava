@@ -58,14 +58,6 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
 
     @Override
     public ResponseEntity<ResponseApi> generateCaptcha() {
-//        ArrayList<CaptchaCode> captchas = getAllCaptchas(); // Сначала удаляем все устаревшие капчи
-//        for (CaptchaCode captcha : captchas) {
-//            LocalDateTime captchaCreatedTime = captcha.getTime().toLocalDateTime();
-//            LocalDateTime oldCaptchaTime = LocalDateTime.now().minusMinutes(oldCaptchaDeleteTimeInMin);
-//            if (captchaCreatedTime.isBefore(oldCaptchaTime)) { // капча устарела
-//                captchaRepository.delete(captcha);
-//            }
-//        }
         captchaRepository.deleteOldCaptchas(oldCaptchaDeleteTimeInMin);
         String secretCode = generateRandomString();
         Cage cage = getCage();
@@ -75,8 +67,7 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
         }
         byte[] encodedBytes = Base64.getEncoder().encode(cage.draw(token));
         String captchaImageBase64String = captchaFormatString + ", " + new String(encodedBytes, StandardCharsets.UTF_8);
-        Timestamp timestamp = Timestamp.from(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-        CaptchaCode newCaptcha = captchaRepository.save(new CaptchaCode(timestamp, token, secretCode));
+        CaptchaCode newCaptcha = captchaRepository.save(new CaptchaCode(LocalDateTime.now(), token, secretCode));
         return new ResponseEntity<>(new ResponseCaptcha(secretCode, captchaImageBase64String), HttpStatus.OK);
     }
 

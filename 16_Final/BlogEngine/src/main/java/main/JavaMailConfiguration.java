@@ -11,7 +11,7 @@ import java.util.Properties;
 @Configuration
 public class JavaMailConfiguration {
 
-    @Value("${spring.mail.username}") // или username + "@gmail.com"
+    @Value("${spring.mail.username}")
     private String emailAddressFrom;
     @Value("${spring.mail.password}")
     private String gmailSecretMailApplicationKey;

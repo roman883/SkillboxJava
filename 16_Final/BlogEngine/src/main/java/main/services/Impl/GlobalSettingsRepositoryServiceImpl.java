@@ -1,6 +1,7 @@
 package main.services.Impl;
 
 import main.api.request.SetGlobalSettingsRequest;
+import main.api.response.ResponseBadReqMsg;
 import main.api.response.ResponseSettings;
 import main.model.entities.GlobalSettings;
 import main.model.entities.User;
@@ -51,7 +52,8 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
         Boolean statisticsIsPublicSetting = setGlobalSettingsRequest.getStatisticsIsPublic();
         // Проверка: задани ли какие-то параметры
         if (multiUserModeSetting == null && postPremoderationSetting == null && statisticsIsPublicSetting == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка в параметрах
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Не переданы параметры настроек"), HttpStatus.BAD_REQUEST);
         }
         // Проверка: есть ли пользователь и права на внесение изменений в настройки
         Integer userId = userRepositoryService.getUserIdBySession(session);
@@ -63,6 +65,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
         // Устанавливаем новые настройки и получаем результат
         HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
         Map<String, Boolean> resultMap = new HashMap<>();
+        // для текущих настроек проверяем их наличие и устанавливаем новые
         for (GlobalSettings g : settings) {
             String settingCode = g.getCode().toUpperCase();
             switch (settingCode) {

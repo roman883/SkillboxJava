@@ -3,6 +3,7 @@ package main.model.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class User implements Serializable {
     private boolean isModerator;            // (может ли править глобальные настройки сайта и модерировать посты)
 
     @Column(name = "reg_time", nullable = false, columnDefinition = "DATETIME")
-    private Timestamp registrationTime;
+    private LocalDateTime registrationTime;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(255)", unique = true)
     private String name;
@@ -42,7 +43,7 @@ public class User implements Serializable {
     @Column(nullable = true, columnDefinition = "TEXT")
     private String photo;
 
-    public User(boolean isModerator, Timestamp registrationTime, String name, String email, String hashedPassword) {
+    public User(boolean isModerator, LocalDateTime registrationTime, String name, String email, String hashedPassword) {
         this.isModerator = isModerator;
         this.registrationTime = registrationTime;
         this.name = name;
@@ -54,7 +55,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<Post>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<PostVote> postVotes = new HashSet<PostVote>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -83,11 +84,11 @@ public class User implements Serializable {
         isModerator = moderator;
     }
 
-    public Timestamp getRegistrationTime() {
+    public LocalDateTime getRegistrationTime() {
         return registrationTime;
     }
 
-    public void setRegistrationTime(Timestamp registrationTime) {
+    public void setRegistrationTime(LocalDateTime registrationTime) {
         this.registrationTime = registrationTime;
     }
 
@@ -107,7 +108,7 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getHashedPassword() {
+    public String getStoredHashPass() {
         return hashedPassword;
     }
 

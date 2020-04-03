@@ -37,5 +37,4 @@ public interface UserRepositoryService {
 
     ArrayList<User> getAllUsersList();
 
-    ResponseEntity<?> uploadImage(MultipartFile image, HttpSession session) throws IOException;
 }

@@ -2,7 +2,6 @@ package main.api.response;
 
 public class ResponseGeneralData implements ResponseApi {
 
-    // TODO почему если тут получать значения @Value() из application.yml они null?
     private String title;
     private String subtitle;
     private String phone;

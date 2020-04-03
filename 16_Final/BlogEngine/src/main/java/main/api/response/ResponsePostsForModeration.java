@@ -50,11 +50,12 @@ public class ResponsePostsForModeration implements ResponseApi {
 
         public ResponsePostsApi(Post post, int announceLength) {
             this.id = post.getId();
-            this.time = getTimeString(post.getTime().toLocalDateTime());
+            this.time = getTimeString(post.getTime());
             this.user = new PostAuthorUser(post);
             this.title = post.getTitle();
-            announce = post.getText().length() < announceLength ? post.getText() // TODO Убрать html теги?
-                    : post.getText().substring(0, announceLength) + "...";
+            String temp = post.getText().replaceAll("<.+?>", "");
+            announce = temp.length() < announceLength ? temp
+                    : temp.substring(0, announceLength) + "...";
         }
 
         public int getId() {

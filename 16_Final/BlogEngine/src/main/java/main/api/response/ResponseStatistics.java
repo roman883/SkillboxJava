@@ -10,11 +10,11 @@ public class ResponseStatistics implements ResponseApi {
     public ResponseStatistics(int postsCount, int allLikesCount, int allDislikeCount, int viewsCount,
                               String firstPublicationDate) {
         this.map = new HashMap<>();
-        map.put("Постов", postsCount);
-        map.put("Лайков", allLikesCount);
-        map.put("Дизлайков", allDislikeCount);
-        map.put("Просмотров", viewsCount);
-        map.put("Первая публикация", firstPublicationDate);
+        map.put("postsCount", postsCount);
+        map.put("likesCount", allLikesCount);
+        map.put("dislikesCount", allDislikeCount);
+        map.put("viewsCount", viewsCount);
+        map.put("firstPublication", firstPublicationDate);
     }
 
     public Map<String, Object> getMap() {

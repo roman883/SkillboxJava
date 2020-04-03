@@ -3,6 +3,7 @@ package main.model.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "post_votes")
@@ -22,14 +23,14 @@ public class PostVote implements Serializable {
     private Post post;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
-    private Timestamp time;
+    private LocalDateTime time;
 
     @Column(nullable = false)  // скрыта или активна публикация: 0 или 1 //columnDefinition="TINYINT(1)"
     private byte value;     //  value TINYINT NOT NULL - лайк или дизлайк: 1 или -1
 
     public PostVote() {}
 
-    public PostVote(User user, Post post, Timestamp timestamp, byte value) {
+    public PostVote(User user, Post post, LocalDateTime timestamp, byte value) {
         this.user = user;
         this.post = post;
         this.time = timestamp;
@@ -61,11 +62,11 @@ public class PostVote implements Serializable {
         this.post = post;
     }
 
-    public Timestamp getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
