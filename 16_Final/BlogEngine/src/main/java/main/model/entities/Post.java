@@ -5,6 +5,7 @@ import main.model.ModerationStatus;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,9 +18,7 @@ public class Post implements Serializable {
     @Column(nullable = false)
     private int id;
 
-    // @Size(max = 1)
-    //@Column(name = "    ", columnDefinition="TINYINT(3) UNSIGNED default '40'")
-    @Column(name = "is_active", nullable = false)  // скрыта или активна публикация: 0 или 1  //columnDefinition="TINYINT(1)"
+    @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
     // http://tomee.apache.org/examples-trunk/jpa-enumerated/
@@ -28,14 +27,14 @@ public class Post implements Serializable {
     private ModerationStatus moderationStatus = ModerationStatus.NEW; // По умолчанию NEW
 
     @Column(name = "moderator_id", nullable = true)
-    private Integer moderatorId = null;                 // ID пользователя-модератора, принявшего решение, или NULL
+    private Integer moderatorId = null;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;     // автор поста
 
     @Column(name = "time", nullable = false, columnDefinition = "DATETIME")
-    private Timestamp time;
+    private LocalDateTime time;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;
@@ -58,7 +57,7 @@ public class Post implements Serializable {
     // Hibernate requires no-args constructor
     public Post() {}
 
-    public Post(boolean isActive, ModerationStatus moderationStatus, User user, Timestamp time, String title, String text, Set<TagToPost> tagsToPostsSet) {
+    public Post(boolean isActive, ModerationStatus moderationStatus, User user, LocalDateTime time, String title, String text, Set<TagToPost> tagsToPostsSet) {
         this.isActive = isActive;
         this.moderationStatus = moderationStatus;
         this.user = user;
@@ -68,7 +67,7 @@ public class Post implements Serializable {
         this.tagsToPostsSet = tagsToPostsSet;
     }
 
-    public Post(boolean isActive, ModerationStatus moderationStatus, User user, Timestamp time, String title, String text) {
+    public Post(boolean isActive, ModerationStatus moderationStatus, User user, LocalDateTime time, String title, String text) {
         this.isActive = isActive;
         this.moderationStatus = moderationStatus;
         this.user = user;
@@ -118,11 +117,11 @@ public class Post implements Serializable {
         this.user = user;
     }
 
-    public Timestamp getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

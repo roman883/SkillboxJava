@@ -54,11 +54,12 @@ public class ResponsePosts implements ResponseApi {
 
         public ResponsePostsApi(Post post, int announceLength) {
             this.id = post.getId();
-            this.time = getTimeString(post.getTime().toLocalDateTime());
+            this.time = getTimeString(post.getTime());
             this.user = new PostAuthorUser(post);
             this.title = post.getTitle();
-            announce = post.getText().length() < announceLength ? post.getText()
-                    : post.getText().substring(0, announceLength) + "...";
+            String temp = post.getText().replaceAll("<.+?>", "");
+            announce = temp.length() < announceLength ? temp
+                    : temp.substring(0, announceLength) + "...";
             this.likeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == 1).count();
             this.dislikeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == -1).count();
             this.commentCount = post.getPostComments().size();

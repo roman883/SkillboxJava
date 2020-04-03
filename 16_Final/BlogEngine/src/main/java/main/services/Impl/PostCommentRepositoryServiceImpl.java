@@ -1,9 +1,7 @@
 package main.services.Impl;
 
 import main.api.request.AddCommentRequest;
-import main.api.response.ResponseApi;
-import main.api.response.ResponseFailComment;
-import main.api.response.ResponseSuccessComment;
+import main.api.response.*;
 import main.model.entities.Post;
 import main.model.entities.PostComment;
 import main.model.entities.User;
@@ -49,7 +47,7 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
         Integer parentId = addCommentRequest.getParentId();
         Integer postId = addCommentRequest.getPostId();
         if (parentId == null && postId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Не заданы родительский пост и комментарий"), HttpStatus.BAD_REQUEST);
         }
         String text = addCommentRequest.getText();
         if (!isTextValid(text)) {
@@ -68,11 +66,11 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             parentPost = postRepositoryService.getPostById(postId);
         }
         if (parentComment == null && parentPost == null) { // не найдены ни пост, ни коммент с таким id на которые добавляем коммент
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // TODO Задавать ли непрописанные в API ошибки?
+            return new ResponseEntity<>(new ResponseBadReqMsg("Не найдены родительский пост и комментарий"), HttpStatus.BAD_REQUEST);
         }
         User user = userRepoService.getUser(userId).getBody();
-        Timestamp time = Timestamp.from(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-        PostComment newComment = postCommentRepository.save(new PostComment(parentComment, user, parentPost, time, text));
+        PostComment newComment = postCommentRepository.save(
+                new PostComment(parentComment, user, parentPost, LocalDateTime.now(), text));
         return new ResponseEntity<>(new ResponseSuccessComment(newComment), HttpStatus.OK);
     }
 

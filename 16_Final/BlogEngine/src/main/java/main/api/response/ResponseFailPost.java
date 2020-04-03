@@ -6,13 +6,11 @@ import java.util.Map;
 public class ResponseFailPost implements ResponseApi {
 
     private boolean result;
-//    private FailPostErrors errors;
     private Map<String, String> errors;
 
     public ResponseFailPost(boolean isTextValid, boolean isTitleValid) {
         result = false;
         errors = new HashMap<>();
-//        errors = new FailPostErrors();
         if (!isTextValid) {
             errors.put("text", "Текст публикации слишком короткий");
         }
@@ -37,14 +35,6 @@ public class ResponseFailPost implements ResponseApi {
     public void setErrors(Map<String, String> errors) {
         this.errors = errors;
     }
-
-    //    public FailPostErrors getErrors() {
-//        return errors;
-//    }
-//
-//    public void setErrors(FailPostErrors errors) {
-//        this.errors = errors;
-//    }
 
     static class FailPostErrors {
         private String title;

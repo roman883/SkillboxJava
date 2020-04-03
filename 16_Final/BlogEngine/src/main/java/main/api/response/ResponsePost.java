@@ -27,11 +27,11 @@ public class ResponsePost implements ResponseApi {
 
     public ResponsePost(Post post, int announceLength) {
         id = post.getId();
-        time = getTimeString(post.getTime().toLocalDateTime());
+        time = getTimeString(post.getTime());
         user = new PostAuthorApi(post.getUser().getId(), post.getUser().getName());
         title = post.getTitle();
         text = post.getText();
-        String temp = post.getText().replaceAll("<.?>", "");
+        String temp = post.getText().replaceAll("<.+?>", "");
         announce = temp.length() < announceLength ? temp
                 : temp.substring(0, announceLength) + "...";
         likeCount = (int) post.getPostVotes().stream().filter(l -> l.getValue() == 1).count();
@@ -47,7 +47,7 @@ public class ResponsePost implements ResponseApi {
             PostCommentApi.PostCommentAuthorApi commentAuthor =
                     new PostCommentApi.PostCommentAuthorApi(commentAuthorId, commentAuthorName, commentAuthorPhoto);
             int commentId = comment.getId();
-            String commentTime = getTimeString(comment.getTime().toLocalDateTime());
+            String commentTime = getTimeString(comment.getTime());
             String commentText = comment.getText();
             PostCommentApi postCommentAPI = new PostCommentApi(commentId, commentTime, commentAuthor, commentText);
             comments.add(postCommentAPI);
@@ -73,9 +73,7 @@ public class ResponsePost implements ResponseApi {
         return timeString.toString();
     }
 
-    // Конструктор, геттеры и сеттеры. Не используются (пока)
-
-
+    // Конструктор, геттеры и сеттеры. Не используются
     public ResponsePost(int id, String time, PostAuthorApi user, String title, String text, String announce, int likeCount,
                         int dislikeCount, int commentCount, int viewCount, List<PostCommentApi> comments, List<String> tags) {
         this.id = id;

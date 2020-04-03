@@ -16,10 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService {
@@ -36,35 +34,35 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         int postId = postVoteRequest.getPostId();
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
         }
         User user = userRepositoryService.getUser(userId).getBody();
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.INTERNAL_SERVER_ERROR); // Ошибка, пользователь не найден, а сессия есть
         }
         // проверяем лайкал ли юзер ранее этот пост
-        PostVote beforeLike = null;
+        PostVote beforeLike = postVoteRepository.getPostVoteByUserIdAndPostId(postId, userId);
         Post currentPost = postRepositoryService.getPostById(postId);
         if (currentPost == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST); // Ошибка. Поста с таким id нет
         }
-        Set<PostVote> currentUserVotes = user.getPostVotes();
-        for (PostVote p : currentUserVotes) {
-            if (p.getPost().getId() == postId) {
-                beforeLike = p;
-                break;
-            }
-        }
+//        Set<PostVote> currentUserVotes = user.getPostVotes(); // Вместо этого получаем лайки из БД
+//        for (PostVote p : currentUserVotes) {
+//            if (p.getPost().getId() == postId) {
+//                beforeLike = p;
+//                break;
+//            }
+//        }
         if (beforeLike == null) { // Не было лайков и диз
             PostVote newLike = postVoteRepository
-                    .save(new PostVote(user, currentPost, Timestamp.valueOf(LocalDateTime.now()), (byte) 1));
+                    .save(new PostVote(user, currentPost, LocalDateTime.now(), (byte) 1));
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         if (beforeLike.getValue() == 1) { // Повторный лайк
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == -1) { // был дизлайк, удаляем
-            postVoteRepository.deleteById(beforeLike.getId()); // TODO НЕ УДАЛЯЮТСЯ ИЗ БАЗЫ ЛАЙКИ/ДИЗЛАЙКИ
+            postVoteRepository.delete(beforeLike);
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
@@ -75,35 +73,35 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         int postId = postVoteRequest.getPostId();
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
         }
         User user = userRepositoryService.getUser(userId).getBody();
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.INTERNAL_SERVER_ERROR); // Ошибка, пользователь не найден, а сессия есть
         }
         // проверяем лайкал ли юзер ранее этот пост
-        PostVote beforeLike = null;
+        PostVote beforeLike = postVoteRepository.getPostVoteByUserIdAndPostId(postId, userId);
         Post currentPost = postRepositoryService.getPostById(postId);
         if (currentPost == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Ошибка
+            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST); // Ошибка
         }
-        Set<PostVote> userVotes = user.getPostVotes();
-        for (PostVote p : userVotes) {
-            if (p.getPost().getId() == postId) {
-                beforeLike = p;
-                break;
-            }
-        }
+//        Set<PostVote> userVotes = user.getPostVotes(); // Получаем из БД по userId и postId
+//        for (PostVote p : userVotes) {
+//            if (p.getPost().getId() == postId) {
+//                beforeLike = p;
+//                break;
+//            }
+//        }
         if (beforeLike == null) { // Не было лайков и диз
             PostVote newDislike = postVoteRepository
-                    .save(new PostVote(user, currentPost, Timestamp.valueOf(LocalDateTime.now()), (byte) -1));
+                    .save(new PostVote(user, currentPost, LocalDateTime.now(), (byte) -1));
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         if (beforeLike.getValue() == -1) { // Повторный дизлайк
             return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         if (beforeLike.getValue() == 1) { // был лайк, удаляем
-            postVoteRepository.deleteById(beforeLike.getId()); // TODO НЕ УДАЛЯЮТСЯ ИЗ БАЗЫ ЛАЙКИ/ДИЗЛАЙКИ. ВЕРНУТЬ КАСКАДЫ, но OrphanRemoval = false? Чтобы посты и юзеры не удалялись после удаления все лайков
+            postVoteRepository.delete(beforeLike);
             return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);

@@ -31,7 +31,7 @@ public interface PostRepositoryService {
     ResponseEntity<ResponseApi> post(PostRequest postRequest,
                                      HttpSession session) throws ParseException;
 
-    ResponseEntity<String> uploadImage(MultipartFile image, HttpSession session) throws IOException;
+    ResponseEntity<?> uploadImage(MultipartFile image, HttpSession session) throws IOException;
 
     ResponseEntity<ResponseApi> editPost(int id, PostRequest postRequest,
                                     HttpSession session);

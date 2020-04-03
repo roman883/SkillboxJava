@@ -9,10 +9,8 @@ import main.model.entities.Tag;
 import main.model.entities.TagToPost;
 import main.model.entities.User;
 import main.model.repositories.PostRepository;
-import main.services.interfaces.PostRepositoryService;
-import main.services.interfaces.TagRepositoryService;
-import main.services.interfaces.TagToPostRepositoryService;
-import main.services.interfaces.UserRepositoryService;
+import main.model.repositories.TagRepository;
+import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Transient;
@@ -22,10 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -58,15 +60,21 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     @Transient // TODO или убрать?
     @Value("${post.announce.max_length}")
     private int announceLength;
+    @Value("${user.password.hashing_algorithm}")
+    private String hashingAlgorithm;
 
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private TagRepository tagRepository;
     @Autowired
     private TagRepositoryService tagRepositoryService;
     @Autowired
     private UserRepositoryService userRepositoryService;
     @Autowired
     private TagToPostRepositoryService tagToPostRepositoryService;
+    @Autowired
+    private FileSystemService fileSystemService;
 
 
     public ResponseEntity<ResponseApi> getPost(int id) {
@@ -75,8 +83,9 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         if (!post.isActive() || !post.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-                || !post.getTime().toLocalDateTime().isBefore(LocalDateTime.now())) {  // Не все данные отображаются, проверить время
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                || !post.getTime().isBefore(LocalDateTime.now())) {  // Не все данные отображаются, проверить время
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Данные поста не соответствуют настройкам отображения"), HttpStatus.BAD_REQUEST);
         }
         ResponseApi responseApi = new ResponsePost(post, announceLength);
         post.setViewCount(post.getViewCount() + 1);
@@ -98,7 +107,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     public ResponseEntity<ResponseApi> getPostsWithParams(int offset, int limit, String mode) {
         if (offset < 0 || limit < 1 ||
                 (!mode.equals("recent") && !mode.equals("popular") && !mode.equals("best") && !mode.equals("early"))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Неверный сдвиг, лимит или режим отображения постов"), HttpStatus.BAD_REQUEST);
         }
         List<Post> postsToShow = new ArrayList<>();
         int count = postRepository.countAllPosts();
@@ -122,7 +131,8 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
 
     public ResponseEntity<ResponseApi> searchPosts(int offset, String query, int limit) {
         if (offset < 0 || limit < 1) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Неверные параметры сдвига и/или лимита"), HttpStatus.BAD_REQUEST);
         }
         List<Post> postsToShow = postRepository.searchPosts(offset, limit, query);
         ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
@@ -130,36 +140,20 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     }
 
     public ResponseEntity<ResponseApi> getPostsByDate(String dateString, int offset, int limit) {
-        LocalDate date = null;
-        try {
-            date = LocalDate.ofInstant(new SimpleDateFormat("yyyy-MM-dd")
-                    .parse(dateString).toInstant(), ZoneId.systemDefault());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        LocalDate date = parseLocalDate(dateString);
         if (offset < 0 || limit < 1 || date == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Неверные параметры сдвига, лимита или даты"), HttpStatus.BAD_REQUEST);
         }
         List<Post> postsToShow = postRepository.getPostsByDate(dateString, limit, offset);
-//        for (int i = 0; i < limit; i++) {
-//            int index = offset + i;
-//            if (index == allPosts.size()) {
-//                break;
-//            }
-//            Post currentPost = allPosts.get(index);
-//            if (currentPost.isActive() && currentPost.getModerationStatus().equals(ModerationStatus.ACCEPTED)
-//                    && !currentPost.getTime().toLocalDateTime().isAfter(LocalDateTime.now())
-//                    && currentPost.getTime().toLocalDateTime().toLocalDate().isEqual(date)) {
-//                postsToShow.add(currentPost);
-//            }
-//        }
         ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
 
     public ResponseEntity<ResponseApi> getPostsByTag(int limit, String tag, int offset) {
         if (offset < 0 || limit < 1 || tag == null || tag.equals("")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Неверные параметры сдвига, лимита или тэга"), HttpStatus.BAD_REQUEST);
         }
         List<Post> postsToShow = postRepository.getPostsByTag(tag, limit, offset);
         ResponseApi responseApi = new ResponsePosts(postsToShow.size(), (ArrayList<Post>) postsToShow, announceLength);
@@ -171,7 +165,8 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (offset < 0 || limit < 1 ||
                 (!status.equalsIgnoreCase("new") && !status.equalsIgnoreCase("declined")
                         && !status.equalsIgnoreCase("accepted"))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Неверные параметры сдвига, лимита или статуса модерации"), HttpStatus.BAD_REQUEST);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
@@ -191,31 +186,14 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 postsToShow = (ArrayList<Post>) postRepository.getPostsForModeration(limit, offset);
                 break;
             case ("declined"):
-                postsToShow = (ArrayList<Post>) postRepository.getPostsModeratedByMe("DECLINED", limit, offset, user.getId());
+                postsToShow = (ArrayList<Post>) postRepository
+                        .getPostsModeratedByMe("DECLINED", limit, offset, user.getId());
                 break;
             case ("accepted"):
-                postsToShow = (ArrayList<Post>) postRepository.getPostsModeratedByMe("ACCEPTED", limit, offset, user.getId());
+                postsToShow = (ArrayList<Post>) postRepository
+                        .getPostsModeratedByMe("ACCEPTED", limit, offset, user.getId());
                 break;
         }
-//        switch (status) {
-//            case ("new"):
-//                queriedPosts = getAllPosts().stream()
-//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.NEW))
-//                        .collect(Collectors.toCollection(ArrayList::new));
-//                break;
-//            case ("declined"):
-//                queriedPosts = getAllPosts().stream()
-//                        .filter(u -> u.getModeratorId().equals(userId))
-//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.DECLINED))
-//                        .collect(Collectors.toCollection(ArrayList::new));
-//                break;
-//            case ("accepted"):
-//                queriedPosts = getAllPosts().stream()
-//                        .filter(u -> u.getModeratorId().equals(userId))
-//                        .filter(p -> p.getModerationStatus().equals(ModerationStatus.ACCEPTED))
-//                        .collect(Collectors.toCollection(ArrayList::new));
-//                break;
-//        }
         ResponseApi responseApi = new ResponsePostsForModeration(postsToShow.size(), postsToShow, announceLength);
         return new ResponseEntity<>(responseApi, HttpStatus.OK);
     }
@@ -224,7 +202,8 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (offset < 0 || limit < 1 || (!status.equals("inactive")
                 && !status.equalsIgnoreCase("pending") && !status.equalsIgnoreCase("declined")
                 && !status.equalsIgnoreCase("published"))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(
+                    new ResponseBadReqMsg("Неверные параметры сдвига, лимита или статуса"), HttpStatus.BAD_REQUEST);
         }
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
@@ -259,15 +238,11 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         String title = postRequest.getTitle();
         String text = postRequest.getText();
         List<String> postTags = postRequest.getTags();
-        LocalDateTime time = null;
-        try {
-            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(timeString).toInstant(), ZoneId.systemDefault());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if (time == null || time.isBefore(LocalDateTime.now())) { // "на frontend нужно исправлять автоматически на текущее время" делать это отсюда?
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+        LocalDateTime time = parseLocalDateTime(timeString);
+//        if (time == null) {
+//            return new ResponseEntity<>(new ResponseBadReqMsg("Неверный параметр времени создания поста"), HttpStatus.BAD_REQUEST);
+//        }
+        time = time == null || time.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : time;
         boolean isTextValidFlag = isTextValid(text);
         boolean isTitleValidFlag = isTitleValid(title);
         if (!isTextValidFlag || !isTitleValidFlag) {
@@ -285,19 +260,21 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (active == 1) {
             isActive = true;
         }
-        Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
-        Post currentPost = postRepository.save(new Post(isActive, ModerationStatus.NEW, user, timestamp, title, text));
+        Post currentPost = postRepository.save(new Post(isActive, ModerationStatus.NEW, user, time, title, text));
         for (String currentTagName : postTags) {
             if (!currentTagName.isBlank()) {
-                Tag currentTag = tagRepositoryService.addTag(new Tag(currentTagName));
+                Tag currentTag = tagRepository.getTagByTagName(currentTagName) != null ? // Создаем теги, только если их еще не было
+                        tagRepository.getTagByTagName(currentTagName) :
+                        tagRepositoryService.addTag(new Tag(currentTagName));
                 tagToPostRepositoryService.addTagToPost(new TagToPost(currentTag, currentPost)); // Возможно надо добавлять в Set у тегов и у постов
             }
         }
         return new ResponseEntity<>(new ResponseBoolean(true), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> uploadImage(MultipartFile image, HttpSession session) throws IOException {
-        if (image == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    public ResponseEntity<?> uploadImage(MultipartFile image, HttpSession session) throws IOException {
+        if (image == null)
+            return new ResponseEntity<>(new ResponseBadReqMsg("Файл для загрузки отсутствует"), HttpStatus.BAD_REQUEST);
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         User user = userRepositoryService.getUser(userId).getBody();
@@ -311,15 +288,18 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             }
         }
         String fileDestPath;
-        File newFile = null;
-        do {
-            fileDestPath = createDirectoriesAndGetFullPath();
-            if (!Files.exists(Path.of(fileDestPath))) {
-                Files.createFile(Path.of(fileDestPath));
-                newFile = new File(fileDestPath);
+        String directoryPath = getRandomDirectoryToUpload();
+        if (fileSystemService.createDirectoriesByPath(directoryPath)) {
+            String imageName = getRandomImageName();
+            fileDestPath = directoryPath + "/" + imageName;
+            while (Files.exists(Path.of(fileDestPath))) {
+                imageName = getRandomImageName();
+                fileDestPath = directoryPath + "/" + imageName;
             }
-        } while (newFile == null);
-        copyFile(image, newFile);
+            image.transferTo(Paths.get(directoryPath, imageName));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Не удалось создать папку
+        }
         return new ResponseEntity<>(fileDestPath, HttpStatus.OK);
     }
 
@@ -329,15 +309,10 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         String title = postRequest.getTitle();
         String text = postRequest.getText();
         List<String> tags = postRequest.getTags();
-        LocalDateTime time = null; // TODO можно вынести парсинг даты в отдельный метод
-        try {
-            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                    .parse(timeString).toInstant(), ZoneId.systemDefault());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        LocalDateTime time = parseLocalDateTime(timeString);
         Post currentPost = getPostById(id);
-        if (currentPost == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Пост не существует
+        if (currentPost == null)
+            return new ResponseEntity<>(new ResponseBadReqMsg("Пост не найден"), HttpStatus.BAD_REQUEST); // Пост не существует
         if (time == null || time.isBefore(LocalDateTime.now())) time = LocalDateTime.now();
         boolean isTextValidFlag = isTextValid(text);
         boolean isTitleValidFlag = isTitleValid(title);
@@ -349,9 +324,8 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         User user = userRepositoryService.getUser(userId).getBody();
         if (user == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
-        Timestamp timestamp = Timestamp.from(time.toInstant(ZoneOffset.UTC));
         currentPost.setActive(active == 1);
-        currentPost.setTime(timestamp);
+        currentPost.setTime(time);
         currentPost.setTitle(title);
         currentPost.setText(text);
         currentPost.setModerationStatus(ModerationStatus.NEW);
@@ -374,7 +348,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         String decision = moderatePostRequest.getDecision();
         decision = decision.toUpperCase().trim();
         if (!decision.equals("DECLINE") && !decision.equals("ACCEPT")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Решение по модерации не распознано"), HttpStatus.BAD_REQUEST);
         }
         // Если пользователь залогинен
         Integer userId = userRepositoryService.getUserIdBySession(session);
@@ -385,7 +359,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         if (!user.isModerator()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         Post post = getPostById(postId);
         if (post == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Пост не найден"), HttpStatus.BAD_REQUEST);
         }
         post.setModeratorId(userId);
         if (decision.equals("DECLINE")) {
@@ -403,7 +377,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 : postRepository.getPostsByYear(year);
         HashMap<Date, Integer> postsCountByDate = new HashMap<>();
         for (Post p : postsByYear) {
-            Date postDate = Date.valueOf(p.getTime().toLocalDateTime().toLocalDate());
+            Date postDate = Date.valueOf(p.getTime().toLocalDate());
             Integer postCount = postsCountByDate.getOrDefault(postDate, 0);
             postsCountByDate.put(postDate, postCount + 1);
         }
@@ -416,39 +390,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
         return new ArrayList<>(postRepository.findAll());
     }
 
-    private String getTimeString(LocalDateTime objectCreatedTime) {
-        StringBuilder timeString = new StringBuilder();
-        if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay())
-                && objectCreatedTime.isBefore(LocalDateTime.now())) {
-            timeString.append("Сегодня, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else if (objectCreatedTime.isAfter(LocalDate.now().atStartOfDay().minusDays(1))) {
-            timeString.append("Вчера, ").append(objectCreatedTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        } else {
-            timeString.append(objectCreatedTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm")));
-        }
-        return timeString.toString();
-    }
-
-    private void copyFile(MultipartFile source, File dest) {
-        try {
-            byte[] bytes = source.getBytes();
-            Files.write(dest.toPath(), bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        try (InputStream inputStream = new FileInputStream(source);
-//        OutputStream outputStream = new FileOutputStream(dest)) { // Autocloseable потоки //TODO переделать на потоки?
-//            byte[] bytes = source.getBytes();
-//            int length = bytes.length;
-//            while ((length = inputStream.read(bytes)) > 0) {
-//                outputStream.write(bytes, 0, length);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-    private String createDirectoriesAndGetFullPath() throws IOException {
+    private String getRandomDirectoryToUpload() {
         String randomHash = String.valueOf(String.valueOf(Math.pow(Math.random(), 100 * Math.random())).hashCode());
         String firstFolder = randomHash.substring(0, randomHash.length() / 3);
         String secondFolder = randomHash.substring(
@@ -459,8 +401,12 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
                 .append("/").append(firstFolder)
                 .append("/").append(secondFolder)
                 .append("/").append(thirdFolder);
-        Files.createDirectories(Path.of(builder.toString()));
-        return builder.append("/").append(randomHash).append(".").append(imagesFormat).toString(); // имя файла задаем тем же хэшем
+        return builder.toString();
+    }
+
+    private String getRandomImageName() {
+        String randomHash = getHashedString(String.valueOf(Math.pow(Math.random(), 100 * Math.random())));
+        return randomHash + "." + imagesFormat; // имя файла задаем хэшем
     }
 
     private boolean isTextValid(String text) {
@@ -471,5 +417,45 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
     private boolean isTitleValid(String title) {
         return title != null && !title.equals("") && title.length() <= postTitleMaxLength
                 && title.length() >= postTitleMinLength;
+    }
+
+    private String getHashedString(String stringToHash) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(hashingAlgorithm);
+            md.update(stringToHash.getBytes());
+            byte[] digest = md.digest();
+            return DatatypeConverter.printHexBinary(digest).toUpperCase();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private LocalDateTime parseLocalDateTime(String timeToParse) {
+        LocalDateTime time = null;
+        try {
+            time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd HH:mm")
+                    .parse(timeToParse).toInstant(), ZoneId.systemDefault());
+        } catch (ParseException e) {
+            try {
+                time = LocalDateTime.ofInstant(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+                        .parse(timeToParse).toInstant(), ZoneId.systemDefault());
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                e.printStackTrace();
+            }
+        }
+        return time;
+    }
+
+    private LocalDate parseLocalDate(String dateToParse) {
+        LocalDate date = null;
+        try {
+            date = LocalDate.ofInstant(new SimpleDateFormat("yyyy-MM-dd")
+                    .parse(dateToParse).toInstant(), ZoneId.systemDefault());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }
