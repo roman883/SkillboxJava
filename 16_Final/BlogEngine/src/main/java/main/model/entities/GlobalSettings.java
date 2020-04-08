@@ -60,13 +60,14 @@ public class GlobalSettings implements Serializable {
 
     public GlobalSettings() {
     }
+
+    @Override
+    public String toString() {
+        return "GlobalSettings{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
-
-// id INT NOT NULL AUTO_INCREMENT
-//● code VARCHAR(255) NOT NULL - системное имя настройки
-//● name VARCHAR(255) NOT NULL - название настройки
-//● value VARCHAR(255) NOT NULL - значение настройки
-
-// MULTIUSER_MODE Многопользовательский режим YES / NO
-//POST_PREMODERATION Премодерация постов YES / NO
-//STATISTICS_IS_PUBLIC Показывать всем статистику блога YES / NO

@@ -172,4 +172,18 @@ public class Post implements Serializable {
     public void setTagsToPostsSet(Set<TagToPost> tagsToPostsSet) {
         this.tagsToPostsSet = tagsToPostsSet;
     }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", isActive=" + isActive +
+                ", moderationStatus=" + moderationStatus +
+                ", moderatorId=" + moderatorId +
+                ", time=" + time +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", viewCount=" + viewCount +
+                '}';
+    }
 }

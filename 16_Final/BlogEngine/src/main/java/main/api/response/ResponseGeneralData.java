@@ -69,4 +69,16 @@ public class ResponseGeneralData implements ResponseApi {
     public void setCopyrightFrom(String copyrightFrom) {
         this.copyrightFrom = copyrightFrom;
     }
+
+    @Override
+    public String toString() {
+        return "ResponseGeneralData{" +
+                "title='" + title + '\'' +
+                ", subtitle='" + subtitle + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", copyright='" + copyright + '\'' +
+                ", copyrightFrom='" + copyrightFrom + '\'' +
+                '}';
+    }
 }

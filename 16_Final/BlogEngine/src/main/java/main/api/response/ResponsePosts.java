@@ -40,6 +40,14 @@ public class ResponsePosts implements ResponseApi {
         this.posts = posts;
     }
 
+    @Override
+    public String toString() {
+        return "Posts{" +
+                "count=" + count +
+                ", posts=" + posts +
+                '}';
+    }
+
     static class ResponsePostsApi {
 
         private int id;
@@ -151,6 +159,21 @@ public class ResponsePosts implements ResponseApi {
             return timeString.toString();
         }
 
+        @Override
+        public String toString() {
+            return "ResponsePostsApi{" +
+                    "id=" + id +
+                    ", time='" + time + '\'' +
+                    ", user=" + user +
+                    ", title='" + title + '\'' +
+                    ", announce='" + announce + '\'' +
+                    ", likeCount=" + likeCount +
+                    ", dislikeCount=" + dislikeCount +
+                    ", commentCount=" + commentCount +
+                    ", viewCount=" + viewCount +
+                    '}';
+        }
+
         static class PostAuthorUser {
             private int id;
             private String name;
@@ -176,6 +199,13 @@ public class ResponsePosts implements ResponseApi {
                 this.name = name;
             }
 
+            @Override
+            public String toString() {
+                return "PostAuthorUser{" +
+                        "id=" + id +
+                        ", name='" + name + '\'' +
+                        '}';
+            }
         }
     }
 }

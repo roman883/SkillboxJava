@@ -25,4 +25,12 @@ public class ResponseCaptcha implements ResponseApi {
     public void setImage(String image) {
         this.image = image;
     }
+
+    @Override
+    public String toString() {
+        return "ResponseCaptcha{" +
+                "secret='" + secret + '\'' +
+                ", image='" + image + '\'' +
+                '}';
+    }
 }

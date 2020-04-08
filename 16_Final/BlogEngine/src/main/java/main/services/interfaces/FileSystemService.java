@@ -3,6 +3,8 @@ package main.services.interfaces;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 public interface FileSystemService {
 
@@ -15,4 +17,8 @@ public interface FileSystemService {
     Boolean createDirectoriesByPath(String path);
 
     void copyMultiPartFileToFile(MultipartFile source, File dest);
+
+    void copyMultiPartFileToPath(MultipartFile source, Path dest);
+
+    File getFileByPath(String pathToFile);
 }

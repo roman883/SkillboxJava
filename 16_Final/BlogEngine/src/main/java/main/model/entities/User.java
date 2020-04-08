@@ -1,5 +1,7 @@
 package main.model.entities;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -16,10 +18,8 @@ public class User implements Serializable {
     @Column(nullable = false)
     private int id;
 
-    // @Size(max = 3)
-    //@Column(name = "      ", columnDefinition="TINYINT(3) UNSIGNED default '40'")
-    @Column(name = "is_moderator", nullable = false)        // является ли пользователь модератором  //columnDefinition="TINYINT(1)"
-    private boolean isModerator;            // (может ли править глобальные настройки сайта и модерировать посты)
+    @Column(name = "is_moderator", nullable = false)
+    private boolean isModerator;
 
     @Column(name = "reg_time", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime registrationTime;
@@ -30,10 +30,6 @@ public class User implements Serializable {
     @Column(nullable = false, columnDefinition = "VARCHAR(255)", unique = true)
     private String email;
 
-    // https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-    // https://www.codota.com/code/java/methods/org.riotfamily.core.security.auth.HibernateUserDao/hashPassword
-    // https://www.baeldung.com/java-password-hashing
-    // https://askdev.ru/q/autentifikaciya-hibernate-bez-paroley-hranyaschihsya-v-obychnom-tekste-214168/
     @Column(name = "password", nullable = false, columnDefinition = "VARCHAR(255)")
     private String hashedPassword;
 
@@ -51,7 +47,6 @@ public class User implements Serializable {
         this.hashedPassword = hashedPassword;
     }
 
-    // Доп поля - связи
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<Post>();
 

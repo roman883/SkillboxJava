@@ -1,5 +1,6 @@
 package main.services.Impl;
 
+import lombok.extern.slf4j.Slf4j;
 import main.api.response.ResponseApi;
 import main.api.response.ResponseGeneralData;
 import main.services.interfaces.GeneralDataService;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class GeneralDataServiceImpl implements GeneralDataService {
 
@@ -26,7 +28,13 @@ public class GeneralDataServiceImpl implements GeneralDataService {
 
     @Override
     public ResponseEntity<ResponseApi> getData() {
-        return new ResponseEntity<>(new ResponseGeneralData(title, subtitle, phone, email, copyright, copyrightFrom),
+        ResponseEntity<ResponseApi> response =
+                new ResponseEntity<>(new ResponseGeneralData(title, subtitle, phone, email, copyright, copyrightFrom),
                 HttpStatus.OK);
+        log.info("--- Направляется ответ со следующими параметрами: {" +
+                "HttpStatus:" + response.getStatusCode() + "," +
+                response.getBody() +
+                "}");
+        return response;
     }
 }

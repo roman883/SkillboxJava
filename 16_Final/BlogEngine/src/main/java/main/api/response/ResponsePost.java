@@ -211,6 +211,14 @@ public class ResponsePost implements ResponseApi {
         public void setName(String name) {
             this.name = name;
         }
+
+        @Override
+        public String toString() {
+            return "PostAuthorApi{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
     }
 
     static class PostCommentApi {
@@ -259,6 +267,16 @@ public class ResponsePost implements ResponseApi {
             this.text = text;
         }
 
+        @Override
+        public String toString() {
+            return "PostCommentApi{" +
+                    "id=" + id +
+                    ", time='" + time + '\'' +
+                    ", user=" + user +
+                    ", text='" + text + '\'' +
+                    '}';
+        }
+
         static class PostCommentAuthorApi {
 
             private int id;
@@ -294,6 +312,33 @@ public class ResponsePost implements ResponseApi {
             public void setPhoto(String photo) {
                 this.photo = photo;
             }
+
+            @Override
+            public String toString() {
+                return "PostCommentAuthorApi{" +
+                        "id=" + id +
+                        ", name='" + name + '\'' +
+                        ", photo='" + photo + '\'' +
+                        '}';
+            }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ResponsePost{" +
+                "id=" + id +
+                ", time='" + time + '\'' +
+                ", user=" + user +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", announce='" + announce + '\'' +
+                ", likeCount=" + likeCount +
+                ", dislikeCount=" + dislikeCount +
+                ", commentCount=" + commentCount +
+                ", viewCount=" + viewCount +
+                ", comments=" + comments +
+                ", tags=" + tags +
+                '}';
     }
 }
