@@ -111,7 +111,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/tag?query=docker",
+					"raw": "http://localhost:8080/api/tag?query=a",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -124,7 +124,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "docker",
+							"value": "a",
 							"description": "could be blank"
 						}
 					]
@@ -211,7 +211,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/post/8",
+					"raw": "http://localhost:8080/api/post/71",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -220,7 +220,7 @@
 					"path": [
 						"api",
 						"post",
-						"8"
+						"71"
 					]
 				}
 			},
@@ -232,7 +232,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/post/byDate?offset=0&limit=10&date=2020-04-01",
+					"raw": "http://localhost:8080/api/post/byDate?offset=0&limit=10&date=2020-04-08",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -254,7 +254,7 @@
 						},
 						{
 							"key": "date",
-							"value": "2020-04-01"
+							"value": "2020-04-08"
 						}
 					]
 				}
@@ -303,7 +303,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"e_mail\": \"newsome@mail.ru\",\n    \"password\": \"password\",\n    \"captcha\": \"ketaq\",\n    \"captcha_secret\": \"jgkfpekmx4b3feio63olp3\"\n}",
+					"raw": "{\n    \"e_mail\": \"vasya@mail.ru\",\n    \"password\": \"password\",\n    \"captcha\": \"betov\",\n    \"captcha_secret\": \"kkcz5vwbsgsbkafxybtnmm\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -632,7 +632,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"post_id\": 38\n}",
+					"raw": "{\n    \"post_id\": 69\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -678,7 +678,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"post_id\": 41\n}",
+					"raw": "{\n    \"post_id\": 69\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -724,7 +724,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"multiuser_MODE\": true,\n    \"post_PREMODERATION\": false,\n    \"statistics_IS_PUBLIC\": false\n}",
+					"raw": "{\n    \"MULTIUSER_MODE\": false,\n    \"POST_PREMODERATION\": true,\n    \"STATISTICS_IS_PUBLIC\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"

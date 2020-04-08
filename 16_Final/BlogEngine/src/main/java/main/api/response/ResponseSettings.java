@@ -89,4 +89,13 @@ public class ResponseSettings implements ResponseApi {
             return false;
         } else return null;
     }
+
+    @Override
+    public String toString() {
+        return "Settings{" +
+                "multiuserMode=" + multiuserMode +
+                ", postPremoderation=" + postPremoderation +
+                ", statisticsIsPublic=" + statisticsIsPublic +
+                '}';
+    }
 }

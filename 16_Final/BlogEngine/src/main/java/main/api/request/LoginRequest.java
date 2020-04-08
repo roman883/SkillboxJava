@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class LoginRequest implements RequestApi, Serializable {
 
-    private String e_mail; // TODO как получать поле в запросе "e_mail" и заполнять поле с именем "email"? Привязка
+    private String e_mail; //TODO Заменить везде на Java формат
     private String password;
 
     public LoginRequest() {

@@ -7,6 +7,7 @@ import com.github.cage.image.EffectConfig;
 import com.github.cage.image.Painter;
 import com.github.cage.image.RgbColorGenerator;
 import com.github.cage.token.RandomTokenGenerator;
+import lombok.extern.slf4j.Slf4j;
 import main.api.response.ResponseApi;
 import main.api.response.ResponseCaptcha;
 import main.model.entities.CaptchaCode;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
 
+@Slf4j
 @Service
 public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
 
@@ -58,17 +60,28 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
 
     @Override
     public ResponseEntity<ResponseApi> generateCaptcha() {
+        log.info("--- Удаление устаревших капч (время устаревания " + oldCaptchaDeleteTimeInMin + " мин)");
         captchaRepository.deleteOldCaptchas(oldCaptchaDeleteTimeInMin);
+        log.info("--- Устаревшие капчи удалены");
         String secretCode = generateRandomString();
         Cage cage = getCage();
         String token = cage.getTokenGenerator().next();
         if (token.length() > captchaPictureTextLength) { // Ограничиваем размер картинки капчи символами
             token = token.substring(0, captchaPictureTextLength);
         }
+        log.info("--- Сгенерировано случайное изображение капчи {" + token + "}");
         byte[] encodedBytes = Base64.getEncoder().encode(cage.draw(token));
         String captchaImageBase64String = captchaFormatString + ", " + new String(encodedBytes, StandardCharsets.UTF_8);
+        log.info("--- Закодировано в BASE64 изображение капчи {" + captchaImageBase64String + "}");
         CaptchaCode newCaptcha = captchaRepository.save(new CaptchaCode(LocalDateTime.now(), token, secretCode));
-        return new ResponseEntity<>(new ResponseCaptcha(secretCode, captchaImageBase64String), HttpStatus.OK);
+        log.info("--- Созданная капча сохранена в БД с ID:" + newCaptcha.getId());
+        ResponseEntity<ResponseApi> response =
+                new ResponseEntity<>(new ResponseCaptcha(secretCode, captchaImageBase64String), HttpStatus.OK);
+        log.info("--- Направляется ответ со следующими параметрами: {" +
+                "HttpStatus:" + response.getStatusCode() + "," +
+                response.getBody() +
+                "}");
+        return response;
     }
 
     public ArrayList<CaptchaCode> getAllCaptchas() {
@@ -80,7 +93,9 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
         for (int i = 0; i < randomSecretKeyLength; i++) {
             builder.append(SYMBOLS_FOR_GENERATOR[(int) (Math.random() * (SYMBOLS_FOR_GENERATOR.length - 1))]);
         }
-        return builder.toString();
+        String randomString = builder.toString();
+        log.info("--- Сгенерирован случайный код {" + randomString + "}");
+        return randomString;
     }
 
     private Cage getCage() {
@@ -88,7 +103,7 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
         Painter painter = new Painter(
                 captchaImageWidth, captchaImageHeight, Color.WHITE, Painter.Quality.MAX, new EffectConfig(), rnd);
         int defFontHeight = painter.getHeight() / 2;
-        return new Cage(
+        Cage cage =  new Cage(
                 painter,
                 (IGenerator<Font>) new ObjectRoulette<>(rnd, new Font[]{
                         new Font(captchaImageRandomFont1, Font.PLAIN, defFontHeight),
@@ -99,5 +114,11 @@ public class CaptchaRepositoryServiceImpl implements CaptchaRepositoryService {
                 Cage.DEFAULT_COMPRESS_RATIO,
                 (IGenerator<String>) new RandomTokenGenerator(rnd),
                 rnd);
+        log.info("--- Создана случайная капча {" +
+                "width:" + captchaImageWidth + "," +
+                "height:" + captchaImageHeight + "," +
+                "format" + captchaFormat
+                + "}");
+        return cage;
     }
 }

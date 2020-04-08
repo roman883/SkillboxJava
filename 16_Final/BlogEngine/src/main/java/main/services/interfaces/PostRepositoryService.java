@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 public interface PostRepositoryService {
 
-    ResponseEntity<ResponseApi> getPost(int id);
-
     ResponseEntity<ResponseApi> getPostsWithParams(int offset, int limit, String mode);
 
     ResponseEntity<ResponseApi> searchPosts(int offset, String query, int limit);
@@ -40,11 +38,11 @@ public interface PostRepositoryService {
 
     ResponseEntity<ResponseApi> countPostsByYear(Integer year);
 
-//    int getModerationCount(int moderatorUserId);
-
     ArrayList<Post> getAllPosts();
 
     Post getPostById(int postId);
 
     ResponseEntity<ResponseApi> getRecentPosts();
+
+    ResponseEntity<ResponseApi> getPost(int id, HttpSession session);
 }

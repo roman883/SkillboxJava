@@ -3,6 +3,7 @@
 
 #temp-folder
 images/
+logs/
 
 # User-specific stuff
 .idea/**/workspace.xml

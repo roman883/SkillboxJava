@@ -40,6 +40,14 @@ public class ResponsePostsForModeration implements ResponseApi {
         this.posts = posts;
     }
 
+    @Override
+    public String toString() {
+        return "ResponsePostsForModeration{" +
+                "count=" + count +
+                ", posts=" + posts +
+                '}';
+    }
+
     static class ResponsePostsApi {
 
         private int id;
@@ -111,6 +119,17 @@ public class ResponsePostsForModeration implements ResponseApi {
             return timeString.toString();
         }
 
+        @Override
+        public String toString() {
+            return "ResponsePostsApi{" +
+                    "id=" + id +
+                    ", time='" + time + '\'' +
+                    ", user=" + user +
+                    ", title='" + title + '\'' +
+                    ", announce='" + announce + '\'' +
+                    '}';
+        }
+
         static class PostAuthorUser {
             private int id;
             private String name;
@@ -136,6 +155,13 @@ public class ResponsePostsForModeration implements ResponseApi {
                 this.name = name;
             }
 
+            @Override
+            public String toString() {
+                return "PostAuthorUser{" +
+                        "id=" + id +
+                        ", name='" + name + '\'' +
+                        '}';
+            }
         }
     }
 }

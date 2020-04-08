@@ -5,6 +5,7 @@ import main.api.response.*;
 import main.model.entities.*;
 import main.model.repositories.CaptchaRepository;
 import main.model.repositories.PostRepository;
+import main.model.repositories.PostVoteRepository;
 import main.model.repositories.UserRepository;
 import main.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -77,6 +77,8 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     @Autowired
     private PostRepository postRepository;
     @Autowired
+    private PostVoteRepository postVoteRepository;
+    @Autowired
     private FileSystemService fileSystemService;
 
     private Map<String, Integer> sessionIdToUserId = new HashMap<>(); // Храним сессию и ID пользователя, по заданию не в БД
@@ -95,14 +97,15 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         String password = loginRequest.getPassword();
         User user = userRepository.getUserByEmail(email);
         if (user == null) {
-            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Ошибка! Пользователь с таким E-mail: " + email + " не существует"), HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         String hashedPassToCheck = getHashedString(password);
         if (user.getStoredHashPass().equals(hashedPassToCheck)) { // пароль совпал по хэшу
             sessionIdToUserId.put(session.getId().toString(), user.getId()); // Запоминаем пользователя и сессию
-            return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseLogin(user, postRepository.countPostsForModeration()), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Ошибка! Пароль введен неверно. Попробуйте еще раз"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -114,7 +117,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             int userId = sessionIdToUserId.get(session.getId().toString());
             User user = getUser(userId).getBody();
             if (user != null) {
-                return new ResponseEntity<>(new ResponseLogin(user), HttpStatus.OK);
+                return new ResponseEntity<>(new ResponseLogin(user, postRepository.countPostsForModeration()), HttpStatus.OK);
             } else {        // "Ошибка! Пользователь найден в сессиях, однако отсутствует в БД!";
                 return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.UNAUTHORIZED);
             }
@@ -125,11 +128,13 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
     public ResponseEntity<ResponseApi> restorePassword(RestorePassRequest restorePassRequest) {
         String email = restorePassRequest.getEmail();
         if (!isEmailValid(email)) {
-            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Ошибка! Вы указали неверный E-mail: " + email), HttpStatus.BAD_REQUEST);
         }
         User user = userRepository.getUserByEmail(email);
         if (user == null) {
-            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBadReqMsg("Ошибка! Пользователь с таким E-mail: " + email + " не существует"), HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new ResponseBoolean(false), HttpStatus.BAD_REQUEST);
         }
         String restoreCode = generateRandomString();
         user.setCode(restoreCode); // запоминаем код в базе
@@ -225,7 +230,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             isNameValid = (userRepository.getUserByName(name) == null);
             if (isNameValid) user.setName(name);
         }
-        if (email != null && !email.isBlank()) {
+        if (email != null && !email.isBlank() && !email.equalsIgnoreCase(user.getEmail())) {
             isEmailValid = (userRepository.getUserByEmail(email.toLowerCase()) == null && isEmailValid(email));
             if (isEmailValid) user.setEmail(email);
         }
@@ -238,7 +243,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
             MultipartFile photo = ((EditProfileWithPhotoRequest) editProfileRequest).getPhoto();
             if (photo != null) {
                 if (photo.getSize() > maxPhotoSizeInBytes && photo.getSize() < 0) {
-                    System.err.println("Размер фото " + photo + " " + photo.getSize() + " " + photo.getOriginalFilename());
+//                    System.err.println("Размер фото " + photo + " " + photo.getSize() + " " + photo.getOriginalFilename());
                     isPhotoValid = false;
                 } else if (photo.getSize() == 0) {
                     isPhotoValid = true;
@@ -269,7 +274,7 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
                 || !isEmailValid || !isPhotoValid) {
             return new ResponseEntity<>(new ResponseFailEditProfile(isEmailValid, isNameValid,
                     isPassValid
-                    , true // isCaptchaCodeValid Временно заглушка, пока непонятно будет ли капча
+                    , true // isCaptchaCodeValid Временно заглушка, пока непонятно будет ли капча // И капчи все же нет при редактировании профиля на фронте
                     ,isPhotoValid), HttpStatus.BAD_REQUEST);
         }
         userRepository.save(user);
@@ -334,9 +339,9 @@ public class UserRepositoryServiceImpl implements UserRepositoryService {
         if (!isStatisticsIsPublic && userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        int postsCount = postRepository.countAllPosts();
-        int allLikesCount = postRepository.countAllLikes();
-        int allDislikeCount = postRepository.countAllDislikes();
+        int postsCount = postRepository.countAllPostsAtDatabase();
+        int allLikesCount = postVoteRepository.countAllLikes();
+        int allDislikeCount = postVoteRepository.countAllDislikes();
         int viewsCount = postRepository.countAllViews();
         String firstPublicationDate = postsCount < 1 ? "Еще не было публикаций" : postRepository
                 .getFirstPublicationDate().toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));

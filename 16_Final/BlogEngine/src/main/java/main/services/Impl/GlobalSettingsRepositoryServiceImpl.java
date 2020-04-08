@@ -1,6 +1,8 @@
 package main.services.Impl;
 
+import lombok.extern.slf4j.Slf4j;
 import main.api.request.SetGlobalSettingsRequest;
+import main.api.response.ResponseApi;
 import main.api.response.ResponseBadReqMsg;
 import main.api.response.ResponseSettings;
 import main.model.entities.GlobalSettings;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsRepositoryService {
 
@@ -30,17 +33,22 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
     public ResponseEntity<?> getGlobalSettings(HttpSession session) {
         Integer userId = userRepositoryService.getUserIdBySession(session);
         if (userId == null) {
+            log.warn("--- Не найден пользователь по номеру сессии: " + session.getId());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         User user = userRepositoryService.getUser(userId).getBody();
         if (user == null) {
+            log.warn("--- Не найден пользователь по userID: " + userId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
         }
         if (!user.isModerator()) {
+            log.info("--- Для данного действия пользователю " + user.getId() + ":" + user.getName() + " требуются права модератора");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
         }
         ResponseSettings responseSettings = new ResponseSettings(getAllGlobalSettingsSet());
-        return new ResponseEntity<>(responseSettings, HttpStatus.OK);
+        ResponseEntity<ResponseApi> response = new ResponseEntity<>(responseSettings, HttpStatus.OK);
+        log.info("--- Направляется ответ: {" + "HttpStatus:" + response.getStatusCode() + "," + response.getBody() + "}");
+        return response;
 
     }
 
@@ -50,18 +58,28 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
         Boolean multiUserModeSetting = setGlobalSettingsRequest.getMultiuserMode();
         Boolean postPremoderationSetting = setGlobalSettingsRequest.getPostPremoderation();
         Boolean statisticsIsPublicSetting = setGlobalSettingsRequest.getStatisticsIsPublic();
-        // Проверка: задани ли какие-то параметры
+        // Проверка: заданы ли какие-то параметры
         if (multiUserModeSetting == null && postPremoderationSetting == null && statisticsIsPublicSetting == null) {
-            return new ResponseEntity<>(
+            ResponseEntity<ResponseApi> response = new ResponseEntity<>(
                     new ResponseBadReqMsg("Не переданы параметры настроек"), HttpStatus.BAD_REQUEST);
+            log.warn("--- Не заданы параметры настроек");
+            return response;
         }
         // Проверка: есть ли пользователь и права на внесение изменений в настройки
         Integer userId = userRepositoryService.getUserIdBySession(session);
-        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        if (userId == null) {
+            log.warn("--- Не найден пользователь по номеру сессии: " + session.getId());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         User user = userRepositoryService.getUser(userId).getBody();
-        if (user == null)
+        if (user == null) {
+            log.warn("--- Не найден пользователь по userID: " + userId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Ошибка, пользователь не найден, а сессия есть
-        if (!user.isModerator()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!user.isModerator()) {
+            log.info("--- Для данного действия пользователю " + user.getId() + ":" + user.getName() + " требуются права модератора");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
+        }
         // Устанавливаем новые настройки и получаем результат
         HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
         Map<String, Boolean> resultMap = new HashMap<>();
@@ -73,6 +91,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                     if (multiUserModeSetting != null) {
                         g.setValue(convertBooleanToYesOrNo(multiUserModeSetting));
                         globalSettingsRepository.save(g);
+                        log.info("--- Установлена настройка " + MULTIUSER_MODE + " со значением " + g.getValue());
                         resultMap.put(MULTIUSER_MODE, multiUserModeSetting);
                     } else {
                         resultMap.put(MULTIUSER_MODE, yesOrNoToBoolean(g.getValue()));
@@ -83,6 +102,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                     if (postPremoderationSetting != null) {
                         g.setValue(convertBooleanToYesOrNo(postPremoderationSetting));
                         globalSettingsRepository.save(g);
+                        log.info("--- Установлена настройка " + POST_PREMODERATION + " со значением " + g.getValue());
                         resultMap.put(POST_PREMODERATION, postPremoderationSetting);
                     } else {
                         resultMap.put(POST_PREMODERATION, yesOrNoToBoolean(g.getValue()));
@@ -93,6 +113,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                     if (statisticsIsPublicSetting != null) {
                         g.setValue(convertBooleanToYesOrNo(statisticsIsPublicSetting));
                         globalSettingsRepository.save(g);
+                        log.info("--- Установлена настройка " + STATISTICS_IS_PUBLIC + " со значением " + g.getValue());
                         resultMap.put(STATISTICS_IS_PUBLIC, statisticsIsPublicSetting);
                     } else {
                         resultMap.put(STATISTICS_IS_PUBLIC, yesOrNoToBoolean(g.getValue()));
@@ -101,7 +122,9 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                 }
             }
         }
-        return new ResponseEntity<>(new ResponseSettings(resultMap), HttpStatus.OK);
+        ResponseEntity<ResponseApi> response = new ResponseEntity<>(new ResponseSettings(resultMap), HttpStatus.OK);
+        log.info("--- Направляется ответ: {" + "HttpStatus:" + response.getStatusCode() + "," + response.getBody() + "}");
+        return response;
     }
 
     @Override
@@ -109,6 +132,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
         HashSet<GlobalSettings> gsSet = new HashSet<>(globalSettingsRepository.findAll());
         // Если нет каких-то или всех настроек, устанавливаем значения по умолчанию false
         if (gsSet.isEmpty()) {
+            log.info("--- Отсутствуют данные по глобальным настройкам. Устанавливаются значения по-умолчанию");
             GlobalSettings globalSettingsMultiUser =
                     new GlobalSettings(MULTIUSER_MODE, MULTIUSER_MODE_NAME, "NO");
             GlobalSettings globalSettingsPreModeration =
@@ -116,8 +140,11 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             GlobalSettings globalSettingsStatisticsIsPublic =
                     new GlobalSettings(STATISTICS_IS_PUBLIC, STATISTICS_IS_PUBLIC_NAME, "NO");
             gsSet.add(globalSettingsRepository.save(globalSettingsMultiUser));
+            log.info("--- Установлена глобальная настрока: " + globalSettingsMultiUser);
             gsSet.add(globalSettingsRepository.save(globalSettingsPreModeration));
+            log.info("--- Установлена глобальная настрока: " + globalSettingsPreModeration);
             gsSet.add(globalSettingsRepository.save(globalSettingsStatisticsIsPublic));
+            log.info("--- Установлена глобальная настрока: " + globalSettingsStatisticsIsPublic);
         } else {
             boolean hasMultiuserMode = false;
             boolean hasPostPremoderation = false;
@@ -152,6 +179,7 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
                 gsSet.add(globalSettingsRepository.save(globalSettings));
             }
         }
+        log.info("--- Возвращен список настроек: " + gsSet.toString());
         return gsSet;
     }
 

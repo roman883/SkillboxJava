@@ -7,9 +7,9 @@ public class ResponseLogin implements ResponseApi {
     private boolean result;
     private ResponseLoginUserApi user;
 
-    public ResponseLogin(User user) {
+    public ResponseLogin(User user, int moderationCount) {
         result = true;
-        this.user = new ResponseLoginUserApi(user);
+        this.user = new ResponseLoginUserApi(user, moderationCount);
     }
 
     public boolean getResult() {
@@ -38,13 +38,14 @@ public class ResponseLogin implements ResponseApi {
         private int moderationCount;
         private boolean settings;
 
-        private ResponseLoginUserApi(User user) {
+        private ResponseLoginUserApi(User user, int moderationCount) {
             id = user.getId();
             name = user.getName();
             photo = user.getPhoto();
             email = user.getEmail();
             moderation = user.isModerator();
-            moderationCount = user.getPostsModerated().size();
+//            moderationCount = user.getPostsModerated().size(); // Меняем на общее количество постов, требующих модерации
+            this.moderationCount = moderationCount;
             settings = user.isModerator();
         }
 

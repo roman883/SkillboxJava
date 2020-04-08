@@ -1,9 +1,15 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import main.services.interfaces.GlobalSettingsRepositoryService;
+
 public class SetGlobalSettingsRequest implements RequestApi {
 
+    @JsonProperty(GlobalSettingsRepositoryService.MULTIUSER_MODE)
     private Boolean MULTIUSER_MODE = null;
+    @JsonProperty(GlobalSettingsRepositoryService.POST_PREMODERATION)
     private Boolean POST_PREMODERATION = null;
+    @JsonProperty(GlobalSettingsRepositoryService.STATISTICS_IS_PUBLIC)
     private Boolean STATISTICS_IS_PUBLIC = null;
 
     public SetGlobalSettingsRequest() {

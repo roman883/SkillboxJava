@@ -8,6 +8,14 @@ public class ResponsePostsCalendar implements ResponseApi {
     private List<Integer> years;
     private HashMap<String, Integer> posts;
 
+    @Override
+    public String toString() {
+        return "ResponsePostsCalendar{" +
+                "years=" + years +
+                ", posts=" + posts +
+                '}';
+    }
+
     public ResponsePostsCalendar(HashMap<Date, Integer> postsCountByDate, List<Integer> allYears) {
         years = new LinkedList<>(allYears);
         years.sort(new Comparator<Integer>() {
