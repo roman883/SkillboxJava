@@ -17,6 +17,14 @@ public class ResponseFailChangePass implements ResponseApi {
         result = false;
     }
 
+    @Override
+    public String toString() {
+        return "ResponseFailChangePass{" +
+                "result=" + result +
+                ", errors=" + errors +
+                '}';
+    }
+
     public boolean isResult() {
         return result;
     }

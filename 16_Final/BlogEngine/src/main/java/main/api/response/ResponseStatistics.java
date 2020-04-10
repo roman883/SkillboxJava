@@ -24,4 +24,11 @@ public class ResponseStatistics implements ResponseApi {
     public void setMap(Map<String, Object> map) {
         this.map = map;
     }
+
+    @Override
+    public String toString() {
+        return "ResponseStatistics{" +
+                "map=" + map +
+                '}';
+    }
 }

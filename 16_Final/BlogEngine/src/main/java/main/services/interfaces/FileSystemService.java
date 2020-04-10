@@ -3,6 +3,7 @@ package main.services.interfaces;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -20,5 +21,5 @@ public interface FileSystemService {
 
     void copyMultiPartFileToPath(MultipartFile source, Path dest);
 
-    File getFileByPath(String pathToFile);
+    File getFileByPath(String pathToFile) throws FileNotFoundException;
 }

@@ -1,5 +1,6 @@
 package main.services.Impl;
 
+import lombok.extern.slf4j.Slf4j;
 import main.api.response.ResponseApi;
 import main.api.response.ResponseTags;
 import main.model.entities.Tag;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class TagRepositoryServiceImpl implements TagRepositoryService {
 
@@ -30,21 +32,27 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
 
     @Override
     public Set<Tag> getAllTags() {
-        return new HashSet<>(tagRepository.findAll());
+        Set<Tag> res = new HashSet<>(tagRepository.findAll());
+        log.info("--- Получен сет тэгов размером:" + res.size() + "}");
+        return res;
     }
 
     @Override
     public Tag addTag(Tag tag) {
         if (tag == null) {
+            log.warn("--- Для добавления в репозиторий передан пустой тэг");
             return null;
         } else {
-            return tagRepository.save(tag);
+            Tag newTag = tagRepository.save(tag);
+            log.info("--- Добавлен тэг: {id:" + newTag.getId() + ", name:" + newTag.getName() + "}");
+            return newTag;
         }
     }
 
     @Override
     public void deleteTag(Tag tag) {
         tagRepository.delete(tag);
+        log.info("--- Удален тэг: " + tag.getName());
     }
 
     @Override
@@ -61,9 +69,14 @@ public class TagRepositoryServiceImpl implements TagRepositoryService {
                 Double weight = ((double) tagRepository.getTagCountByTagId(tag.getId()) / (double) mostFrequentTagCount);
                 queryTagsMap.put(tag.getName(), weight);
             }
-            return new ResponseEntity<>(new ResponseTags(queryTagsMap), HttpStatus.OK);
+            ResponseEntity<ResponseApi> response = new ResponseEntity<>(new ResponseTags(queryTagsMap), HttpStatus.OK);
+            log.info("--- Направляется ответ " + (response.getBody() == null ? "с пустым телом"
+                    : "с тегами: " + response.getBody().toString()));
+            return response;
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(null); // Тегов нет, запрос - ОК.
+            ResponseEntity<ResponseApi> response = ResponseEntity.status(HttpStatus.OK).body(null); // Тегов нет, запрос - ОК.
+            log.info("--- Теги отсутствуют");
+            return response;
         }
     }
 }

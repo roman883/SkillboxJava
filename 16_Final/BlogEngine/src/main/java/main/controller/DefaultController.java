@@ -21,12 +21,6 @@ import java.nio.file.Files;
 @Slf4j
 @Controller
 public class DefaultController {
-    @Value("${user.image.root_folder}")
-    private String rootPathToUploadAvatars;
-    @Value("${user.image.upload_folder}")
-    private String uploadFolder;
-    @Value("${user.image.avatars_folder}")
-    private String avatarsFolder;
 
     @Autowired
     FileSystemService fileSystemService;
@@ -48,86 +42,108 @@ public class DefaultController {
     // Можно ли в RequestMapping("/КАКОЙ-то ПУТЬ с переменными из YML/{path_variable}") использовать частично данный из yml а частично pathVariable
     @GetMapping("/posts/images/upload/avatars/{imageName}")
     public ResponseEntity<?> getAvatarImagePostsPath(@PathVariable("imageName") String imageName) {
-        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+//        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+
 //        StringBuilder builder = new StringBuilder(rootPathToUploadAvatars).append("/")
 //                .append(uploadFolder).append("/").append(avatarsFolder);
 //        String pathToFileFolder = builder.toString();
         String pathToFile = "images/upload/avatars/" + imageName;
+        return getResponseWithImage(pathToFile);
 //        if (imageName.startsWith(pathToFileFolder)) {
 //            pathToFile = "/images/upload/avatars/" + imageName;
 //        } else return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
-        try {
-            File imageFile = fileSystemService.getFileByPath(pathToFile);
-            byte[] image = Files.readAllBytes(imageFile.toPath());
-            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
-                    .body(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
-            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
-        }
+
+//        try {
+//            File imageFile = fileSystemService.getFileByPath(pathToFile);
+//            byte[] image = Files.readAllBytes(imageFile.toPath());
+//            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
+//                    .body(image);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+//            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
+//        }
     }
 
     @GetMapping("/images/upload/avatars/{imageName}")
     public ResponseEntity<?> getAvatarImage(@PathVariable("imageName") String imageName) {
-        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+//        log.info("--- Запрошен файл изображения: {" + imageName + "}");
         String pathToFile = "images/upload/avatars/" + imageName;
-        try {
-            File imageFile = fileSystemService.getFileByPath(pathToFile);
-            byte[] image = Files.readAllBytes(imageFile.toPath());
-            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
-                    .body(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
-            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
-        }
+        return getResponseWithImage(pathToFile);
+//        try {
+//            File imageFile = fileSystemService.getFileByPath(pathToFile);
+//            byte[] image = Files.readAllBytes(imageFile.toPath());
+//            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
+//                    .body(image);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+//            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
+//        }
     }
 
     @GetMapping("/my/images/upload/avatars/{imageName}")
     public ResponseEntity<?> getMyAvatarImage(@PathVariable("imageName") String imageName) {
-        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+//        log.info("--- Запрошен файл изображения: {" + imageName + "}");
         String pathToFile = "images/upload/avatars/" + imageName;
-        try {
-            File imageFile = fileSystemService.getFileByPath(pathToFile);
-            byte[] image = Files.readAllBytes(imageFile.toPath());
-            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
-                    .body(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
-            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
-        }
+        return getResponseWithImage(pathToFile);
+//        try {
+//            File imageFile = fileSystemService.getFileByPath(pathToFile);
+//            byte[] image = Files.readAllBytes(imageFile.toPath());
+//            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
+//                    .body(image);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+//            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
+//        }
     }
 
     @GetMapping("/images/upload/{imageName}")
     public ResponseEntity<?> getImage(@PathVariable("imageName") String imageName) {
-        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+//        log.info("--- Запрошен файл изображения: {" + imageName + "}");
         String pathToFile = "images/upload/" + imageName;
-        try {
-            File imageFile = fileSystemService.getFileByPath(pathToFile);
-            byte[] image = Files.readAllBytes(imageFile.toPath());
-            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
-                    .body(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
-            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
-        }
+        return getResponseWithImage(pathToFile);
+//        try {
+//            File imageFile = fileSystemService.getFileByPath(pathToFile);
+//            byte[] image = Files.readAllBytes(imageFile.toPath());
+//            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
+//                    .body(image);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+//            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
+//        }
     }
 
     @GetMapping("/post/images/upload/{imageName}")
     public ResponseEntity<?> getImageByPostsPath(@PathVariable("imageName") String imageName) {
-        log.info("--- Запрошен файл изображения: {" + imageName + "}");
+//        log.info("--- Запрошен файл изображения: {" + imageName + "}");
         String pathToFile = "images/upload/" + imageName;
+        return getResponseWithImage(pathToFile);
+//        try {
+//            File imageFile = fileSystemService.getFileByPath(pathToFile);
+//            byte[] image = Files.readAllBytes(imageFile.toPath());
+//            log.info("--- Получен файл изображения: {" + imageFile.getAbsolutePath() + "}");
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(imageFile)))
+//                    .body(image);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+//            return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
+//        }
+    }
+    private ResponseEntity<?> getResponseWithImage(String pathToFile) {
+        log.info("--- Запрошен файл изображения: {" + pathToFile + "}");
         try {
             File imageFile = fileSystemService.getFileByPath(pathToFile);
             byte[] image = Files.readAllBytes(imageFile.toPath());
@@ -137,7 +153,7 @@ public class DefaultController {
                     .body(image);
         } catch (IOException e) {
             e.printStackTrace();
-            log.info("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
+            log.warn("--- Не удалось получить файл изображения по пути: {" + pathToFile + "}");
             return ResponseEntity.badRequest().body("Файл по указанному пути отсутствует");
         }
     }
