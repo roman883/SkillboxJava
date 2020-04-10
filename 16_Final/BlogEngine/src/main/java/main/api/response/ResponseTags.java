@@ -17,6 +17,13 @@ public class ResponseTags implements ResponseApi {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ResponseTags{" +
+                "tags=" + tags +
+                '}';
+    }
+
     public List<ResponseTagApi> getTags() {
         return tags;
     }
@@ -33,6 +40,14 @@ public class ResponseTags implements ResponseApi {
         private ResponseTagApi(String name, double weight) {
             this.name = name;
             this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return "ResponseTagApi{" +
+                    "name='" + name + '\'' +
+                    ", weight=" + weight +
+                    '}';
         }
 
         public String getName() {

@@ -597,7 +597,7 @@ public class PostRepositoryServiceImpl implements PostRepositoryService {
             return result;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            log.info("--- Не удалось получить хэш-строку по алгоритму: " + hashingAlgorithm + " из строки {" + stringToHash + "}");
+            log.warn("--- Не удалось получить хэш-строку по алгоритму: " + hashingAlgorithm + " из строки {" + stringToHash + "}");
             return null;
         }
     }

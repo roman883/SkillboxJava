@@ -157,11 +157,16 @@ public class FileSystemServiceImpl implements FileSystemService {
     }
 
     @Override
-    public File getFileByPath(String pathToFile) {
-        File file = new File(pathToFile);
-        log.info("--- Получен файл по пути: {" +
-                pathToFile + "}"
-        );
-        return file;
+    public File getFileByPath(String pathToFile) throws FileNotFoundException {
+        if (Files.exists(Path.of(pathToFile))) {
+            File file = new File(pathToFile);
+            log.info("--- Получен файл по пути: {" +
+                    pathToFile + "}"
+            );
+            return file;
+        } else {
+            log.error("--- Не удалось найти файл: " + pathToFile);
+            throw new FileNotFoundException("По указанному пути отсутствует файл");
+        }
     }
 }
