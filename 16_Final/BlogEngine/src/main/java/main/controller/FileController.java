@@ -26,22 +26,30 @@ public class FileController {
     @GetMapping({"/**/images/upload/avatars/{imageName}"})
     public ResponseEntity<?> getAvatar(@PathVariable("imageName") String imageName) {
         String pathToFile = "images/upload/avatars/" + imageName;
+        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathToFile);
         return getResponseWithImage(pathToFile);
     }
 
     // Картинки к постам
-    @GetMapping({"/**/images/upload/{subDir1}/{subDir2}/{subDir3}/{imageName}"})
-    public ResponseEntity<?> getImage(@PathVariable("imageName") String imageName,
-                                      @PathVariable("subDir1") String subDir1,
-                                      @PathVariable("subDir2") String subDir2,
-                                      @PathVariable("subDir3") String subDir3) {
-        String pathToFile = "images/upload/" + subDir1 + "/" + subDir2 + "/" + subDir3 + "/" + imageName;
+    @GetMapping({"/**/images/upload/{subDir1}/{subDir2}/{subDir3}/{imageName}",
+            "/**/images/upload/{imageName}"})
+    public ResponseEntity<?> getImage(@PathVariable(value = "imageName", required = true) String imageName,
+                                      @PathVariable(value = "subDir1", required = false) String subDir1,
+                                      @PathVariable(value = "subDir2", required = false) String subDir2,
+                                      @PathVariable(value = "subDir3", required = false) String subDir3) {
+        String pathToFile = "images/upload/" +
+                (subDir1 != null ? subDir1 + "/" : "") +
+                (subDir2 != null ? subDir2 + "/" : "") +
+                (subDir3 != null ? subDir3 + "/" : "")
+                + imageName;
+        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathToFile);
         return getResponseWithImage(pathToFile);
     }
 
     @GetMapping("/{fileName}") // Изначально только для favicon
     public ResponseEntity<?> getFileFromTemplatesFolder(@PathVariable("fileName") String fileName) {
         String pathName = "src/main/resources/templates/" + fileName;
+        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathName);
         return getResponseWithImage(pathName);
     }
 

@@ -54,26 +54,32 @@ public class DefaultControllerIntegrationGetFilesTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
     }
+
     @Test
     public void testGetAvatarImage_ValidPath() throws Exception {
         executeMockTests(URL_TO_IMAGE_GET_AVATAR_IMAGE, PATH_TO_STORE_AVATARS);
     }
+
     @Test
     public void testGetAvatarImagePostsPath_ValidPath() throws Exception {
-       executeMockTests(URL_TO_IMAGE_GET_AVATAR_IMAGE_POSTS_PATH, PATH_TO_STORE_AVATARS);
+        executeMockTests(URL_TO_IMAGE_GET_AVATAR_IMAGE_POSTS_PATH, PATH_TO_STORE_AVATARS);
     }
+
     @Test
     public void testGetMyAvatarImage_ValidPath() throws Exception {
         executeMockTests(URL_TO_GET_MY_AVATAR_IMAGE, PATH_TO_STORE_AVATARS);
     }
+
     @Test
     public void testGetImage_ValidPath() throws Exception {
         executeMockTests(URL_TO_GET_IMAGE, PATH_TO_STORE_IMAGES);
     }
+
     @Test
     public void testGetImageByPostPath_ValidPath() throws Exception {
-        executeMockTests(URL_TO_GET_IMAGE_BY_POST_PATH,  PATH_TO_STORE_IMAGES);
+        executeMockTests(URL_TO_GET_IMAGE_BY_POST_PATH, PATH_TO_STORE_IMAGES);
     }
+
     @Test
     public void testGetImage_WrongPath() throws Exception {
         Files.deleteIfExists(Paths.get(PATH_TO_STORE_AVATARS + "/" + TEMP_FILE_NAME));
@@ -83,14 +89,18 @@ public class DefaultControllerIntegrationGetFilesTest {
                         + PLACEHOLDER_IMAGENAME, TEMP_FILE_NAME)
                         .accept(MediaType.IMAGE_JPEG)).andReturn();
         int status = result.getResponse().getStatus();
-        assertEquals("Incorrect Response Status", HttpStatus.BAD_REQUEST.value(), status);
-        assertEquals("Incorrect Response Body", "Файл по указанному пути отсутствует",
-                result.getResponse().getContentAsString());
+        assertEquals("Incorrect Response Status", HttpStatus.NOT_FOUND.value(), status);
     }
 
-    private File createAndGetFile(String path) throws IOException {
+    private File createAndGetFileByPath(String path) throws IOException {
         Files.deleteIfExists(Path.of(path));
         return Files.createFile(Path.of(path)).toFile();
+    }
+
+    private void createDirectoryByPath(String pathToDir) throws IOException {
+        if (!Files.exists(Path.of(pathToDir))) {
+            Files.createDirectories(Paths.get(pathToDir));
+        }
     }
 
     private void cleanUpFiles(File... files) throws IOException {
@@ -100,11 +110,14 @@ public class DefaultControllerIntegrationGetFilesTest {
     }
 
     private void executeMockTests(String urlForGetRequest, String pathToStore) throws Exception {
+        System.err.println("GET URL " + urlForGetRequest);
+        System.err.println("URL TO GET FILE " + urlForGetRequest + "result-" + TEMP_FILE_NAME);
         // Создаем пустой результирующий файл
-        File resultImageFile = createAndGetFile(pathToStore + "/" + "result-" + TEMP_FILE_NAME);
+        createDirectoryByPath(pathToStore);
+        File resultImageFile = createAndGetFileByPath(pathToStore + "/" + "result-" + TEMP_FILE_NAME);
         // Временный исходный файл, копируеv его туда, откуда получаем позже по тестовому GET запросу
         File sourceFile = new File(PATH_TO_SOURCE_IMAGE);
-        File fileToGet = createAndGetFile(pathToStore + "/" + TEMP_FILE_NAME);
+        File fileToGet = createAndGetFileByPath(pathToStore + "/" + TEMP_FILE_NAME);
         Files.copy(sourceFile.toPath(), fileToGet.toPath(), StandardCopyOption.REPLACE_EXISTING);
         // Execute
         MvcResult result = mockMvc.perform(

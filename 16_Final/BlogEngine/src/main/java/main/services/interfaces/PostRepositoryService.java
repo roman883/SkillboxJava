@@ -25,8 +25,8 @@ public interface PostRepositoryService {
 
     ResponseEntity<ResponseApi> getMyPosts(String status, int offset, int limit, HttpSession session);
 
-    ResponseEntity<ResponseApi> post(AddPostRequest addPostRequest,
-                                     HttpSession session) throws ParseException;
+    ResponseEntity<ResponseApi> addNewPost(AddPostRequest addPostRequest,
+                                           HttpSession session) throws ParseException;
 
     ResponseEntity<?> uploadImage(MultipartFile image, HttpSession session) throws IOException;
 

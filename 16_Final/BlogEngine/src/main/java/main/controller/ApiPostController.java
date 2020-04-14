@@ -123,7 +123,7 @@ public class ApiPostController {
                 "isActive:" + addPostRequest.getActive() + "," +
                 "tags:" + addPostRequest.getTags()
                 + "}");
-        return postRepoService.post(addPostRequest, request.getSession());
+        return postRepoService.addNewPost(addPostRequest, request.getSession());
     }
 
     @PutMapping(value = "/api/post/{id}")

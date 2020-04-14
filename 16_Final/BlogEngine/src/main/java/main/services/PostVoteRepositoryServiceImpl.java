@@ -41,7 +41,8 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
         return setPostVote(postVoteRequest, session, false);
     }
 
-    private ResponseEntity<ResponseApi> setPostVote(PostVoteRequest postVoteRequest, HttpSession session, boolean isLike) {
+    private ResponseEntity<ResponseApi> setPostVote(PostVoteRequest postVoteRequest,
+                                                    HttpSession session, boolean isLike) {
         int postId = postVoteRequest.getPostId();
 
         User user = userRepositoryService.getUserBySession(session);
@@ -50,7 +51,6 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Пользователь не авторизован"),
                     HttpStatus.BAD_REQUEST);
-//                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         ResponseEntity<ResponseApi> response =
                 new ResponseEntity<>(new BooleanResponse(false), HttpStatus.BAD_REQUEST);
@@ -60,7 +60,6 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Пост не найден"),
                     HttpStatus.BAD_REQUEST);
-//            return response;
         }
         // проверяем лайкал/дизлайкал ли юзер ранее этот пост
         PostVote beforeLike = postVoteRepository.getPostVoteByUserIdAndPostId(postId, user.getId());
@@ -78,7 +77,6 @@ public class PostVoteRepositoryServiceImpl implements PostVoteRepositoryService 
             response = new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Повторный лайк/дизлайк"),
                     HttpStatus.BAD_REQUEST);
-//                    new ResponseEntity<>(new BooleanResponse(false), HttpStatus.BAD_REQUEST);
         }
         else if (beforeLike.getValue() == (isLike ? -1 : 1))
         { // ранее был противоположный postVote, удаляем

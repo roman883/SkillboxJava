@@ -48,8 +48,6 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Не заданы родительский пост и комментарий"),
                     HttpStatus.BAD_REQUEST);
-//                    new ResponseEntity<>(new BadRequestMsgResponse("Не заданы родительский пост и комментарий"),
-//                    HttpStatus.BAD_REQUEST);
         }
 
         String text = addCommentRequest.getText();
@@ -58,11 +56,8 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
                     + " символов) или превышает максимальный размер (" + maxCommentLength + " символов)";
             log.warn("--- " + message);
             return new ResponseEntity<>(
-                    new BadRequestMsgWithErrorsResponse(message),
-                    HttpStatus.BAD_REQUEST);
-//                    new ResponseEntity<>(new FailAddCommentResponse(message), HttpStatus.BAD_REQUEST);
-        } // Если все ок, создаем комментарий и возвращаем id
-
+                    new BadRequestMsgWithErrorsResponse(message), HttpStatus.BAD_REQUEST);
+        }
         PostComment parentComment = null;
         Post parentPost = null;
         if (parentId != null) {
@@ -77,7 +72,6 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Не найдены родительский пост и комментарий"),
                     HttpStatus.BAD_REQUEST);
-//                    new ResponseEntity<>(new BadRequestMsgResponse("Не найдены родительский пост и комментарий"), HttpStatus.BAD_REQUEST);
         }
 
         User user = userRepoService.getUserBySession(session);
@@ -86,14 +80,12 @@ public class PostCommentRepositoryServiceImpl implements PostCommentRepositorySe
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Пользователь не авторизован"),
                     HttpStatus.BAD_REQUEST);
-//                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!user.isModerator() && !isMultiuserMode())
             return new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Для добавления комментария требуется включить " +
                             "многопользовательский режим и/или требуются права модератора"),
                     HttpStatus.BAD_REQUEST);
-//                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Требуются права модератора или мультиюзер
 
         PostComment newComment = postCommentRepository.save(
                 new PostComment(parentComment, user, parentPost, LocalDateTime.now(), text));

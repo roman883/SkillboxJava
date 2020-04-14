@@ -57,8 +57,6 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             ResponseEntity<ResponseApi> response = new ResponseEntity<>(
                     new BadRequestMsgWithErrorsResponse("Не переданы параметры настроек"),
                     HttpStatus.BAD_REQUEST);
-//            ResponseEntity<ResponseApi> response = new ResponseEntity<>(
-//                    new BadRequestMsgResponse("Не переданы параметры настроек"), HttpStatus.BAD_REQUEST);
             log.warn("--- Не заданы параметры настроек");
             return response;
         }
@@ -69,7 +67,6 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             return new ResponseEntity<ResponseApi>(
                     new BadRequestMsgWithErrorsResponse("Пользователь не авторизован"),
                     HttpStatus.BAD_REQUEST);
-//                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!user.isModerator()) {
             log.info("--- Для данного действия пользователю " + user.getId() + ":"
@@ -77,7 +74,6 @@ public class GlobalSettingsRepositoryServiceImpl implements GlobalSettingsReposi
             return new ResponseEntity<ResponseApi>(
                     new BadRequestMsgWithErrorsResponse("Для данного действия требуются права модератора"),
                     HttpStatus.BAD_REQUEST);
-//                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Недостаточно прав
         }
         // Устанавливаем новые настройки и получаем результат
         HashSet<GlobalSettings> settings = getAllGlobalSettingsSet();
