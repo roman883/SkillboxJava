@@ -4,7 +4,6 @@ import main.model.ModerationStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +20,6 @@ public class Post implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    // http://tomee.apache.org/examples-trunk/jpa-enumerated/
     @Column(name = "moderation_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ModerationStatus moderationStatus = ModerationStatus.NEW; // По умолчанию NEW
@@ -31,7 +29,7 @@ public class Post implements Serializable {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;     // автор поста
+    private User user;
 
     @Column(name = "time", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime time;
@@ -54,20 +52,11 @@ public class Post implements Serializable {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TagToPost> tagsToPostsSet = new HashSet<TagToPost>();
 
-    // Hibernate requires no-args constructor
-    public Post() {}
-
-    public Post(boolean isActive, ModerationStatus moderationStatus, User user, LocalDateTime time, String title, String text, Set<TagToPost> tagsToPostsSet) {
-        this.isActive = isActive;
-        this.moderationStatus = moderationStatus;
-        this.user = user;
-        this.time = time;
-        this.title = title;
-        this.text = text;
-        this.tagsToPostsSet = tagsToPostsSet;
+    public Post() {
     }
 
-    public Post(boolean isActive, ModerationStatus moderationStatus, User user, LocalDateTime time, String title, String text) {
+    public Post(boolean isActive, ModerationStatus moderationStatus,
+                User user, LocalDateTime time, String title, String text) {
         this.isActive = isActive;
         this.moderationStatus = moderationStatus;
         this.user = user;
@@ -76,7 +65,6 @@ public class Post implements Serializable {
         this.text = text;
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }

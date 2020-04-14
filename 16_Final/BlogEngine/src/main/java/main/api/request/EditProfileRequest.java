@@ -6,26 +6,16 @@ public class EditProfileRequest implements RequestApi {
     private String name;
     private String email;
     private String password;
-//    private String captcha;
-//    private String captcha_secret;
 
     public EditProfileRequest() {
     }
 
-    public EditProfileRequest(Byte removePhoto, String name, String email, String password
-//            ,String captcha, String captcha_secret
-    ) {
+    public EditProfileRequest(Byte removePhoto, String name, String email, String password) {
         this.removePhoto = removePhoto;
         this.name = name;
         this.email = email;
         this.password = password;
-//        this.captcha = captcha;
-//        this.captcha_secret = captcha_secret;
     }
-
-//    public String getCaptcha_secret() {
-//        return captcha_secret;
-//    }
 
     public Byte getRemovePhoto() {
         return removePhoto;
@@ -59,19 +49,4 @@ public class EditProfileRequest implements RequestApi {
         this.password = password;
     }
 
-//    public String getCaptcha() {
-//        return captcha;
-//    }
-//
-//    public void setCaptcha(String captcha) {
-//        this.captcha = captcha;
-//    }
-//
-//    public String getCaptchaSecret() {
-//        return captcha_secret;
-//    }
-//
-//    public void setCaptcha_secret(String captcha_secret) {
-//        this.captcha_secret = captcha_secret;
-//    }
 }

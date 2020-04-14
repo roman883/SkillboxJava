@@ -1,21 +1,23 @@
 package main.api.request;
 
-public class PostVoteRequest implements RequestApi {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private int post_id;
+public class PostVoteRequest implements RequestApi {
+    @JsonProperty("post_id")
+    private int postId;
 
     public PostVoteRequest() {
     }
 
-    public PostVoteRequest(int post_id) {
-        this.post_id = post_id;
+    public PostVoteRequest(int postId) {
+        this.postId = postId;
     }
 
     public int getPostId() {
-        return post_id;
+        return postId;
     }
 
-    public void setPost_id(int post_id) {
-        this.post_id = post_id;
+    public void setPostId(int postId) {
+        this.postId = postId;
     }
 }

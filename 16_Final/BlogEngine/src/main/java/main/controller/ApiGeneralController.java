@@ -43,7 +43,7 @@ public class ApiGeneralController {
 
     @PostMapping(value = "/api/image")
     public ResponseEntity<?> uploadImage(@RequestParam MultipartFile image,
-                                              HttpServletRequest request) {
+                                         HttpServletRequest request) {
         log.info("--- Получен POST запрос на /api/image со следующими параметрами: {" +
                 "SessionID:" + request.getSession().getId() + "," +
                 "ImageFileName:" + image.getOriginalFilename() + "," +
@@ -119,7 +119,7 @@ public class ApiGeneralController {
 
     @PostMapping(value = "/api/profile/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseApi> editProfileWithPhoto(@ModelAttribute EditProfileWithPhotoRequest editProfileRequest,
-                                                   HttpServletRequest request) { //@RequestParam("photo") MultipartFile image
+                                                            HttpServletRequest request) { //@RequestParam("photo") MultipartFile image
         log.info("--- Получен POST запрос на /api/profile/my со следующими параметрами: {" +
                 "SessionID:" + request.getSession().getId() + "," +
                 "Email:" + editProfileRequest.getEmail() + "," +
@@ -149,15 +149,12 @@ public class ApiGeneralController {
     }
 
     @GetMapping(value = "/api/settings")
-    public ResponseEntity<?> getGlobalSettings(HttpServletRequest request) {
-        log.info("--- Получен GET запрос на /api/settings со следующими параметрами: {" +
-                "SessionID:" + request.getSession().getId()
-                + "}");
-        return globalSettingsRepoService.getGlobalSettings(request.getSession());
+    public ResponseEntity<?> getGlobalSettings() {
+        log.info("--- Получен GET запрос на /api/settings");
+        return globalSettingsRepoService.getGlobalSettings();
     }
 
     @PutMapping(value = "/api/settings")
-    //TODO как их устанавливать??
     public ResponseEntity<?> setGlobalSettings(@RequestBody SetGlobalSettingsRequest setGlobalSettingsRequest,
                                                HttpServletRequest request) {
         log.info("--- Получен PUT запрос на /api/settings со следующими параметрами: {" +

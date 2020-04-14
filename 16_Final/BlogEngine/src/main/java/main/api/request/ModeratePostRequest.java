@@ -1,12 +1,14 @@
 package main.api.request;
 
-public class ModeratePostRequest implements RequestApi {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private Integer post_id;
+public class ModeratePostRequest implements RequestApi {
+    @JsonProperty("post_id")
+    private Integer postId;
     private String decision;
 
-    public ModeratePostRequest(Integer post_id, String decision) {
-        this.post_id = post_id;
+    public ModeratePostRequest(Integer postId, String decision) {
+        this.postId = postId;
         this.decision = decision;
     }
 
@@ -14,11 +16,11 @@ public class ModeratePostRequest implements RequestApi {
     }
 
     public Integer getPostId() {
-        return post_id;
+        return postId;
     }
 
-    public void setPost_id(Integer post_id) {
-        this.post_id = post_id;
+    public void setPostId(Integer postId) {
+        this.postId = postId;
     }
 
     public String getDecision() {

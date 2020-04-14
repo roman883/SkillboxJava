@@ -4,11 +4,8 @@ import main.api.request.*;
 import main.api.response.ResponseApi;
 import main.model.entities.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public interface UserRepositoryService {
 
@@ -35,6 +32,5 @@ public interface UserRepositoryService {
 
     Integer getUserIdBySession(HttpSession session);
 
-    ArrayList<User> getAllUsersList();
-
+    User getUserBySession(HttpSession session);
 }

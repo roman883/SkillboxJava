@@ -2,7 +2,6 @@ package main.model.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,10 +24,11 @@ public class PostVote implements Serializable {
     @Column(nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime time;
 
-    @Column(nullable = false)  // скрыта или активна публикация: 0 или 1 //columnDefinition="TINYINT(1)"
-    private byte value;     //  value TINYINT NOT NULL - лайк или дизлайк: 1 или -1
+    @Column(nullable = false)
+    private byte value;     //  value - лайк или дизлайк: 1 или -1
 
-    public PostVote() {}
+    public PostVote() {
+    }
 
     public PostVote(User user, Post post, LocalDateTime timestamp, byte value) {
         this.user = user;
@@ -37,7 +37,6 @@ public class PostVote implements Serializable {
         this.value = value;
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }

@@ -11,9 +11,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MultipartException.class)
-    public String handleError1(MultipartException e, RedirectAttributes redirectAttributes) {
+    public String handleUploadedFileOversizeError(MultipartException e, RedirectAttributes redirectAttributes) {
         log.error("--- Загружаемый файл превышает максимальный возможный для загрузки размер", e);
-        redirectAttributes.addFlashAttribute("message", "Загружаемый файл превышает максимальный возможный для загрузки размер");
-        return "redirect://";
+        redirectAttributes.addFlashAttribute("message",
+                "Загружаемый файл превышает максимальный возможный для загрузки размер");
+        return "redirect:/";
     }
 }
