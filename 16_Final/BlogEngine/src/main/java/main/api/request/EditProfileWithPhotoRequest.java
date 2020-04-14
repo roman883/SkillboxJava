@@ -6,12 +6,9 @@ public class EditProfileWithPhotoRequest extends EditProfileRequest {
 
     private MultipartFile photo;
 
-    public EditProfileWithPhotoRequest(Byte removePhoto, String name, String email, String password
-//            ,String captcha, String captcha_secret
-            , MultipartFile photo) {
-        super(removePhoto, name, email, password
-//                , captcha, captcha_secret
-        );
+    public EditProfileWithPhotoRequest(Byte removePhoto, String name, String email,
+                                       String password, MultipartFile photo) {
+        super(removePhoto, name, email, password);
         this.photo = photo;
     }
 

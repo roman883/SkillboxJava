@@ -3,10 +3,8 @@ package main.model.repositories;
 import main.model.entities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -31,13 +29,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "LIMIT ?2 OFFSET ?1", nativeQuery = true)
     List<Post> getBestPosts(int offset, int limit);
 
-    // SELECT p.* FROM posts AS p JOIN (SELECT post_id, SUM(value) AS sum_values FROM post_votes GROUP BY post_id) AS sum_votes ON p.id=sum_votes.post_id ORDER BY sum_values DESC
-
-    // Посты по количеству просмотров
-//    @Query(value = "SELECT * FROM posts p WHERE p.is_active = 1 " +
-//            "AND p.moderation_status = 'ACCEPTED' " +
-//            "AND p.time < NOW() " +
-//            "ORDER BY p.view_count DESC LIMIT ?2 OFFSET ?1", nativeQuery = true)
     // Самые обсуждаемые (популярные) посты по комментам
     @Query(value = "SELECT p.* FROM posts AS p " +
             "LEFT JOIN (SELECT post_id, COUNT(post_id) AS post_counts " +
@@ -59,7 +50,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "SELECT count(id) AS count FROM posts", nativeQuery = true)
     int countAllPostsAtDatabase();
 
-    // Только доступные посты на сайте
+    // Все доступные посты на сайте
     @Query(value = "SELECT COUNT(filtered_posts.id) " +
             "FROM (SELECT * FROM posts p WHERE p.is_active = 1 " +
             "AND p.moderation_status = 'ACCEPTED' " +
@@ -124,7 +115,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "WHERE YEAR(p.time) = ?", nativeQuery = true)
     List<Post> getPostsByYear(int year);
 
-    // или такой запрос: SELECT YEAR(p.time) AS post_year FROM posts p GROUP BY post_year ORDER BY post_year DESC
     @Query(value = "SELECT DISTINCT YEAR(p.time) AS post_year " +
             "FROM posts p ORDER BY post_year DESC", nativeQuery = true)
     List<Integer> getYearsWithAnyPosts();

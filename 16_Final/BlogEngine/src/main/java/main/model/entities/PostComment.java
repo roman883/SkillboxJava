@@ -2,7 +2,6 @@ package main.model.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +36,8 @@ public class PostComment implements Serializable {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<PostComment> childPostComments = new HashSet<PostComment>();
 
-    public PostComment(PostComment parentComment, User user, Post parentPost, LocalDateTime time, String text) {
+    public PostComment(PostComment parentComment, User user,
+                       Post parentPost, LocalDateTime time, String text) {
         this.parent = parentComment;
         this.user = user;
         this.post = parentPost;
@@ -45,9 +45,8 @@ public class PostComment implements Serializable {
         this.text = text;
     }
 
-    public PostComment() {}
-
-    // Геттеры и сеттеры
+    public PostComment() {
+    }
 
     public int getId() {
         return id;

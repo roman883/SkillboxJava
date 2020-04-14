@@ -1,35 +1,37 @@
 package main.api.request;
 
-public class AddCommentRequest implements RequestApi {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private Integer parent_id;
-    //@JsonProperty("post_id") //TODO Заменить везде на Java формат
-    private Integer post_id;
+public class AddCommentRequest implements RequestApi {
+    @JsonProperty("parent_id")
+    private Integer parentId;
+    @JsonProperty("post_id")
+    private Integer postId;
     private String text;
 
     public AddCommentRequest() {
     }
 
-    public AddCommentRequest(Integer parent_id, Integer post_id, String text) {
-        this.parent_id = parent_id;
-        this.post_id = post_id;
+    public AddCommentRequest(Integer parentId, Integer postId, String text) {
+        this.parentId = parentId;
+        this.postId = postId;
         this.text = text;
     }
 
     public Integer getParentId() {
-        return parent_id;
+        return parentId;
     }
 
-    public void setParent_id(Integer parent_id) {
-        this.parent_id = parent_id;
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     public Integer getPostId() {
-        return post_id;
+        return postId;
     }
 
-    public void setPost_id(Integer post_id) {
-        this.post_id = post_id;
+    public void setPostId(Integer postId) {
+        this.postId = postId;
     }
 
     public String getText() {

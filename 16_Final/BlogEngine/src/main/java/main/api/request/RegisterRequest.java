@@ -1,33 +1,39 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
+
 import java.io.Serializable;
 
+@ToString
 public class RegisterRequest implements RequestApi, Serializable {
 
-    private String e_mail;
-//    private String name; // При регистрации не задается! Приравняем к E-mail
+    @JsonProperty("e_mail")
+    private String email;
     private String password;
     private String captcha;
-    private String captcha_secret;
+    private String name;
+    @JsonProperty("captcha_secret")
+    private String captchaSecret;
 
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String e_mail, String password, String captcha, String captcha_secret) {
-        this.e_mail = e_mail;
+    public RegisterRequest(String email, String password, String captcha, String captchaSecret, String name) {
+        this.email = email;
         this.password = password;
         this.captcha = captcha;
-        this.captcha_secret = captcha_secret;
+        this.captchaSecret = captchaSecret;
+        this.name = name;
     }
 
     public String getEmail() {
-        return e_mail;
+        return email;
     }
 
-    public void setE_mail(String e_mail) {
-        this.e_mail = e_mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
-
 
     public String getPassword() {
         return password;
@@ -46,10 +52,18 @@ public class RegisterRequest implements RequestApi, Serializable {
     }
 
     public String getCaptchaSecret() {
-        return captcha_secret;
+        return captchaSecret;
     }
 
-    public void setCaptcha_secret(String captcha_secret) {
-        this.captcha_secret = captcha_secret;
+    public void setCaptchaSecret(String captchaSecret) {
+        this.captchaSecret = captchaSecret;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

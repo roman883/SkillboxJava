@@ -1,20 +1,23 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ChangePasswordRequest implements RequestApi {
 
     private String code;
     private String password;
     private String captcha;
-    private String captcha_secret;
+    @JsonProperty("captcha_secret")
+    private String captchaSecret;
 
     public ChangePasswordRequest() {
     }
 
-    public ChangePasswordRequest(String code, String password, String captcha, String captcha_secret) {
+    public ChangePasswordRequest(String code, String password, String captcha, String captchaSecret) {
         this.code = code;
         this.password = password;
         this.captcha = captcha;
-        this.captcha_secret = captcha_secret;
+        this.captchaSecret = captchaSecret;
     }
 
     public String getCode() {
@@ -42,10 +45,10 @@ public class ChangePasswordRequest implements RequestApi {
     }
 
     public String getCaptchaSecret() {
-        return captcha_secret;
+        return captchaSecret;
     }
 
-    public void setCaptcha_secret(String captcha_secret) {
-        this.captcha_secret = captcha_secret;
+    public void setCaptchaSecret(String captchaSecret) {
+        this.captchaSecret = captchaSecret;
     }
 }

@@ -1,26 +1,28 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class LoginRequest implements RequestApi, Serializable {
-
-    private String e_mail; //TODO Заменить везде на Java формат
+    @JsonProperty("e_mail")
+    private String email;
     private String password;
 
     public LoginRequest() {
     }
 
-    public LoginRequest(String e_mail, String password) {
-        this.e_mail = e_mail;
+    public LoginRequest(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
     public String getEmail() {
-        return e_mail;
+        return email;
     }
 
-    public void setE_mail(String e_mail) {
-        this.e_mail = e_mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

@@ -20,13 +20,12 @@ public class Tag implements Serializable {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TagToPost> tagsToPostsSet = new HashSet<TagToPost>();
 
-    public Tag() {}
+    public Tag() {
+    }
 
     public Tag(String tagName) {
         name = tagName;
     }
-
-    // Геттеры и сеттеры
 
     public int getId() {
         return id;

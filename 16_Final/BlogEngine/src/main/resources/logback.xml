@@ -3,22 +3,15 @@
     <Property name="HOME-DIR" value="logs"/>
 
     <appender name="INFO-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-<!--        <file>${HOME_DIR}</file>-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${HOME-DIR}/archived/app.%d{yyyy-MM-dd}.%i.info.log.gz</fileNamePattern>
-            <!-- each archived file, size max 10MB, archived -->
             <maxFileSize>10MB</maxFileSize>
-            <!-- total size of all archive files, if total size > 150MB,
-				it will delete old archived file -->
             <totalSizeCap>150MB</totalSizeCap>
-            <!-- 60 days to keep -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
         <encoder>
-            <!--            %d %p %c{1.} [%t] %m%n-->
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
-        <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
@@ -39,7 +32,6 @@
         </filter>
     </appender>
 
-<!--    В консоль много выводится сообщений (уровень инфо)-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
@@ -49,8 +41,8 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
+
     </appender>
-<!--Make logging async-->
     <appender name="ASYNC-INFO-FILE" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="INFO-FILE" />
     </appender>

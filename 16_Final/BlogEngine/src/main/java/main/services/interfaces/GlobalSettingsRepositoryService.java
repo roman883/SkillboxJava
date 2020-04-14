@@ -16,7 +16,7 @@ public interface GlobalSettingsRepositoryService {
     String POST_PREMODERATION_NAME = "Премодерация постов";
     String STATISTICS_IS_PUBLIC_NAME = "Показывать всем статистику блога";
 
-    ResponseEntity<?> getGlobalSettings(HttpSession session);
+    ResponseEntity<?> getGlobalSettings();
 
     ResponseEntity<?> setGlobalSettings(SetGlobalSettingsRequest setGlobalSettingsRequest,
                                         HttpSession session);

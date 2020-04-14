@@ -1,10 +1,7 @@
 package main.model.entities;
 
-import lombok.RequiredArgsConstructor;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +36,8 @@ public class User implements Serializable {
     @Column(nullable = true, columnDefinition = "TEXT")
     private String photo;
 
-    public User(boolean isModerator, LocalDateTime registrationTime, String name, String email, String hashedPassword) {
+    public User(boolean isModerator, LocalDateTime registrationTime,
+                String name, String email, String hashedPassword) {
         this.isModerator = isModerator;
         this.registrationTime = registrationTime;
         this.name = name;
@@ -62,7 +60,6 @@ public class User implements Serializable {
     public User() {
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }

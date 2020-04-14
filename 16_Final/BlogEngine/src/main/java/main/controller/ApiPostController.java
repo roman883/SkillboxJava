@@ -1,7 +1,7 @@
 package main.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import main.api.request.PostRequest;
+import main.api.request.AddPostRequest;
 import main.api.request.PostVoteRequest;
 import main.api.response.ResponseApi;
 import main.services.interfaces.PostRepositoryService;
@@ -113,33 +113,33 @@ public class ApiPostController {
     }
 
     @PostMapping(value = "/api/post")
-    public ResponseEntity<ResponseApi> post(@RequestBody PostRequest postRequest,
+    public ResponseEntity<ResponseApi> post(@RequestBody AddPostRequest addPostRequest,
                                             HttpServletRequest request) throws ParseException {
         log.info("--- Получен POST запрос на /api/post со следующими параметрами: {" +
                 "sessionID:" + request.getSession().getId() + "," +
-                "title:" + postRequest.getTitle() + "," +
-                "text:" + postRequest.getText() + "," +
-                "time:" + postRequest.getTime() + "," +
-                "isActive:" + postRequest.getActive() + "," +
-                "tags:" + postRequest.getTags()
+                "title:" + addPostRequest.getTitle() + "," +
+                "text:" + addPostRequest.getText() + "," +
+                "time:" + addPostRequest.getTime() + "," +
+                "isActive:" + addPostRequest.getActive() + "," +
+                "tags:" + addPostRequest.getTags()
                 + "}");
-        return postRepoService.post(postRequest, request.getSession());
+        return postRepoService.addNewPost(addPostRequest, request.getSession());
     }
 
     @PutMapping(value = "/api/post/{id}")
     public ResponseEntity<ResponseApi> editPost(@PathVariable int id,
-                                                @RequestBody PostRequest postRequest,
+                                                @RequestBody AddPostRequest addPostRequest,
                                                 HttpServletRequest request) {
         log.info("--- Получен PUT запрос на /api/post/{id} со следующими параметрами: {" +
                 "id:" + id + "," +
                 "sessionID:" + request.getSession().getId() + "," +
-                "title:" + postRequest.getTitle() + "," +
-                "text:" + postRequest.getText() + "," +
-                "time:" + postRequest.getTime() + "," +
-                "isActive:" + postRequest.getActive() + "," +
-                "tags:" + postRequest.getTags()
+                "title:" + addPostRequest.getTitle() + "," +
+                "text:" + addPostRequest.getText() + "," +
+                "time:" + addPostRequest.getTime() + "," +
+                "isActive:" + addPostRequest.getActive() + "," +
+                "tags:" + addPostRequest.getTags()
                 + "}");
-        return postRepoService.editPost(id, postRequest, request.getSession());
+        return postRepoService.editPost(id, addPostRequest, request.getSession());
     }
 
     @PostMapping(value = "/api/post/like")

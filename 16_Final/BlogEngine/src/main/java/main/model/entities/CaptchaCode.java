@@ -2,7 +2,6 @@ package main.model.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,7 +27,8 @@ public class CaptchaCode implements Serializable {
         this.secretCode = secretCode;
     }
 
-    public CaptchaCode() {}
+    public CaptchaCode() {
+    }
 
     public int getId() {
         return id;
@@ -62,8 +62,3 @@ public class CaptchaCode implements Serializable {
         this.secretCode = secretCode;
     }
 }
-
-// id INT NOT NULL AUTO_INCREMENT
-//● time DATETIME NOT NULL - дата и время генерации кода капчи
-//● code TINYTEXT NOT NULL - код, отображаемый на картинкке капчи
-//● secret_code TINYTEXT NOT NULL - код, передаваемый в параметре

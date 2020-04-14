@@ -16,18 +16,17 @@ public class TagToPost implements Serializable {
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
-    @ManyToOne(cascade = CascadeType.PERSIST) //Каскад убрал, чтобы посты без тегов существовали
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    public TagToPost() {}
+    public TagToPost() {
+    }
 
     public TagToPost(Tag tag, Post post) {
         this.tag = tag;
         this.post = post;
     }
-
-    // Геттеры и сеттеры
 
     public int getId() {
         return id;
