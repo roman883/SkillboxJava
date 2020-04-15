@@ -24,7 +24,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: surkov.r.b
-    password:  #somepassword (application password generated for your google account)
+    password: #somepassword (application password generated for your google account)
     properties:
       mail:
         transport:
@@ -71,7 +71,7 @@ user:
     restore_key_length: 45
     restore_pass_message_string: "/login/change-password/"    # + передается код для восстановления
     restore_message_subject: "Ссылка для восстановление пароля"
-    validation_regex: ^.+{6,}$
+    validation_regex: "^.{6,}$"
     hashing_algorithm: MD5
   image:
     root_folder: images
@@ -84,7 +84,7 @@ user:
     validation_regex: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}"
 global_settings:
   default_values:   # items accept values "YES" or "NO"
-    multiuser_mode: "NO"
+    multiuser_mode: "YES"
     statistics_is_public: "YES"
     post_premoderation: "YES"
 general_data:

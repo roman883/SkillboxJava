@@ -110,8 +110,6 @@ public class DefaultControllerIntegrationGetFilesTest {
     }
 
     private void executeMockTests(String urlForGetRequest, String pathToStore) throws Exception {
-        System.err.println("GET URL " + urlForGetRequest);
-        System.err.println("URL TO GET FILE " + urlForGetRequest + "result-" + TEMP_FILE_NAME);
         // Создаем пустой результирующий файл
         createDirectoryByPath(pathToStore);
         File resultImageFile = createAndGetFileByPath(pathToStore + "/" + "result-" + TEMP_FILE_NAME);
