@@ -119,7 +119,7 @@ public class ApiGeneralController {
 
     @PostMapping(value = "/api/profile/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseApi> editProfileWithPhoto(@ModelAttribute EditProfileWithPhotoRequest editProfileRequest,
-                                                            HttpServletRequest request) { //@RequestParam("photo") MultipartFile image
+                                                            HttpServletRequest request) {
         log.info("--- Получен POST запрос на /api/profile/my со следующими параметрами: {" +
                 "SessionID:" + request.getSession().getId() + "," +
                 "Email:" + editProfileRequest.getEmail() + "," +

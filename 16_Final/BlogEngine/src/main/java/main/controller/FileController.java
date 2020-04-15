@@ -26,7 +26,6 @@ public class FileController {
     @GetMapping({"/**/images/upload/avatars/{imageName}"})
     public ResponseEntity<?> getAvatar(@PathVariable("imageName") String imageName) {
         String pathToFile = "images/upload/avatars/" + imageName;
-        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathToFile);
         return getResponseWithImage(pathToFile);
     }
 
@@ -42,14 +41,13 @@ public class FileController {
                 (subDir2 != null ? subDir2 + "/" : "") +
                 (subDir3 != null ? subDir3 + "/" : "")
                 + imageName;
-        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathToFile);
         return getResponseWithImage(pathToFile);
     }
 
-    @GetMapping("/{fileName}") // Изначально только для favicon
-    public ResponseEntity<?> getFileFromTemplatesFolder(@PathVariable("fileName") String fileName) {
-        String pathName = "src/main/resources/templates/" + fileName;
-        System.err.println("ПОЛУЧЕНИ ЗАПРОС pathToFile " + pathName);
+    @GetMapping("/{fileName}.{fileExt}") // Изначально только для favicon
+    public ResponseEntity<?> getFileFromTemplatesFolder(@PathVariable("fileName") String fileName,
+                                                        @PathVariable("fileExt") String fileExt) {
+        String pathName = "src/main/resources/templates/" + fileName + "." + fileExt;
         return getResponseWithImage(pathName);
     }
 
@@ -69,17 +67,3 @@ public class FileController {
         }
     }
 }
-
-// Временно, пути к изображениям, запрашиваемые с фронта:
-//
-//            "/post/images/upload/avatars/{imageName}",
-//            "/images/upload/avatars/{imageName}",
-//            "/my/images/upload/avatars/{imageName}",
-//            "/moderation/images/upload/avatars/{imageName}",
-//            "/edit/images/upload/avatars/{imageName}"
-
-//            "/post/images/upload/avatars/{imageName}",
-//            "/images/upload/avatars/{imageName}",
-//            "/my/images/upload/avatars/{imageName}",
-//            "/moderation/images/upload/avatars/{imageName}",
-//            "/edit/images/upload/avatars/{imageName}"
