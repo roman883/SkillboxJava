@@ -2,8 +2,8 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 #temp-folder
-images/
-logs/
+images/**
+logs/**
 
 # User-specific stuff
 .idea/**/workspace.xml
