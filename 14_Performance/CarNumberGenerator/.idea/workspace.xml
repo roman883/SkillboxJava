@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="dc9b9c81-4490-4706-bd79-31420047e9e7" name="Default" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="CarNumberGenerator" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Y632pZNmSFuoqeTZA0KR7pXuKA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571378817833" />
+    <property name="dynamic.classpath" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="recentsLimit" value="5" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\CarNumberGenerator\src" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\CarNumberGenerator\res" />
+      <recent name="C:\Users\Danya\Documents\Development\Idea Projects\CarNumberGenerator\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.GenerateWriteMultiThreads">
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet">
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GenerateWriteMultiThreads" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="GenerateWriteMultiThreads" />
+      <module name="CarNumberGenerator" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Generator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Generator" />
+      <module name="CarNumberGenerator" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LoaderThreads" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="LoaderThreads" />
+      <module name="CarNumberGenerator" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LoaderThreadsOptim" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="LoaderThreadsOptim" />
+      <module name="CarNumberGenerator" />
+      <option name="VM_PARAMETERS" value="-Xmx2048m" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="CarNumberGenerator" />
+      <option name="VM_PARAMETERS" value="-Xmx1024m" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file enabled="true" id="idea.log" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.LoaderThreads" />
+      <item itemvalue="Application.LoaderThreadsOptim" />
+      <item itemvalue="Application.Generator" />
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.GenerateWriteMultiThreads" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.GenerateWriteMultiThreads" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Generator" />
+        <item itemvalue="Application.LoaderThreadsOptim" />
+        <item itemvalue="Application.LoaderThreads" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="dc9b9c81-4490-4706-bd79-31420047e9e7" name="Default" comment="" />
+      <created>1455953172085</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1455953172085</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582421346413">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582421346413" />
+    <state x="488" y="74" key="#com.intellij.ide.util.MemberChooser" timestamp="1582419459388">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="488" y="74" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1582419459388" />
+    <state x="531" y="253" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1582416309849">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="531" y="253" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1366.728@0.0.1366.728" timestamp="1582416309849" />
+    <state x="716" y="224" key="#xdebugger.evaluate" timestamp="1582338248748">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="716" y="224" key="#xdebugger.evaluate/2.0.1918.1040@2.0.1918.1040" timestamp="1582338248748" />
+    <state width="430" height="466" key="DebuggerActiveHint" timestamp="1582338363105">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="430" height="466" key="DebuggerActiveHint/2.0.1918.1040@2.0.1918.1040" timestamp="1582338363105" />
+    <state width="1875" height="253" key="GridCell.Tab.0.bottom" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1582420532174" />
+    <state width="1875" height="253" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.center" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1582420532173" />
+    <state width="1875" height="253" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.left" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1582420532173" />
+    <state width="1875" height="253" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="253" key="GridCell.Tab.0.right" timestamp="1582434110986">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1323" height="179" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1582420532174" />
+    <state width="1875" height="253" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582434110986" />
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1582374811952">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811952" />
+    <state width="1875" height="348" key="GridCell.Tab.1.center" timestamp="1582374811951">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.center/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811951" />
+    <state width="1875" height="348" key="GridCell.Tab.1.left" timestamp="1582374811951">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.left/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811951" />
+    <state width="1875" height="348" key="GridCell.Tab.1.right" timestamp="1582374811952">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1582374811952" />
+    <state x="441" y="95" key="SettingsEditor" timestamp="1582360807670">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="441" y="95" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1582360807670" />
+    <state x="466" y="242" key="com.intellij.ide.util.TipDialog" timestamp="1582416284860">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="466" y="242" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1582416284860" />
+    <state x="657" y="345" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1582249018864" />
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1582360544467">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="624" y="225" width="672" height="678" key="search.everywhere.popup/2.0.1918.1040@2.0.1918.1040" timestamp="1582360544467" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="letters" />
+        <watch expression="((OutputStreamWriter)((BufferedWriter)printWriter.out).out).writeBuffer" language="JAVA" custom="java.io.OutputStreamWriter,java.io.BufferedWriter" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+</project>

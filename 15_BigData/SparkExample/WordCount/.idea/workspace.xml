@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ad72f125-6451-4f0b-a692-aeb98a76fa40" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="11" />
+  </component>
+  <component name="ProjectId" id="1YW2lodQsqf6cHd5I7ehQQaAxq8" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 15\WordCount\src\main\resources" />
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 15\WordCount\src" />
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 15\WordCount" />
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 15\WordCount\src\main" />
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Модуль 15\WordCount\data" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="WordCount" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ad72f125-6451-4f0b-a692-aeb98a76fa40" name="Default Changelist" comment="" />
+      <created>1583044182765</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1583044182765</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="161" y="181" key="#Project_Structure" timestamp="1583044361828">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="161" y="181" key="#Project_Structure/2.0.1918.1040@2.0.1918.1040" timestamp="1583044361828" />
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1583044540126">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="415" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1583044540126" />
+    <state x="691" y="304" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1583044600726">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="691" y="304" key="#com.intellij.ide.util.TreeClassChooserDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1583044600726" />
+    <state x="719" y="383" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1583046532949">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="719" y="383" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/2.0.1918.1040@2.0.1918.1040" timestamp="1583046532949" />
+    <state width="937" height="164" key="GridCell.Tab.0.bottom" timestamp="1583050968492">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="937" height="164" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1583050968492" />
+    <state width="937" height="164" key="GridCell.Tab.0.center" timestamp="1583050968492">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="937" height="164" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1583050968492" />
+    <state width="937" height="164" key="GridCell.Tab.0.left" timestamp="1583050968492">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="937" height="164" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1583050968492" />
+    <state width="937" height="164" key="GridCell.Tab.0.right" timestamp="1583050968492">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="937" height="164" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1583050968492" />
+    <state x="441" y="95" key="SettingsEditor" timestamp="1583050677402">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="441" y="95" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1583050677402" />
+  </component>
+</project>

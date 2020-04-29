@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="18: Algorithms: update Rabin-Karp algorithm. Added input parameter validation">
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/JavaMailConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/JavaMailConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/GeneralData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseGeneralData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseMyPosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponseMyPosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePost.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePost.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePostsForModeration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/api/response/ResponsePostsForModeration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiAuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiAuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiGeneralController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiGeneralController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiPostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/controller/ApiPostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/CaptchaRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/CaptchaRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/GeneralDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/GeneralDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostCommentRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostCommentRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/PostRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/UserRepositoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../16_Final/BlogEngine/src/main/java/main/services/Impl/UserRepositoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="JUnit4 Test Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>equal</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../.." value="dev" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="1ZQaHNKcTMluHcKHDXQFLVyKJ7y" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="true" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582543715733" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
+    <property name="create.test.in.the.same.root" value="true" />
+    <property name="last_opened_file_path" value="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar!/" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="bubble_sort" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="merge_sort" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\## Синхрон с гугл\SKILLBOX\Git\Gitlab\java_basics\18_Algorithms\Algorithms\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="Algorithms" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BubbleSortTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Algorithms" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="tests" />
+      <option name="MAIN_CLASS_NAME" value="tests.BubbleSortTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="JUnit.BubbleSortTest" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.BubbleSortTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c24eee5d-4ad3-40f0-a8be-df1c4f79f1bf" name="Default Changelist" comment="" />
+      <created>1581243506486</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1581243506486</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Merge branch 'master' of https://gitlab.skillbox.ru/surkov_roman/java_basics&#10;&#10;# Conflicts:&#10;#&#9;18_Algorithms/Algorithms/.idea/workspace.xml">
+      <created>1584918182617</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1584918182617</updated>
+    </task>
+    <task id="LOCAL-00002" summary="18: Algorithms: update Rabin-Karp algorithm. Added input parameter validation">
+      <created>1584959158261</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1584959158261</updated>
+    </task>
+    <task id="LOCAL-00003" summary="18: Algorithms: update Rabin-Karp algorithm. Added input parameter validation">
+      <created>1584969870366</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1584969870366</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="18: Algorithms: All home tasks have done" />
+    <MESSAGE value="Merge branch 'master' of https://gitlab.skillbox.ru/surkov_roman/java_basics&#10;&#10;# Conflicts:&#10;#&#9;18_Algorithms/Algorithms/.idea/workspace.xml" />
+    <MESSAGE value="18: Algorithms: update Rabin-Karp algorithm. Added input parameter validation" />
+    <option name="LAST_COMMIT_MESSAGE" value="18: Algorithms: update Rabin-Karp algorithm. Added input parameter validation" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="415" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584883021346">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="415" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1584883021346" />
+    <state x="159" y="25" width="1412" height="1011" key="CommitChangelistDialog2" timestamp="1584969981565">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="159" y="25" width="1412" height="1011" key="CommitChangelistDialog2/2.0.1918.1040@2.0.1918.1040" timestamp="1584969981565" />
+    <state x="598" y="261" key="FileChooserDialogImpl" timestamp="1584858659812">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="598" y="261" key="FileChooserDialogImpl/2.0.1918.1040@2.0.1918.1040" timestamp="1584858659812" />
+    <state width="1875" height="327" key="GridCell.Tab.0.bottom" timestamp="1584969984249">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1877" height="206" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
+    <state width="1875" height="327" key="GridCell.Tab.0.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1584969984249" />
+    <state width="1875" height="327" key="GridCell.Tab.0.center" timestamp="1584969984249">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1877" height="206" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
+    <state width="1875" height="327" key="GridCell.Tab.0.center/2.0.1918.1040@2.0.1918.1040" timestamp="1584969984249" />
+    <state width="1875" height="327" key="GridCell.Tab.0.left" timestamp="1584969984249">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1877" height="206" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
+    <state width="1875" height="327" key="GridCell.Tab.0.left/2.0.1918.1040@2.0.1918.1040" timestamp="1584969984249" />
+    <state width="1875" height="327" key="GridCell.Tab.0.right" timestamp="1584969984249">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1877" height="206" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1584775639496" />
+    <state width="1875" height="327" key="GridCell.Tab.0.right/2.0.1918.1040@2.0.1918.1040" timestamp="1584969984249" />
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom" timestamp="1584883113509">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.bottom/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
+    <state width="1875" height="348" key="GridCell.Tab.1.center" timestamp="1584883113509">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.center/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
+    <state width="1875" height="348" key="GridCell.Tab.1.left" timestamp="1584883113509">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.left/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
+    <state width="1875" height="348" key="GridCell.Tab.1.right" timestamp="1584883113509">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state width="1875" height="348" key="GridCell.Tab.1.right/2.0.1918.1040@2.0.1918.1040" timestamp="1584883113509" />
+    <state x="441" y="94" key="SettingsEditor" timestamp="1584858682009">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="441" y="94" key="SettingsEditor/2.0.1918.1040@2.0.1918.1040" timestamp="1584858682009" />
+    <state x="553" y="253" key="Vcs.Push.Dialog.v2" timestamp="1584918186676">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="553" y="253" key="Vcs.Push.Dialog.v2/2.0.1918.1040@2.0.1918.1040" timestamp="1584918186676" />
+    <state x="657" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1584917518300">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="657" y="344" key="com.intellij.ide.util.TipDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1584917518300" />
+    <state x="665" y="413" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1584858673720">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="665" y="413" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/2.0.1918.1040@2.0.1918.1040" timestamp="1584858673720" />
+    <state x="732" y="223" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1584858750821">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="732" y="223" key="com.intellij.testIntegration.createTest.CreateTestDialog/2.0.1918.1040@2.0.1918.1040" timestamp="1584858750821" />
+    <state x="617" y="240" key="run.anything.popup" timestamp="1584865159401">
+      <screen x="2" y="0" width="1918" height="1040" />
+    </state>
+    <state x="617" y="240" key="run.anything.popup/2.0.1918.1040@2.0.1918.1040" timestamp="1584865159401" />
+  </component>
+</project>
