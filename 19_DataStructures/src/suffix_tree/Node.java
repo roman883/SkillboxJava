@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Node
 {
+    // Just test
     private String fragment;
     private ArrayList<Integer> nextNodes;
     private int position;
